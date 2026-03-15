@@ -1,5 +1,5 @@
-export type EmploymentStatus = "active" | "inactive";
-export type NINVerificationStatus = "verified" | "pending" | "not_submitted";
+export type EmploymentStatus = 'active' | 'inactive';
+export type NINStatus = 'verified' | 'pending' | 'not_submitted';
 
 export interface PortalEmployee {
   id: number;
@@ -8,12 +8,13 @@ export interface PortalEmployee {
   first_name: string;
   last_name: string;
   email: string;
+  phone?: string;
   employee_number: string;
   department?: string;
   position?: string;
   date_of_birth: string;
   employment_status: EmploymentStatus;
-
+  
   // NIN Verification
   nin_verification?: {
     has_submitted_nin: boolean;
@@ -38,15 +39,14 @@ export interface PortalEmployee {
         lga: string;
         address: string;
       };
-      photo: string;
+      photo?: string;
       report_id: string;
     } | null;
   };
-
+  
   // Beneficiaries
   beneficiaries_count: number;
-  beneficiaries?: Beneficiary[];
-
+  
   // Timestamps
   created_at: string;
   updated_at?: string;
@@ -70,8 +70,13 @@ export interface CreateEmployeeData {
   last_name: string;
   email: string;
   date_of_birth: string;
+  phone?: string;
   department?: string;
   position?: string;
+}
+
+export interface UpdateEmployeeData extends Partial<CreateEmployeeData> {
+  employment_status?: EmploymentStatus;
 }
 
 export interface EmployeeFilters {
@@ -103,4 +108,12 @@ export interface PaginatedResponse<T> {
     from: number;
     to: number;
   };
+}
+
+export interface EmployeeStats {
+  total: number;
+  active: number;
+  inactive: number;
+  verified_nin: number;
+  pending_nin: number;
 }

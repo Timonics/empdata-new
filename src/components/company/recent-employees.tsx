@@ -1,20 +1,33 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Skeleton } from '@/components/ui/skeleton';
-import { ArrowRight, UserPlus } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useRecentEmployees } from '@/hooks/queries/usePortalDashboard';
-import { formatDistanceToNow } from 'date-fns';
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowRight, UserPlus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useRecentEmployees } from "@/hooks/queries/usePortalDashboard";
+import { formatDistanceToNow, isValid } from "date-fns";
 
 const statusStyles = {
-  verified: 'bg-green-100 text-green-800 border-green-200',
-  pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-  inactive: 'bg-gray-100 text-gray-800 border-gray-200',
+  verified: "bg-green-100 text-green-800 border-green-200",
+  pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  inactive: "bg-gray-100 text-gray-800 border-gray-200",
+};
+
+// Helper function to safely format date
+const formatDateSafely = (dateString: string | null | undefined) => {
+  if (!dateString) return "Date unknown";
+
+  try {
+    const date = new Date(dateString);
+    if (!isValid(date)) return "Date unknown";
+    return formatDistanceToNow(date, { addSuffix: true });
+  } catch (error) {
+    return "Date unknown";
+  }
 };
 
 export function RecentEmployees() {
@@ -49,11 +62,16 @@ export function RecentEmployees() {
           <CardTitle>Recent Employees</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-red-500">Failed to load recent employees</p>
+          <p className="text-sm text-red-500">
+            Failed to load recent employees
+          </p>
         </CardContent>
       </Card>
     );
   }
+
+  // Ensure employees is an array
+  const employeeList = Array.isArray(employees) ? employees : [];
 
   return (
     <Card>
@@ -68,7 +86,7 @@ export function RecentEmployees() {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {employees.map((employee) => (
+          {employeeList.map((employee) => (
             <div
               key={employee.id}
               className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
@@ -76,14 +94,21 @@ export function RecentEmployees() {
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10 border">
                   <AvatarFallback className="bg-blue-100 text-blue-600">
-                    {employee.first_name[0]}{employee.last_name[0]}
+                    {employee.first_name?.[0] || ""}
+                    {employee.last_name?.[0] || ""}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{employee.first_name} {employee.last_name}</p>
-                  <p className="text-xs text-muted-foreground">{employee.email}</p>
+                  <p className="font-medium">
+                    {employee.first_name || ""} {employee.last_name || ""}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {employee.email || ""}
+                  </p>
                   {employee.department && (
-                    <p className="text-xs text-muted-foreground mt-1">{employee.department}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {employee.department}
+                    </p>
                   )}
                 </div>
               </div>
@@ -92,19 +117,21 @@ export function RecentEmployees() {
                   variant="outline"
                   className={cn(
                     "font-medium",
-                    statusStyles[employee.status as keyof typeof statusStyles]
+                    statusStyles[
+                      employee.status as keyof typeof statusStyles
+                    ] || "bg-gray-100",
                   )}
                 >
-                  {employee.status}
+                  {employee.status || "unknown"}
                 </Badge>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {formatDistanceToNow(new Date(employee.joined_at), { addSuffix: true })}
+                  {formatDateSafely(employee.joined_at)}
                 </p>
               </div>
             </div>
           ))}
 
-          {employees.length === 0 && (
+          {employeeList.length === 0 && (
             <p className="text-center text-sm text-muted-foreground py-8">
               No employees found
             </p>

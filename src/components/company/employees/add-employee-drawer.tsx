@@ -4,15 +4,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
@@ -34,28 +28,22 @@ import {
   Phone,
   Calendar,
   Briefcase,
-  Hash,
   X,
   Save,
+  Loader2,
 } from "lucide-react";
+import { useCreateEmployee } from "@/hooks/queries/useEmployees";
+import { toast } from "sonner";
 
+// Update schema to match API requirements
 const employeeSchema = z.object({
-  firstName: z.string().min(2, "First name is required"),
-  lastName: z.string().min(2, "Last name is required"),
+  first_name: z.string().min(2, "First name is required"),
+  last_name: z.string().min(2, "Last name is required"),
   email: z.string().email("Valid email is required"),
-  phone: z.string().min(10, "Valid phone number is required"),
-  employeeId: z.string().min(2, "Employee ID is required"),
-  department: z.string().min(1, "Department is required"),
-  position: z.string().min(2, "Position is required"),
-  dateOfBirth: z.string().min(1, "Date of birth is required"),
-  dateJoined: z.string().min(1, "Date joined is required"),
-  gender: z.string().min(1, "Gender is required"),
-  address: z.string().min(5, "Address is required"),
-  city: z.string().min(2, "City is required"),
-  state: z.string().min(2, "State is required"),
-  emergencyName: z.string().min(2, "Emergency contact name is required"),
-  emergencyPhone: z.string().min(10, "Emergency phone is required"),
-  emergencyRelation: z.string().min(2, "Relationship is required"),
+  phone: z.string().min(10, "Valid phone number is required").optional(),
+  date_of_birth: z.string().min(1, "Date of birth is required"),
+  department: z.string().optional(),
+  position: z.string().optional(),
 });
 
 type EmployeeFormValues = z.infer<typeof employeeSchema>;
@@ -63,55 +51,48 @@ type EmployeeFormValues = z.infer<typeof employeeSchema>;
 interface AddEmployeeDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  companyId?: number; // Optional - for system admin use
 }
 
 export function AddEmployeeDrawer({
   open,
   onOpenChange,
+  companyId,
 }: AddEmployeeDrawerProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const createEmployee = useCreateEmployee();
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      first_name: "",
+      last_name: "",
       email: "",
       phone: "",
-      employeeId: "",
+      date_of_birth: "",
       department: "",
       position: "",
-      dateOfBirth: "",
-      dateJoined: "",
-      gender: "",
-      address: "",
-      city: "",
-      state: "",
-      emergencyName: "",
-      emergencyPhone: "",
-      emergencyRelation: "",
     },
   });
 
   const onSubmit = async (data: EmployeeFormValues) => {
-    setIsSubmitting(true);
     try {
-      // TODO: Implement API call
-      console.log("Adding employee:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const payload = companyId ? { ...data, company_id: companyId } : data;
+
+      await createEmployee.mutateAsync(payload);
+
       onOpenChange(false);
       form.reset();
+      toast.success("Employee created successfully");
     } catch (error) {
+      // Error is already handled by the hook
       console.error("Error adding employee:", error);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
-        {" "}
+        {/* Header */}
         <div className="sticky top-0 bg-linear-to-r from-emerald-600 to-emerald-800 text-white p-6 z-10">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-white text-xl">
@@ -122,6 +103,7 @@ export function AddEmployeeDrawer({
               size="icon"
               onClick={() => onOpenChange(false)}
               className="text-white hover:bg-white/20"
+              disabled={createEmployee.isPending}
             >
               <X className="h-5 w-5" />
             </Button>
@@ -130,6 +112,8 @@ export function AddEmployeeDrawer({
             Fill in the employee details below
           </p>
         </div>
+
+        {/* Form */}
         <div className="p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -139,17 +123,18 @@ export function AddEmployeeDrawer({
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="firstName"
+                    name="first_name"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>First Name</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                             <Input
                               className="pl-9"
                               placeholder="John"
                               {...field}
+                              disabled={createEmployee.isPending}
                             />
                           </div>
                         </FormControl>
@@ -160,17 +145,18 @@ export function AddEmployeeDrawer({
 
                   <FormField
                     control={form.control}
-                    name="lastName"
+                    name="last_name"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Last Name</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                             <Input
                               className="pl-9"
                               placeholder="Doe"
                               {...field}
+                              disabled={createEmployee.isPending}
                             />
                           </div>
                         </FormControl>
@@ -181,42 +167,21 @@ export function AddEmployeeDrawer({
 
                   <FormField
                     control={form.control}
-                    name="dateOfBirth"
+                    name="date_of_birth"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Date of Birth</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                            <Input className="pl-9" type="date" {...field} />
+                            <Calendar className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                            <Input
+                              className="pl-9"
+                              type="date"
+                              {...field}
+                              disabled={createEmployee.isPending}
+                            />
                           </div>
                         </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Gender</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select gender" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="Male">Male</SelectItem>
-                            <SelectItem value="Female">Female</SelectItem>
-                            <SelectItem value="Other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -230,34 +195,14 @@ export function AddEmployeeDrawer({
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="employeeId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Employee ID</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Hash className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                            <Input
-                              className="pl-9"
-                              placeholder="EMP-001"
-                              {...field}
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
                     name="department"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Department</FormLabel>
+                        <FormLabel>Department (Optional)</FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
+                          disabled={createEmployee.isPending}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -286,32 +231,16 @@ export function AddEmployeeDrawer({
                     name="position"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Position</FormLabel>
+                        <FormLabel>Position (Optional)</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <Briefcase className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <Briefcase className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                             <Input
                               className="pl-9"
                               placeholder="Software Engineer"
                               {...field}
+                              disabled={createEmployee.isPending}
                             />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="dateJoined"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Date Joined</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                            <Input className="pl-9" type="date" {...field} />
                           </div>
                         </FormControl>
                         <FormMessage />
@@ -333,12 +262,13 @@ export function AddEmployeeDrawer({
                         <FormLabel>Email</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                             <Input
                               className="pl-9"
                               type="email"
                               placeholder="john.doe@company.com"
                               {...field}
+                              disabled={createEmployee.isPending}
                             />
                           </div>
                         </FormControl>
@@ -352,58 +282,17 @@ export function AddEmployeeDrawer({
                     name="phone"
                     render={({ field }) => (
                       <FormItem className="col-span-2">
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel>Phone Number (Optional)</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                            <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                             <Input
                               className="pl-9"
                               placeholder="+234 801 234 5678"
                               {...field}
+                              disabled={createEmployee.isPending}
                             />
                           </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="address"
-                    render={({ field }) => (
-                      <FormItem className="col-span-2">
-                        <FormLabel>Street Address</FormLabel>
-                        <FormControl>
-                          <Input placeholder="123 Main Street" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="city"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>City</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Lagos" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="state"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>State</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Lagos State" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -412,55 +301,13 @@ export function AddEmployeeDrawer({
                 </div>
               </div>
 
-              {/* Emergency Contact */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Emergency Contact</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="emergencyName"
-                    render={({ field }) => (
-                      <FormItem className="col-span-2">
-                        <FormLabel>Full Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Jane Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="emergencyPhone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="+234 812 345 6789" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="emergencyRelation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Relationship</FormLabel>
-                        <FormControl>
-                          <Input
-                            placeholder="Spouse, Parent, etc."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+              {/* Note about employee status */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> The employee will be created with
+                  status "inactive". They will become active after setting their
+                  password.
+                </p>
               </div>
 
               {/* Form Actions */}
@@ -469,13 +316,18 @@ export function AddEmployeeDrawer({
                   type="button"
                   variant="outline"
                   onClick={() => onOpenChange(false)}
+                  disabled={createEmployee.isPending}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? (
+                <Button
+                  type="submit"
+                  disabled={createEmployee.isPending}
+                  className="bg-emerald-600 hover:bg-emerald-700"
+                >
+                  {createEmployee.isPending ? (
                     <>
-                      <div className="animate-spin mr-2 h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Adding...
                     </>
                   ) : (

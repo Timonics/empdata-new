@@ -1,7 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PortalEmployeeService } from '@/services/employee.service';
 import { toast } from 'sonner';
-import type { EmployeeFilters, CreateEmployeeData, SubmitNINData, BeneficiariesData } from '@/types/employee.types';
+import type { 
+  EmployeeFilters, 
+  CreateEmployeeData, 
+  UpdateEmployeeData,
+  SubmitNINData,
+  BeneficiariesData 
+} from '@/types/employee.types';
 
 export const employeeKeys = {
   all: ['portal-employees'] as const,
@@ -10,10 +16,11 @@ export const employeeKeys = {
   details: () => [...employeeKeys.all, 'detail'] as const,
   detail: (id: number) => [...employeeKeys.details(), id] as const,
   beneficiaries: (id: number) => [...employeeKeys.all, 'beneficiaries', id] as const,
+  stats: () => ['portal-employee-stats'] as const,
 };
 
 /**
- * Get employees list (for company dashboard)
+ * Get employees list with pagination and filters
  */
 export function useEmployees(filters?: EmployeeFilters) {
   return useQuery({
@@ -58,6 +65,7 @@ export function useCreateEmployee() {
       if (response.success) {
         toast.success('Employee created successfully');
         queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
+        queryClient.invalidateQueries({ queryKey: employeeKeys.stats() });
       } else {
         toast.error('Failed to create employee');
       }
@@ -75,13 +83,14 @@ export function useUpdateEmployee() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<CreateEmployeeData> }) =>
+    mutationFn: ({ id, data }: { id: number; data: UpdateEmployeeData }) =>
       PortalEmployeeService.updateEmployee(id, data),
     onSuccess: (response, variables) => {
       if (response.success) {
         toast.success('Employee updated successfully');
         queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
         queryClient.invalidateQueries({ queryKey: employeeKeys.detail(variables.id) });
+        queryClient.invalidateQueries({ queryKey: employeeKeys.stats() });
       } else {
         toast.error('Failed to update employee');
       }
@@ -104,8 +113,9 @@ export function useDeleteEmployee() {
       if (response.success) {
         toast.success('Employee deleted successfully');
         queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
+        queryClient.invalidateQueries({ queryKey: employeeKeys.stats() });
       } else {
-        toast.error('Failed to delete employee');
+        toast.error(response.message || 'Failed to delete employee');
       }
     },
     onError: (error: any) => {
@@ -127,6 +137,8 @@ export function useSubmitNIN() {
       if (response.success) {
         toast.success('NIN submitted successfully');
         queryClient.invalidateQueries({ queryKey: employeeKeys.detail(variables.id) });
+        queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
+        queryClient.invalidateQueries({ queryKey: employeeKeys.stats() });
       } else {
         toast.error('Failed to submit NIN');
       }
@@ -169,7 +181,7 @@ export function useSaveBeneficiaries() {
         queryClient.invalidateQueries({ queryKey: employeeKeys.beneficiaries(variables.id) });
         queryClient.invalidateQueries({ queryKey: employeeKeys.detail(variables.id) });
       } else {
-        toast.error('Failed to save beneficiaries');
+        toast.error(response.message || 'Failed to save beneficiaries');
       }
     },
     onError: (error: any) => {
@@ -204,5 +216,19 @@ export function useExportEmployees() {
     onError: (error: any) => {
       toast.error(error.message || 'Failed to export employees');
     },
+  });
+}
+
+/**
+ * Get employee statistics for dashboard
+ */
+export function useEmployeeStats() {
+  return useQuery({
+    queryKey: employeeKeys.stats(),
+    queryFn: async () => {
+      const stats = await PortalEmployeeService.getEmployeeStats();
+      return stats;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

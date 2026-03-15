@@ -2,14 +2,13 @@
 
 import { useState } from "react";
 import { CompanyEmployeesHeader } from "@/components/company/employees/company-employees-header";
-import { CompanyEmployeesStats } from "@/components/company/employees/company-employees-stats";
 import { CompanyEmployeesTable } from "@/components/company/employees/company-employees-table";
+import { CompanyEmployeesStats } from "@/components/company/employees/company-employees-stats";
 
 export default function CompanyEmployeesPage() {
   const [filters, setFilters] = useState({
     employment_status: "all",
     nin_verified: "all",
-    department: "all",
     search: "",
   });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,7 +40,7 @@ import { EditEmployeeDrawer } from "./edit-employee-drawer";
 import { DeleteEmployeeModal } from "./delete-employee-modal";
 import { useEmployees, useDeleteEmployee } from "@/hooks/queries/useEmployees";
 import { format } from "date-fns";
-import { EmployeeFilters } from "@/types/employee.types";
+import { EmploymentStatus } from "@/types/employee.types";
 
 const statusStyles = {
   active: "bg-green-100 text-green-800 border-green-200",
@@ -59,7 +59,6 @@ interface CompanyEmployeesTableProps {
   filters?: {
     employment_status?: string;
     nin_verified?: string;
-    department?: string;
     search?: string;
   };
 }
@@ -77,37 +76,25 @@ export function CompanyEmployeesTable({
   const [editEmployee, setEditEmployee] = useState<any | null>(null);
   const [deleteEmployee, setDeleteEmployee] = useState<any | null>(null);
 
-  // Memoize internal filters to prevent unnecessary re-renders
-  const internalFilters = useMemo(
-    () => ({
-      employment_status:
-        externalFilters.employment_status !== "all"
-          ? externalFilters.employment_status as EmployeeFilters["employment_status"]
-          : undefined,
-      nin_verified:
-        externalFilters.nin_verified !== "all"
-          ? externalFilters.nin_verified === "true"
-          : undefined,
-      department:
-        externalFilters.department !== "all"
-          ? externalFilters.department
-          : undefined,
-      search: externalFilters.search || "",
-    }),
-    [
-      externalFilters.employment_status,
-      externalFilters.nin_verified,
-      externalFilters.department,
-      externalFilters.search,
-    ],
-  );
+  // Memoize internal filters
+  const internalFilters = {
+    employment_status:
+      externalFilters.employment_status !== "all"
+        ? (externalFilters.employment_status as EmploymentStatus)
+        : undefined,
+    nin_verified:
+      externalFilters.nin_verified !== "all"
+        ? externalFilters.nin_verified === "true"
+        : undefined,
+    search: externalFilters.search || "",
+  };
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [internalFilters]);
+  }, [externalFilters]);
 
-  // Fetch real data
+  // Fetch data
   const { data, isLoading, refetch, isFetching } = useEmployees({
     ...internalFilters,
     page: currentPage,
@@ -119,7 +106,7 @@ export function CompanyEmployeesTable({
   const employees = data?.data || [];
   const pagination = data?.pagination;
 
-  // Notify parent of counts - use useEffect with proper dependencies
+  // Notify parent of counts
   useEffect(() => {
     if (pagination) {
       onCountsChange?.(pagination.total, employees.length);
@@ -131,33 +118,33 @@ export function CompanyEmployeesTable({
     onSelectionChange?.(selectedRows);
   }, [selectedRows, onSelectionChange]);
 
-  const toggleAllRows = useCallback(() => {
+  const toggleAllRows = () => {
     if (selectedRows.length === employees.length) {
       setSelectedRows([]);
     } else {
       setSelectedRows(employees.map((e: any) => e.id));
     }
-  }, [selectedRows.length, employees]);
+  };
 
-  const toggleRow = useCallback((id: number) => {
+  const toggleRow = (id: number) => {
     setSelectedRows((prev) =>
       prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id],
     );
-  }, []);
+  };
 
-  const handleView = useCallback((employee: any) => {
+  const handleView = (employee: any) => {
     setDetailsEmployee(employee);
-  }, []);
+  };
 
-  const handleEdit = useCallback((employee: any) => {
+  const handleEdit = (employee: any) => {
     setEditEmployee(employee);
-  }, []);
+  };
 
-  const handleDelete = useCallback((employee: any) => {
+  const handleDelete = (employee: any) => {
     setDeleteEmployee(employee);
-  }, []);
+  };
 
-  const handleConfirmDelete = useCallback(() => {
+  const handleConfirmDelete = () => {
     if (!deleteEmployee) return;
 
     deleteMutation.mutate(deleteEmployee.id, {
@@ -168,216 +155,196 @@ export function CompanyEmployeesTable({
         );
       },
     });
-  }, [deleteEmployee, deleteMutation]);
+  };
 
-  const handlePageChange = useCallback((page: number) => {
+  const handlePageChange = (page: number) => {
     setCurrentPage(page);
     setSelectedRows([]);
-  }, []);
+  };
 
-  const handlePageSizeChange = useCallback((size: string) => {
+  const handlePageSizeChange = (size: string) => {
     setPageSize(Number(size));
     setCurrentPage(1);
     setSelectedRows([]);
-  }, []);
+  };
 
-  const getNINStatusIcon = useCallback((employee: any) => {
+  const getNINStatusIcon = (employee: any) => {
     if (employee.nin_verification?.is_nin_verified) return ShieldCheck;
     if (employee.nin_verification?.has_submitted_nin) return Clock;
     return ShieldX;
-  }, []);
+  };
 
-  const getNINStatusColor = useCallback((employee: any) => {
+  const getNINStatusColor = (employee: any) => {
     if (employee.nin_verification?.is_nin_verified) return "text-green-600";
     if (employee.nin_verification?.has_submitted_nin) return "text-yellow-600";
     return "text-red-600";
-  }, []);
+  };
 
-  const getNINStatusText = useCallback((employee: any) => {
+  const getNINStatusText = (employee: any) => {
     if (employee.nin_verification?.is_nin_verified) return "Verified";
     if (employee.nin_verification?.has_submitted_nin) return "Pending";
     return "Not Submitted";
-  }, []);
+  };
 
-  const columns = useMemo(
-    () => [
-      {
-        header: (
-          <input
-            type="checkbox"
-            className="rounded border-gray-300"
-            checked={
-              employees.length > 0 && selectedRows.length === employees.length
-            }
-            onChange={toggleAllRows}
-          />
-        ),
-        cell: (item: any) => (
-          <input
-            type="checkbox"
-            className="rounded border-gray-300"
-            checked={selectedRows.includes(item.id)}
-            onChange={() => toggleRow(item.id)}
-          />
-        ),
-        className: "w-12",
-      },
-      {
-        header: "Employee",
-        cell: (item: any) => (
-          <div className="flex items-center gap-3">
-            <Avatar className="h-9 w-9 border">
-              <AvatarFallback className="bg-emerald-100 text-emerald-600">
-                {item.first_name?.[0]}
-                {item.last_name?.[0]}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="font-medium">
-                {item.first_name} {item.last_name}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {item.employee_number}
-              </p>
-            </div>
-          </div>
-        ),
-      },
-      {
-        header: "Contact",
-        cell: (item: any) => (
+  const columns = [
+    {
+      header: (
+        <input
+          type="checkbox"
+          className="rounded border-gray-300"
+          checked={
+            employees.length > 0 && selectedRows.length === employees.length
+          }
+          onChange={toggleAllRows}
+        />
+      ),
+      cell: (item: any) => (
+        <input
+          type="checkbox"
+          className="rounded border-gray-300"
+          checked={selectedRows.includes(item.id)}
+          onChange={() => toggleRow(item.id)}
+        />
+      ),
+      className: "w-12",
+    },
+    {
+      header: "Employee",
+      sortable: true,
+      cell: (item: any) => (
+        <div className="flex items-center gap-3">
+          <Avatar className="h-9 w-9 border">
+            <AvatarFallback className="bg-emerald-100 text-emerald-600">
+              {item.first_name?.[0]}
+              {item.last_name?.[0]}
+            </AvatarFallback>
+          </Avatar>
           <div>
-            <p className="text-sm">{item.email}</p>
-            <p className="text-xs text-muted-foreground">{item.phone}</p>
+            <p className="font-medium">
+              {item.first_name} {item.last_name}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {item.employee_number}
+            </p>
           </div>
-        ),
-      },
-      {
-        header: "Department",
-        cell: (item: any) => (
-          <span className="text-sm">{item.department || "N/A"}</span>
-        ),
-      },
-      {
-        header: "Position",
-        cell: (item: any) => (
-          <span className="text-sm">{item.position || "N/A"}</span>
-        ),
-      },
-      {
-        header: "Status",
-        cell: (item: any) => (
-          <Badge
-            variant="outline"
-            className={cn(
-              "font-medium",
-              statusStyles[
-                item.employment_status as keyof typeof statusStyles
-              ] || "bg-gray-100",
-            )}
-          >
-            {item.employment_status}
-          </Badge>
-        ),
-      },
-      {
-        header: "NIN",
-        cell: (item: any) => {
-          const Icon = getNINStatusIcon(item);
-          return (
-            <div className="flex items-center gap-2">
-              <Icon className={cn("h-4 w-4", getNINStatusColor(item))} />
-              <span className="text-sm">{getNINStatusText(item)}</span>
-            </div>
-          );
-        },
-      },
-      {
-        header: "Joined",
-        cell: (item: any) => (
-          <span className="text-sm text-muted-foreground">
-            {item.created_at
-              ? format(new Date(item.created_at), "MMM d, yyyy")
-              : "N/A"}
-          </span>
-        ),
-      },
-      {
-        header: "Beneficiaries",
-        cell: (item: any) => (
-          <span className="font-medium text-center block">
-            {item.beneficiaries_count || 0}
-          </span>
-        ),
-        className: "text-center",
-      },
-      {
-        header: "Actions",
-        cell: (item: any) => (
+        </div>
+      ),
+    },
+    {
+      header: "Contact",
+      cell: (item: any) => (
+        <div>
+          <p className="text-sm">{item.email}</p>
+          <p className="text-xs text-muted-foreground">{item.phone || "N/A"}</p>
+        </div>
+      ),
+    },
+    {
+      header: "Department",
+      cell: (item: any) => (
+        <span className="text-sm">{item.department || "N/A"}</span>
+      ),
+    },
+    {
+      header: "Position",
+      cell: (item: any) => (
+        <span className="text-sm">{item.position || "N/A"}</span>
+      ),
+    },
+    {
+      header: "Status",
+      sortable: true,
+      cell: (item: any) => (
+        <Badge
+          variant="outline"
+          className={cn(
+            "font-medium",
+            statusStyles[item.employment_status as keyof typeof statusStyles] ||
+              "bg-gray-100",
+          )}
+        >
+          {item.employment_status}
+        </Badge>
+      ),
+    },
+    {
+      header: "NIN",
+      cell: (item: any) => {
+        const Icon = getNINStatusIcon(item);
+        return (
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleView(item)}
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleEdit(item)}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <Mail className="mr-2 h-4 w-4" />
-                  Send Email
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Phone className="mr-2 h-4 w-4" />
-                  Call
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <UserCog className="mr-2 h-4 w-4" />
-                  Manage Access
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => handleDelete(item)}
-                  className="text-red-600"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Icon className={cn("h-4 w-4", getNINStatusColor(item))} />
+            <span className="text-sm">{getNINStatusText(item)}</span>
           </div>
-        ),
-        className: "w-32",
+        );
       },
-    ],
-    [
-      employees,
-      selectedRows,
-      toggleAllRows,
-      toggleRow,
-      handleView,
-      handleEdit,
-      handleDelete,
-      getNINStatusIcon,
-      getNINStatusColor,
-      getNINStatusText,
-    ],
-  );
+    },
+    {
+      header: "Joined",
+      sortable: true,
+      cell: (item: any) => (
+        <span className="text-sm text-muted-foreground">
+          {item.created_at
+            ? format(new Date(item.created_at), "MMM d, yyyy")
+            : "N/A"}
+        </span>
+      ),
+    },
+    {
+      header: "Beneficiaries",
+      cell: (item: any) => (
+        <span className="font-medium text-center block">
+          {item.beneficiaries_count || 0}
+        </span>
+      ),
+      className: "text-center",
+    },
+    {
+      header: "Actions",
+      cell: (item: any) => (
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={() => handleView(item)}>
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}>
+            <Edit className="h-4 w-4" />
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Mail className="mr-2 h-4 w-4" />
+                Send Email
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Phone className="mr-2 h-4 w-4" />
+                Call
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <UserCog className="mr-2 h-4 w-4" />
+                Manage Access
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={() => handleDelete(item)}
+                className="text-red-600"
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      ),
+      className: "w-32",
+    },
+  ];
 
   return (
     <div className="space-y-6">

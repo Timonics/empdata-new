@@ -6,39 +6,47 @@ export async function GET(request: Request) {
   try {
     const cookieStore = await cookies();
     // Try company token first, then employee token
-    const token = cookieStore.get("token_company")?.value || 
-                  cookieStore.get("token_employee")?.value;
+    const token =
+      cookieStore.get("token_company_admin")?.value ||
+      cookieStore.get("token_employee")?.value;
 
     if (!token) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
+
+    console.log(`Found token: ${token}`);
 
     const url = new URL(request.url);
     const queryString = url.searchParams.toString();
 
     const result = await callBackend({
       method: "GET",
-      path: `/portal/employees${queryString ? `?${queryString}` : ''}`,
-      authType: "company_admin", // Will be overridden by token
+      path: `/portal/employees${queryString ? `?${queryString}` : ""}`,
+      authType: "company_admin",
       token,
     });
+
+    console.log(`Result:`, JSON.stringify(result, null, 2));
 
     if (result.success) {
       return NextResponse.json(result);
     }
 
     return NextResponse.json(
-      { success: false, message: result.message || "Failed to fetch employees" },
-      { status: result.status || 400 }
+      {
+        success: false,
+        message: result.message || "Failed to fetch employees",
+      },
+      { status: result.status || 400 },
     );
   } catch (error) {
     console.error("Portal employees API error:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -51,7 +59,7 @@ export async function POST(request: Request) {
     if (!token) {
       return NextResponse.json(
         { success: false, message: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -70,14 +78,17 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(
-      { success: false, message: result.message || "Failed to create employee" },
-      { status: result.status || 400 }
+      {
+        success: false,
+        message: result.message || "Failed to create employee",
+      },
+      { status: result.status || 400 },
     );
   } catch (error) {
     console.error("Create employee API error:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -2,11 +2,13 @@ import { api } from "@/lib/axios";
 import type { 
   PortalEmployee, 
   CreateEmployeeData, 
+  UpdateEmployeeData,
   EmployeeFilters,
   SubmitNINData,
   BeneficiariesData,
-  PaginatedResponse, 
-  Beneficiary
+  Beneficiary,
+  PaginatedResponse,
+  EmployeeStats
 } from "@/types/employee.types";
 
 export class PortalEmployeeService {
@@ -59,7 +61,7 @@ export class PortalEmployeeService {
    * Update employee
    * PUT /api/portal/employees/{id}
    */
-  static async updateEmployee(id: number, data: Partial<CreateEmployeeData>) {
+  static async updateEmployee(id: number, data: UpdateEmployeeData) {
     const response = await api.put<{ success: boolean; data: PortalEmployee }>(
       `${this.BASE_PATH}/${id}`,
       data
@@ -112,17 +114,22 @@ export class PortalEmployeeService {
    * POST /api/portal/employees/{id}/beneficiaries
    */
   static async saveBeneficiaries(id: number, data: BeneficiariesData) {
-    // If there are files, use FormData
+    // Check if there are any files
     const hasFiles = data.beneficiaries.some(b => 
       b.utility_bill instanceof File || b.identification_document instanceof File
     );
 
     if (hasFiles) {
       const formData = new FormData();
+      
+      // Send beneficiaries as JSON string (without file data)
       formData.append('beneficiaries', JSON.stringify(data.beneficiaries.map(b => ({
-        ...b,
-        utility_bill: b.utility_bill instanceof File ? undefined : b.utility_bill,
-        identification_document: b.identification_document instanceof File ? undefined : b.identification_document,
+        id: b.id,
+        first_name: b.first_name,
+        last_name: b.last_name,
+        address: b.address,
+        date_of_birth: b.date_of_birth,
+        percentage_allocation: b.percentage_allocation,
       }))));
 
       // Append files
@@ -174,5 +181,25 @@ export class PortalEmployeeService {
       }
     );
     return response.data;
+  }
+
+  /**
+   * Get employee statistics for dashboard
+   * Combines multiple queries to get stats
+   */
+  static async getEmployeeStats(): Promise<EmployeeStats> {
+    const [totalRes, activeRes, verifiedRes] = await Promise.all([
+      this.getEmployees({ per_page: 1 }),
+      this.getEmployees({ employment_status: 'active', per_page: 1 }),
+      this.getEmployees({ nin_verified: true, per_page: 1 }),
+    ]);
+
+    return {
+      total: totalRes.pagination?.total || 0,
+      active: activeRes.pagination?.total || 0,
+      inactive: (totalRes.pagination?.total || 0) - (activeRes.pagination?.total || 0),
+      verified_nin: verifiedRes.pagination?.total || 0,
+      pending_nin: (totalRes.pagination?.total || 0) - (verifiedRes.pagination?.total || 0),
+    };
   }
 }

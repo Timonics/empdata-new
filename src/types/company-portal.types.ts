@@ -17,6 +17,8 @@ export interface CompanyProfile {
   admin_name: string;
   admin_email: string;
   admin_phone?: string;
+
+  created_at?: string;
 }
 
 export interface DashboardStats {
@@ -34,7 +36,7 @@ export interface EmployeeSummary {
   last_name: string;
   email: string;
   department?: string;
-  status: 'verified' | 'pending' | 'inactive';
+  status: "verified" | "pending" | "inactive";
   nin_verified: boolean;
   joined_at: string;
 }
@@ -45,5 +47,5 @@ export interface InvitationSummary {
   role: string;
   sent_at: string;
   expires_at: string;
-  status: 'pending' | 'accepted' | 'expired';
+  status: "pending" | "accepted" | "expired";
 }

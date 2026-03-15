@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,7 +29,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { api } from "@/lib/axios";
+import { AuthService } from "@/services/auth.service";
 import { toast } from "sonner";
 
 const setPasswordSchema = z
@@ -61,7 +61,6 @@ interface PasswordRequirement {
 export function SetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const pathname = usePathname();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -74,40 +73,14 @@ export function SetPasswordForm() {
   // Get token and email from URL
   const token = searchParams.get("token");
   const email = searchParams.get("email");
-  const type = searchParams.get("type") || "employee"; // 'company' or 'employee'
+  const type = searchParams.get("type") as 'company' | 'employee' | null;
 
-  // Validate token on mount
+  // Basic validation on mount
   useEffect(() => {
-    const validateToken = async () => {
-      if (!token || !email) {
-        setError("Invalid invitation link. Missing token or email.");
-        setIsValidating(false);
-        return;
-      }
-
-      try {
-        // Validate the invitation token with your backend
-        const response = await api.post("/api/auth/validate-invitation", {
-          token,
-          email,
-          type,
-        });
-
-        if (!response.data.success) {
-          setError(
-            response.data.message || "Invalid or expired invitation link",
-          );
-        }
-      } catch (error: any) {
-        setError(
-          error.response?.data?.message || "Failed to validate invitation",
-        );
-      } finally {
-        setIsValidating(false);
-      }
-    };
-
-    validateToken();
+    if (!token || !email || !type) {
+      setError("Invalid invitation link. Missing required parameters.");
+    }
+    setIsValidating(false);
   }, [token, email, type]);
 
   const {
@@ -172,8 +145,8 @@ export function SetPasswordForm() {
   };
 
   const onSubmit = async (data: SetPasswordFormValues) => {
-    if (!token || !email) {
-      setError("Missing token or email");
+    if (!token || !email || !type) {
+      setError("Missing required information");
       return;
     }
 
@@ -181,27 +154,24 @@ export function SetPasswordForm() {
     setError(null);
 
     try {
-      // Call your API to set the password
-      const response = await api.post("/api/auth/set-password", {
+      // Call the correct API endpoint
+      const response = await AuthService.setPassword({
         token,
         email,
         password: data.password,
         password_confirmation: data.confirmPassword,
-        type, // 'company' or 'employee'
       });
 
-      if (response.data.success) {
+      if (response.success) {
         setSuccess(true);
         toast.success("Password set successfully!");
 
         // Redirect to login after 3 seconds
         setTimeout(() => {
-          const loginPath =
-            type === "company" ? "/portal/auth" : "/portal/auth/employee";
-          router.push(loginPath);
+          router.push("/portal/auth");
         }, 3000);
       } else {
-        setError(response.data.message || "Failed to set password");
+        setError(response.message || "Failed to set password");
       }
     } catch (error: any) {
       setError(error.response?.data?.message || "An error occurred");
@@ -215,14 +185,7 @@ export function SetPasswordForm() {
       <Card className="w-full shadow-lg border-0">
         <CardContent className="pt-6">
           <div className="flex flex-col items-center justify-center py-12">
-            <Loader2
-              className={cn(
-                "h-8 w-8 animate-spin mb-4",
-                pathname.startsWith("/admin")
-                  ? "text-blue-600"
-                  : "text-emerald-600",
-              )}
-            />
+            <Loader2 className="h-8 w-8 animate-spin text-emerald-600 mb-4" />
             <p className="text-muted-foreground">
               Validating your invitation...
             </p>
@@ -232,7 +195,7 @@ export function SetPasswordForm() {
     );
   }
 
-  if (error && !token) {
+  if (error && (!token || !email || !type)) {
     return (
       <Card className="w-full shadow-lg border-0">
         <CardHeader>
@@ -249,12 +212,7 @@ export function SetPasswordForm() {
         <CardFooter>
           <Link
             href="/"
-            className={cn(
-              "text-sm flex items-center gap-1",
-              pathname.startsWith("/admin")
-                ? "text-blue-600 hover:text-blue-800"
-                : "text-emerald-600 hover:text-emerald-800",
-            )}
+            className="text-sm text-emerald-600 hover:text-emerald-800 flex items-center gap-1"
           >
             <ArrowLeft className="h-4 w-4" />
             Go to home page
@@ -268,14 +226,7 @@ export function SetPasswordForm() {
     return (
       <Card className="w-full shadow-lg border-0">
         <CardHeader>
-          <CardTitle
-            className={cn(
-              "flex items-center gap-2",
-              pathname.startsWith("/admin")
-                ? "text-blue-600"
-                : "text-emerald-600 ",
-            )}
-          >
+          <CardTitle className="flex items-center gap-2 text-emerald-600">
             <CheckCircle2 className="h-6 w-6" />
             Password Set Successfully!
           </CardTitle>
@@ -286,27 +237,15 @@ export function SetPasswordForm() {
         </CardHeader>
         <CardContent>
           <div className="bg-emerald-50 p-4 rounded-lg">
-            <p
-              className={cn(
-                "text-sm",
-                pathname.startsWith("/admin")
-                  ? "text-blue-800"
-                  : "text-emerald-800 ",
-              )}
-            >
+            <p className="text-sm text-emerald-800">
               You can now log in with your email and new password.
             </p>
           </div>
         </CardContent>
         <CardFooter>
           <Link
-            href={type === "company" ? "/portal/auth" : "/portal/auth/employee"}
-            className={cn(
-              "text-sm",
-              pathname.startsWith("/admin")
-                ? "text-blue-600 hover:text-blue-800"
-                : "text-emerald-600 hover:text-emerald-800",
-            )}
+            href="/portal/auth"
+            className="text-sm text-emerald-600 hover:text-emerald-800"
           >
             Go to login now →
           </Link>
@@ -315,24 +254,14 @@ export function SetPasswordForm() {
     );
   }
 
+  const isPortal = true; // Always portal for this form
+
   return (
     <Card className="w-full shadow-lg border-0">
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div
-            className={cn(
-              "h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center",
-              pathname.startsWith("/admin") ? "bg-blue-100" : "bg-emerald-100",
-            )}
-          >
-            <Lock
-              className={cn(
-                "h-5 w-5",
-                pathname.startsWith("/admin")
-                  ? "text-blue-600"
-                  : "text-emerald-600",
-              )}
-            />
+          <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
+            <Lock className="h-5 w-5 text-emerald-600" />
           </div>
           <div>
             <CardTitle className="text-xl">Set Your Password</CardTitle>
@@ -475,7 +404,7 @@ export function SetPasswordForm() {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full h-11 text-base"
+            className="w-full h-11 text-base bg-emerald-600 hover:bg-emerald-700"
             disabled={isLoading || passwordStrength < 5}
           >
             {isLoading ? (
@@ -493,24 +422,14 @@ export function SetPasswordForm() {
           By setting a password, you agree to our{" "}
           <Link
             href="/terms"
-            className={cn(
-              "hover:underline",
-              pathname.startsWith("/admin")
-                ? "text-blue-600"
-                : "text-emerald-600",
-            )}
+            className="text-emerald-600 hover:text-emerald-800 hover:underline"
           >
             Terms of Service
           </Link>{" "}
           and{" "}
           <Link
             href="/privacy"
-            className={cn(
-              "hover:underline",
-              pathname.startsWith("/admin")
-                ? "text-blue-600"
-                : "text-emerald-600",
-            )}
+            className="text-emerald-600 hover:text-emerald-800 hover:underline"
           >
             Privacy Policy
           </Link>

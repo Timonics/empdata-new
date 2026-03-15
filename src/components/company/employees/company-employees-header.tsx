@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { AddEmployeeDrawer } from "./add-employee-drawer";
 import { ExportModal } from "@/components/export-modal";
+import { useExportEmployees } from "@/hooks/queries/useEmployees";
 
 interface CompanyEmployeesHeaderProps {
   onSearch?: (query: string) => void;
@@ -44,6 +45,7 @@ export function CompanyEmployeesHeader({
   const [showExportModal, setShowExportModal] = useState(false);
   const [showAddDrawer, setShowAddDrawer] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const exportMutation = useExportEmployees();
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
@@ -101,24 +103,6 @@ export function CompanyEmployeesHeader({
 
         <div className="flex items-center gap-2">
           <Select 
-            value={filters.department || "all"}
-            onValueChange={(value) => onFilterChange?.("department", value)}
-          >
-            <SelectTrigger className="w-40">
-              <Filter className="mr-2 h-4 w-4" />
-              <SelectValue placeholder="Department" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Departments</SelectItem>
-              <SelectItem value="engineering">Engineering</SelectItem>
-              <SelectItem value="hr">Human Resources</SelectItem>
-              <SelectItem value="finance">Finance</SelectItem>
-              <SelectItem value="marketing">Marketing</SelectItem>
-              <SelectItem value="operations">Operations</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select 
             value={filters.employment_status || "all"}
             onValueChange={(value) => onFilterChange?.("employment_status", value)}
           >
@@ -168,6 +152,9 @@ export function CompanyEmployeesHeader({
         formats={['csv', 'excel']}
         showDateRange={true}
         showColumnSelection={true}
+        // onExport={async (options) => {
+        //   await exportMutation.mutateAsync(options.filters);
+        // }}
       />
     </>
   );

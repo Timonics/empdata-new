@@ -20,6 +20,8 @@ import { useCompanyProfile } from '@/hooks/queries/usePortalDashboard';
 export function CompanyOverview() {
   const { data: company, isLoading, error } = useCompanyProfile();
 
+  console.log(company);
+
   if (isLoading) {
     return (
       <Card>

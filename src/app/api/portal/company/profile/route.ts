@@ -5,7 +5,7 @@ import { callBackend } from "@/lib/server-api";
 export async function GET() {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("token_company")?.value;
+    const token = cookieStore.get("token_company_admin")?.value;
 
     if (!token) {
       return NextResponse.json(

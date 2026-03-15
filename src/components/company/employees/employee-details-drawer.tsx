@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 import {
   User,
   Mail,
@@ -17,8 +18,14 @@ import {
   FileText,
   X,
   Edit,
+  Building2,
+  Hash,
+  Clock,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { format, isValid } from "date-fns";
 
 interface EmployeeDetailsDrawerProps {
   employee: any;
@@ -27,9 +34,14 @@ interface EmployeeDetailsDrawerProps {
 }
 
 const statusStyles = {
+  active: "bg-green-100 text-green-800 border-green-200",
+  inactive: "bg-gray-100 text-gray-800 border-gray-200",
+};
+
+const ninStatusStyles = {
   verified: "bg-green-100 text-green-800 border-green-200",
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  inactive: "bg-gray-100 text-gray-800 border-gray-200",
+  not_submitted: "bg-gray-100 text-gray-800 border-gray-200",
 };
 
 export function EmployeeDetailsDrawer({
@@ -45,7 +57,7 @@ export function EmployeeDetailsDrawer({
     icon: Icon,
   }: {
     label: string;
-    value: string;
+    value: string | number | null | undefined;
     icon?: any;
   }) => (
     <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
@@ -53,7 +65,7 @@ export function EmployeeDetailsDrawer({
       <div className="flex-1 min-w-0">
         <p className="text-xs text-gray-500">{label}</p>
         <p className="text-sm font-medium mt-0.5 wrap-break-word">
-          {value || "—"}
+          {value?.toString() || "—"}
         </p>
       </div>
     </div>
@@ -72,6 +84,31 @@ export function EmployeeDetailsDrawer({
     </div>
   );
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "N/A";
+    try {
+      const date = new Date(dateString);
+      if (!isValid(date)) return "N/A";
+      return format(date, "PPP");
+    } catch {
+      return "N/A";
+    }
+  };
+
+  const getInitials = () => {
+    const first = employee.first_name?.[0] || "";
+    const last = employee.last_name?.[0] || "";
+    return (first + last).toUpperCase() || "EM";
+  };
+
+  const getNINStatus = () => {
+    if (employee.nin_verification?.is_nin_verified) return "verified";
+    if (employee.nin_verification?.has_submitted_nin) return "pending";
+    return "not_submitted";
+  };
+
+  const ninStatus = getNINStatus();
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
@@ -81,16 +118,16 @@ export function EmployeeDetailsDrawer({
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16 border-2 border-white">
                 <AvatarFallback className="bg-white/20 text-white text-xl">
-                  {employee.firstName[0]}
-                  {employee.lastName[0]}
+                  {getInitials()}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <SheetTitle className="text-white text-xl">
-                  {employee.firstName} {employee.lastName}
+                  {employee.first_name || ""} {employee.last_name || ""}
                 </SheetTitle>
                 <p className="text-emerald-100 text-sm mt-1">
-                  {employee.employeeId} • {employee.position}
+                  {employee.employee_number || "No ID"} •{" "}
+                  {employee.position || "No Position"}
                 </p>
               </div>
             </div>
@@ -113,19 +150,34 @@ export function EmployeeDetailsDrawer({
               className={cn(
                 "px-3 py-1",
                 "bg-white/20 text-white border-white/30",
-                statusStyles[employee.status as keyof typeof statusStyles],
+                statusStyles[
+                  employee.employment_status as keyof typeof statusStyles
+                ],
               )}
             >
-              {employee.status}
+              {employee.employment_status || "inactive"}
             </Badge>
             <Badge
               variant="outline"
-              className="bg-white/20 text-white border-white/30"
+              className={cn(
+                "px-3 py-1",
+                "bg-white/20 text-white border-white/30",
+                ninStatusStyles[ninStatus as keyof typeof ninStatusStyles],
+              )}
             >
-              {employee.department}
+              NIN: {ninStatus.replace("_", " ")}
             </Badge>
+            {employee.department && (
+              <Badge
+                variant="outline"
+                className="bg-white/20 text-white border-white/30"
+              >
+                {employee.department}
+              </Badge>
+            )}
           </div>
         </div>
+
         {/* Tabs */}
         <div className="border-b px-6">
           <Tabs defaultValue="personal" className="w-full">
@@ -157,6 +209,7 @@ export function EmployeeDetailsDrawer({
             </TabsList>
           </Tabs>
         </div>
+
         {/* Content */}
         <div className="p-6">
           <Tabs defaultValue="personal">
@@ -164,12 +217,15 @@ export function EmployeeDetailsDrawer({
               <SectionCard title="Personal Information">
                 <InfoRow
                   label="Full Name"
-                  value={`${employee.firstName} ${employee.lastName}`}
+                  value={
+                    `${employee.first_name || ""} ${employee.last_name || ""}`.trim() ||
+                    "—"
+                  }
                   icon={User}
                 />
                 <InfoRow
                   label="Date of Birth"
-                  value={new Date(employee.dateOfBirth).toLocaleDateString()}
+                  value={formatDate(employee.date_of_birth)}
                   icon={Calendar}
                 />
                 <InfoRow label="Gender" value={employee.gender} icon={User} />
@@ -180,7 +236,16 @@ export function EmployeeDetailsDrawer({
               <SectionCard title="Address">
                 <InfoRow
                   label="Address"
-                  value={`${employee.address}, ${employee.city}, ${employee.state}, ${employee.country}`}
+                  value={
+                    [
+                      employee.address,
+                      employee.city,
+                      employee.state,
+                      employee.country,
+                    ]
+                      .filter(Boolean)
+                      .join(", ") || "—"
+                  }
                   icon={MapPin}
                 />
               </SectionCard>
@@ -188,13 +253,18 @@ export function EmployeeDetailsDrawer({
               <SectionCard title="Emergency Contact">
                 <InfoRow
                   label="Name"
-                  value={employee.emergencyContact.split(" - ")[0]}
+                  value={employee.emergency_contact?.name}
                   icon={Heart}
                 />
                 <InfoRow
                   label="Phone"
-                  value={employee.emergencyContact.split(" - ")[1]}
+                  value={employee.emergency_contact?.phone}
                   icon={Phone}
+                />
+                <InfoRow
+                  label="Relationship"
+                  value={employee.emergency_contact?.relationship}
+                  icon={Heart}
                 />
               </SectionCard>
             </TabsContent>
@@ -203,8 +273,8 @@ export function EmployeeDetailsDrawer({
               <SectionCard title="Employment Details">
                 <InfoRow
                   label="Employee ID"
-                  value={employee.employeeId}
-                  icon={FileText}
+                  value={employee.employee_number}
+                  icon={Hash}
                 />
                 <InfoRow
                   label="Department"
@@ -218,27 +288,55 @@ export function EmployeeDetailsDrawer({
                 />
                 <InfoRow
                   label="Date Joined"
-                  value={new Date(employee.dateJoined).toLocaleDateString()}
+                  value={formatDate(employee.created_at)}
                   icon={Calendar}
+                />
+                <InfoRow
+                  label="Employment Status"
+                  value={employee.employment_status}
+                  icon={Clock}
                 />
               </SectionCard>
 
               <SectionCard title="NIN Verification">
+                <div className="flex items-center gap-2 mb-3">
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      "font-medium",
+                      ninStatusStyles[
+                        ninStatus as keyof typeof ninStatusStyles
+                      ],
+                    )}
+                  >
+                    {ninStatus.replace("_", " ")}
+                  </Badge>
+                  {employee.nin_verification?.is_validated && (
+                    <Badge
+                      variant="outline"
+                      className="bg-green-50 text-green-700 border-green-200"
+                    >
+                      Validated
+                    </Badge>
+                  )}
+                </div>
                 <InfoRow
-                  label="Status"
+                  label="NIN Status"
                   value={
-                    employee.ninVerified
+                    employee.nin_verification?.is_nin_verified
                       ? "Verified"
-                      : employee.ninSubmitted
+                      : employee.nin_verification?.has_submitted_nin
                         ? "Pending"
                         : "Not Submitted"
                   }
                   icon={Shield}
                 />
-                {employee.ninVerified && (
+                {employee.nin_verification?.nin_verified_at && (
                   <InfoRow
                     label="Verified Date"
-                    value="2024-03-15"
+                    value={formatDate(
+                      employee.nin_verification.nin_verified_at,
+                    )}
                     icon={Calendar}
                   />
                 )}
@@ -247,16 +345,54 @@ export function EmployeeDetailsDrawer({
 
             <TabsContent value="beneficiaries" className="mt-0">
               <SectionCard title="Beneficiaries">
-                <div className="text-center py-8">
-                  <Heart className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-                  <p className="text-gray-500">
-                    This employee has {employee.beneficiaries} registered
-                    beneficiaries
-                  </p>
-                  <Button variant="outline" className="mt-4">
-                    View Beneficiaries
-                  </Button>
-                </div>
+                {employee.beneficiaries && employee.beneficiaries.length > 0 ? (
+                  <div className="space-y-4">
+                    {employee.beneficiaries.map(
+                      (beneficiary: any, index: number) => (
+                        <div
+                          key={beneficiary.id || index}
+                          className="bg-white p-4 rounded-lg border"
+                        >
+                          <p className="font-medium">
+                            {beneficiary.first_name} {beneficiary.last_name}
+                          </p>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {beneficiary.relationship}
+                          </p>
+                          <div className="flex items-center justify-between mt-2">
+                            <span className="text-sm text-gray-500">
+                              Allocation: {beneficiary.percentage_allocation}%
+                            </span>
+                            {beneficiary.identification_url && (
+                              <Button variant="ghost" size="sm" className="h-8">
+                                <FileText className="h-4 w-4 mr-2" />
+                                View Document
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ),
+                    )}
+                    <div className="flex items-center justify-between pt-2">
+                      <span className="text-sm font-medium">
+                        Total Allocation
+                      </span>
+                      <span className="text-sm font-bold">
+                        {employee.beneficiaries.reduce(
+                          (sum: number, b: any) =>
+                            sum + (b.percentage_allocation || 0),
+                          0,
+                        )}
+                        %
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Heart className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+                    <p className="text-gray-500">No beneficiaries added yet</p>
+                  </div>
+                )}
               </SectionCard>
             </TabsContent>
 
@@ -273,11 +409,13 @@ export function EmployeeDetailsDrawer({
             </TabsContent>
           </Tabs>
         </div>
+
         {/* Footer */}
         <div className="border-t p-6 bg-gray-50 sticky bottom-0">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-500">
-              Last updated: 2 days ago
+              Last updated:{" "}
+              {formatDate(employee.updated_at || employee.created_at)}
             </div>
             <Button>
               <Edit className="h-4 w-4 mr-2" />

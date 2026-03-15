@@ -242,18 +242,18 @@ export function useAuth() {
     },
     onSuccess: () => {
       // Clear cache
-      // queryClient.setQueryData(authKeys.user(), null);
-      // queryClient.invalidateQueries({ queryKey: authKeys.all });
-      // // Clear token manager
-      // tokenManager.clearUserData();
-      // toast.success("Logged out successfully");
-      // // Redirect to appropriate login page
-      // const lastRole = tokenManager.getUserRole();
-      // if (lastRole === "admin") {
-      //   router.push("/admin/login");
-      // } else {
-      //   router.push("/portal/auth");
-      // }
+      queryClient.setQueryData(authKeys.user(), null);
+      queryClient.invalidateQueries({ queryKey: authKeys.all });
+      // Clear token manager
+      tokenManager.clearUserData();
+      toast.success("Logged out successfully");
+      // Redirect to appropriate login page
+      const lastRole = tokenManager.getUserRole();
+      if (lastRole === "admin") {
+        router.push("/admin/login");
+      } else {
+        router.push("/portal/auth");
+      }
     },
     onError: (error: any) => {
       toast.error("Logout failed", {
