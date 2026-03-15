@@ -1,23 +1,23 @@
-import { clientEnv } from './env.client';
-
 export async function encryptData(plaintext: string) {
-  const keyBytes = hexStringToUint8Array(clientEnv.ENCRYPTION_KEY);
-  
-  const key = await crypto.subtle.importKey(
-    'raw',
-    keyBytes,
-    'AES-GCM',
-    false,
-    ['encrypt']
-  );
+  const encryptionKey = process.env.ENCRYPTION_KEY;
+
+  if (!encryptionKey) {
+    throw new Error("Encryption Key Not Found");
+  }
+
+  const keyBytes = hexStringToUint8Array(encryptionKey);
+
+  const key = await crypto.subtle.importKey("raw", keyBytes, "AES-GCM", false, [
+    "encrypt",
+  ]);
 
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const encodedPlaintext = new TextEncoder().encode(plaintext);
-  
+
   const buffer = await crypto.subtle.encrypt(
-    { name: 'AES-GCM', iv },
+    { name: "AES-GCM", iv },
     key,
-    encodedPlaintext
+    encodedPlaintext,
   );
 
   const ciphertextWithTag = new Uint8Array(buffer);
@@ -33,7 +33,7 @@ export async function encryptData(plaintext: string) {
 
 function hexStringToUint8Array(hexString: string) {
   if (hexString.length % 2 !== 0) {
-    throw new Error('Hex string must have an even number of characters');
+    throw new Error("Hex string must have an even number of characters");
   }
   const bytes = new Uint8Array(hexString.length / 2);
   for (let i = 0; i < hexString.length; i += 2) {
@@ -43,7 +43,7 @@ function hexStringToUint8Array(hexString: string) {
 }
 
 function arrayBufferToBase64(buffer: Uint8Array) {
-  let binary = '';
+  let binary = "";
   const bytes = new Uint8Array(buffer);
   const len = bytes.byteLength;
   for (let i = 0; i < len; i++) {
