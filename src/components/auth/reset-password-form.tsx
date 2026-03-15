@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -16,29 +16,31 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { AuthService } from '@/services/auth.service';
-import { toast } from 'sonner';
+} from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, CheckCircle2, ArrowLeft } from "lucide-react";
+import { AuthService } from "@/services/auth.service";
+import { toast } from "sonner";
 
-const resetPasswordSchema = z.object({
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-});
+const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+      .regex(/[0-9]/, "Password must contain at least one number"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
 
 interface ResetPasswordFormProps {
-  role: 'admin' | 'company' | 'employee';
+  role: "admin" | "company" | "employee";
 }
 
 export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
@@ -48,24 +50,25 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const token = searchParams.get('token');
-  const email = searchParams.get('email') || sessionStorage.getItem('resetEmail');
+  const token = searchParams.get("token");
+  const email =
+    searchParams.get("email") || sessionStorage.getItem("resetEmail");
 
   useEffect(() => {
     if (!token || !email) {
-      setError('Invalid or missing reset token');
+      setError("Invalid or missing reset token");
     }
   }, [token, email]);
 
   // Get the appropriate login link based on role
   const getLoginLink = () => {
     switch (role) {
-      case 'admin':
-        return '/admin/auth/login';
-      case 'company':
-        return '/portal/auth';
-      case 'employee':
-        return '/portal/auth/employee';
+      case "admin":
+        return "/admin/auth/login";
+      case "company":
+        return "/portal/auth";
+      case "employee":
+        return "/portal/auth/employee";
     }
   };
 
@@ -79,7 +82,7 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
 
   const onSubmit = async (data: ResetPasswordValues) => {
     if (!token || !email) {
-      setError('Missing reset information');
+      setError("Missing reset information");
       return;
     }
 
@@ -87,28 +90,25 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
     setError(null);
 
     try {
-      const response = await AuthService.resetPassword(
-        {
-          token,
-          email,
-          password: data.password,
-          password_confirmation: data.confirmPassword,
-        },
-        role
-      );
+      const response = await AuthService.resetPassword({
+        token,
+        email,
+        password: data.password,
+        password_confirmation: data.confirmPassword,
+      });
 
       if (response.success) {
         setSuccess(true);
-        toast.success('Password reset successful!');
-        
+        toast.success("Password reset successful!");
+
         // Clear stored data
-        sessionStorage.removeItem('resetEmail');
-        sessionStorage.removeItem('resetRole');
+        sessionStorage.removeItem("resetEmail");
+        sessionStorage.removeItem("resetRole");
       } else {
-        setError(response.message || 'Failed to reset password');
+        setError(response.message || "Failed to reset password");
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      setError(err.message || "An error occurred");
     } finally {
       setIsLoading(false);
     }
@@ -125,9 +125,13 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
         </CardHeader>
         <CardFooter>
           <Link
-            href={role === 'admin' ? '/admin/auth/forgot-password' : 
-                  role === 'company' ? '/portal/auth/forgot-password' : 
-                  '/portal/auth/employee/forgot-password'}
+            href={
+              role === "admin"
+                ? "/admin/auth/forgot-password"
+                : role === "company"
+                  ? "/portal/auth/forgot-password"
+                  : "/portal/auth/employee/forgot-password"
+            }
             className="text-sm text-blue-600 hover:text-blue-800"
           >
             Request a new reset link
@@ -173,9 +177,7 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
     <Card>
       <CardHeader>
         <CardTitle>Reset your password</CardTitle>
-        <CardDescription>
-          Enter your new password below
-        </CardDescription>
+        <CardDescription>Enter your new password below</CardDescription>
       </CardHeader>
       <CardContent>
         {error && (
@@ -191,7 +193,7 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
               id="password"
               type="password"
               placeholder="Enter new password"
-              {...register('password')}
+              {...register("password")}
             />
             {errors.password && (
               <p className="text-sm text-red-500">{errors.password.message}</p>
@@ -204,15 +206,19 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
               id="confirmPassword"
               type="password"
               placeholder="Confirm new password"
-              {...register('confirmPassword')}
+              {...register("confirmPassword")}
             />
             {errors.confirmPassword && (
-              <p className="text-sm text-red-500">{errors.confirmPassword.message}</p>
+              <p className="text-sm text-red-500">
+                {errors.confirmPassword.message}
+              </p>
             )}
           </div>
 
           <div className="rounded-md bg-blue-50 p-4">
-            <p className="text-sm text-blue-800 font-medium">Password requirements:</p>
+            <p className="text-sm text-blue-800 font-medium">
+              Password requirements:
+            </p>
             <ul className="mt-2 text-sm text-blue-700 list-disc list-inside">
               <li>At least 8 characters long</li>
               <li>At least one uppercase letter</li>
@@ -228,7 +234,7 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
                 Resetting password...
               </>
             ) : (
-              'Reset password'
+              "Reset password"
             )}
           </Button>
         </form>
