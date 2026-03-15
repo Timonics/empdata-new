@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { UserRole } from "@/types/auth.types";
 
-const BACKEND_URL = "https://empdata.josbiz.com/api";
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
 
 if (!BACKEND_URL) {
   throw new Error("BACKEND_URL is not defined");

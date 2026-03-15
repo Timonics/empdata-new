@@ -61,7 +61,7 @@ export function AdminLoginForm() {
           </div>
         </div>
         <CardDescription>
-          Sign in to manage the EMPDATA platform
+          Sign in to manage the Client Onboarding platform
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

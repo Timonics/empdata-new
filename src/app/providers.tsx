@@ -51,7 +51,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
               />
             </TooltipProvider>
           </ThemeProvider>
-          {process.env.NODE_ENV === "development" && <ReactQueryDevtools />}
+         {/* <ReactQueryDevtools /> */}
         </QueryClientProvider>
       </PersistGate>
     </Provider>

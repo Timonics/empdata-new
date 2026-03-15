@@ -2,7 +2,6 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useOnboardingWizard } from "@/hooks/queries/useOnboarding";
-import { OnboardingProgress } from "./onboarding-progress";
 import { OnboardingHeader } from "./onboarding-header";
 import { SuccessScreen } from "./success-screen";
 import { AccountTypeStep } from "./steps/account-type-step";

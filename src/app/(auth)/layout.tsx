@@ -43,8 +43,8 @@ export default function AuthLayout({
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
-                "Streamline your employee data management with our comprehensive
-                platform. Secure, efficient, and built for modern businesses."
+                Streamline your employee data management with our comprehensive
+                platform. Secure, efficient, and built for modern businesses.
               </p>
               <footer className="text-sm text-blue-100">
                 Enterprise Grade Solution

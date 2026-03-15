@@ -183,13 +183,19 @@ export function useOnboardingWizard() {
 
   const handleNext = () => {
     setCurrentStep((prev) => prev + 1);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   const handleBack = () => {
     if (currentStep > 0) {
       setCurrentStep((prev) => prev - 1);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     }
   };
 
