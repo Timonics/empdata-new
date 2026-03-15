@@ -30,7 +30,9 @@ export function CompanyGrowth() {
           <div className="h-50 flex items-center justify-center">
             <div className="text-center">
               <Loader2 className="h-8 w-8 animate-spin text-green-600 mx-auto mb-4" />
-              <p className="text-sm text-muted-foreground">Loading company data...</p>
+              <p className="text-sm text-muted-foreground">
+                Loading company data...
+              </p>
             </div>
           </div>
         </CardContent>
@@ -51,7 +53,9 @@ export function CompanyGrowth() {
           <div className="h-50 flex items-center justify-center">
             <div className="text-center">
               <p className="text-red-500 mb-2">Failed to load company data</p>
-              <p className="text-sm text-muted-foreground">Please try again later</p>
+              <p className="text-sm text-muted-foreground">
+                Please try again later
+              </p>
             </div>
           </div>
         </CardContent>
@@ -60,7 +64,7 @@ export function CompanyGrowth() {
   }
 
   // Transform data for the chart
-  const chartData = data.data.map(item => ({
+  const chartData = data.data.map((item) => ({
     month: item.month,
     new: item.total, // Total new registrations for the month
     total: item.total, // You might want cumulative total here
@@ -75,8 +79,11 @@ export function CompanyGrowth() {
 
   // Calculate growth rate
   const previousMonth = chartData[chartData.length - 2];
-  const growthRate = previousMonth 
-    ? ((lastMonth.total - previousMonth.total) / previousMonth.total * 100).toFixed(1)
+  const growthRate = previousMonth
+    ? (
+        ((lastMonth.total - previousMonth.total) / previousMonth.total) *
+        100
+      ).toFixed(1)
     : 0;
 
   return (
@@ -99,15 +106,28 @@ export function CompanyGrowth() {
               <YAxis className="text-xs" />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  backgroundColor: "white",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
-                formatter={(value: number, name: string) => {
-                  if (name === 'new') return [`${value} companies`, 'New Registrations'];
-                  return [value, name];
-                }}
+                formatter={
+                  ((value: any, name: any) => {
+                    let val = value;
+
+                    if (Array.isArray(val)) {
+                      val = val[0];
+                    }
+
+                    const num = Number(val) || 0;
+
+                    if (name === "new") {
+                      return [`${num} companies`, "New Registrations"];
+                    }
+
+                    return [num, name ?? ""];
+                  }) as any
+                }
               />
               <Bar dataKey="new" fill="#3b82f6" radius={[4, 4, 0, 0]}>
                 {chartData.map((entry, index) => (
@@ -150,8 +170,11 @@ export function CompanyGrowth() {
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground">Growth Rate</p>
-            <p className={`text-2xl font-bold ${Number(growthRate) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {Number(growthRate) >= 0 ? '+' : ''}{growthRate}%
+            <p
+              className={`text-2xl font-bold ${Number(growthRate) >= 0 ? "text-green-600" : "text-red-600"}`}
+            >
+              {Number(growthRate) >= 0 ? "+" : ""}
+              {growthRate}%
             </p>
           </div>
         </div>

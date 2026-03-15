@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Logo from "@/components/logo";
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
@@ -10,36 +11,35 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const isAdmin = pathname.startsWith("/admin");
 
   return (
     <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-blue-50">
-      <div className="container relative min-h-screen  items-center justify-center grid max-w-none lg:grid-cols-2 lg:px-0">
+      <div className="container relative min-h-screen items-center justify-center grid max-w-none lg:grid-cols-2 lg:px-0">
         {/* Left side - Brand/Info */}
         <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-          <div
-            className={cn(
-              "absolute inset-0 bg-linear-to-br",
-              pathname.startsWith("/admin")
-                ? "from-blue-600 via-blue-700 to-blue-900"
-                : "from-emerald-600 via-emerald-700 to-emerald-900",
-            )}
-          />
+          {/* Background Image */}
+          <div className="absolute inset-0">
+            <Image
+              src={isAdmin ? "/auth/admin-sidebar.png" : "/auth/portal-sidebar.png"}
+              alt={isAdmin ? "Admin Background" : "Portal Background"}
+              fill
+              className="object-cover"
+              priority
+            />
+            {/* Different overlays based on path */}
+            <div 
+              className={cn(
+                "absolute inset-0",
+                isAdmin ? "bg-blue-900/60" : "bg-emerald-900/60"
+              )} 
+            />
+          </div>
+
           <div className="relative z-20 flex items-center text-lg font-medium">
-            {/* <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="mr-2 h-6 w-6"
-            >
-              <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-            </svg>
-            EMPDATA */}
             <Logo />
           </div>
+          
           <div className="relative z-20 mt-auto">
             <blockquote className="space-y-2">
               <p className="text-lg">
