@@ -4,9 +4,11 @@ import { callBackend } from "@/lib/server-api";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
+
     const cookieStore = await cookies();
     const token = cookieStore.get("token_admin")?.value;
 
@@ -19,7 +21,7 @@ export async function GET(
 
     const result = await callBackend({
       method: "GET",
-      path: `/admin/grouplife/company-registrations/${params.id}`,
+      path: `/admin/grouplife/company-registrations/${id}`,
       authType: "admin",
       token,
     });
@@ -43,9 +45,11 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const { id } = await params;
+
     const cookieStore = await cookies();
     const token = cookieStore.get("token_admin")?.value;
 
@@ -60,7 +64,7 @@ export async function PUT(
 
     const result = await callBackend({
       method: "POST", // Using POST with _method=PUT for Laravel
-      path: `/admin/grouplife/company-registrations/${params.id}`,
+      path: `/admin/grouplife/company-registrations/${id}`,
       data: formData,
       authType: "admin",
       token,
