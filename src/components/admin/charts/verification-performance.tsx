@@ -30,7 +30,9 @@ export function VerificationPerformance() {
           <div className="h-62.5 flex items-center justify-center">
             <div className="text-center">
               <Loader2 className="h-8 w-8 animate-spin text-purple-600 mx-auto mb-4" />
-              <p className="text-sm text-muted-foreground">Loading verification data...</p>
+              <p className="text-sm text-muted-foreground">
+                Loading verification data...
+              </p>
             </div>
           </div>
         </CardContent>
@@ -50,8 +52,12 @@ export function VerificationPerformance() {
         <CardContent>
           <div className="h-62.5 flex items-center justify-center">
             <div className="text-center">
-              <p className="text-red-500 mb-2">Failed to load verification data</p>
-              <p className="text-sm text-muted-foreground">Please try again later</p>
+              <p className="text-red-500 mb-2">
+                Failed to load verification data
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Please try again later
+              </p>
             </div>
           </div>
         </CardContent>
@@ -60,21 +66,21 @@ export function VerificationPerformance() {
   }
 
   // Transform data for the chart
-  const chartData = data.data.map(day => {
+  const chartData = data.data.map((day) => {
     // Calculate verification metrics from the data
     const totalCompanies = day.companies.total;
     const totalEmployees = day.employees.total;
     const verifiedCompanies = day.companies.by_verification_status.verified;
     const verifiedEmployees = day.employees.by_verification_status.verified;
-    
+
     // Calculate pending (not verified)
     const pendingCompanies = day.companies.by_verification_status.not_verified;
     const pendingEmployees = day.employees.by_verification_status.not_verified;
-    
+
     // Calculate completion counts
     const completed = verifiedCompanies + verifiedEmployees;
     const pending = pendingCompanies + pendingEmployees;
-    
+
     // Calculate average verification time (you might need a different API for this)
     // For now, we'll use a simulated value based on pending count
     const avgTime = pending > 0 ? Number((pending * 0.1).toFixed(1)) : 0;
@@ -100,11 +106,11 @@ export function VerificationPerformance() {
 
   // Calculate averages
   const avgDaily = Math.round(
-    chartData.reduce((sum, day) => sum + day.completed, 0) / chartData.length
+    chartData.reduce((sum, day) => sum + day.completed, 0) / chartData.length,
   );
-  
+
   const totalPending = chartData.reduce((sum, day) => sum + day.pending, 0);
-  
+
   const avgTimeValue = (
     chartData.reduce((sum, day) => sum + day.avgTime, 0) / chartData.length
   ).toFixed(1);
@@ -130,26 +136,30 @@ export function VerificationPerformance() {
               <YAxis yAxisId="right" orientation="right" className="text-xs" />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                  backgroundColor: "white",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
-                formatter={(value: number, name: string, props: any) => {
-                  if (name === 'completed') {
-                    return [
-                      `${value} (C:${props.payload.companies.verified}, E:${props.payload.employees.verified})`,
-                      'Completed'
-                    ];
-                  }
-                  if (name === 'pending') {
-                    return [
-                      `${value} (C:${props.payload.companies.pending}, E:${props.payload.employees.pending})`,
-                      'Pending'
-                    ];
-                  }
-                  return [value, 'Avg Time (hours)'];
-                }}
+                formatter={
+                  ((value: any, name: any, props: any) => {
+                    if (name === "completed") {
+                      return [
+                        `${value} (C:${props.payload.companies.verified}, E:${props.payload.employees.verified})`,
+                        "Completed",
+                      ];
+                    }
+
+                    if (name === "pending") {
+                      return [
+                        `${value} (C:${props.payload.companies.pending}, E:${props.payload.employees.pending})`,
+                        "Pending",
+                      ];
+                    }
+
+                    return [value, "Avg Time (hours)"];
+                  }) as any
+                }
               />
               <Legend />
               <Line
@@ -193,34 +203,43 @@ export function VerificationPerformance() {
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground">Pending</p>
-              <p className="text-lg font-bold text-yellow-600">{totalPending}</p>
+              <p className="text-lg font-bold text-yellow-600">
+                {totalPending}
+              </p>
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground">Avg. Time</p>
-              <p className="text-lg font-bold text-purple-600">{avgTimeValue}h</p>
+              <p className="text-lg font-bold text-purple-600">
+                {avgTimeValue}h
+              </p>
             </div>
           </div>
         </div>
 
         {/* Daily Breakdown */}
         <div className="mt-4 pt-4 border-t">
-          <p className="text-xs font-medium text-muted-foreground mb-2">Daily Breakdown</p>
+          <p className="text-xs font-medium text-muted-foreground mb-2">
+            Daily Breakdown
+          </p>
           <div className="space-y-2">
             {chartData.map((day) => (
-              <div key={day.day} className="flex items-center justify-between text-xs">
+              <div
+                key={day.day}
+                className="flex items-center justify-between text-xs"
+              >
                 <span className="font-medium w-8">{day.day}</span>
                 <div className="flex-1 mx-4">
                   <div className="flex items-center gap-1">
-                    <div 
-                      className="h-2 bg-green-500 rounded-l-full" 
-                      style={{ 
-                        width: `${(day.completed / (day.completed + day.pending)) * 100}%` 
+                    <div
+                      className="h-2 bg-green-500 rounded-l-full"
+                      style={{
+                        width: `${(day.completed / (day.completed + day.pending)) * 100}%`,
                       }}
                     />
-                    <div 
-                      className="h-2 bg-yellow-500 rounded-r-full" 
-                      style={{ 
-                        width: `${(day.pending / (day.completed + day.pending)) * 100}%` 
+                    <div
+                      className="h-2 bg-yellow-500 rounded-r-full"
+                      style={{
+                        width: `${(day.pending / (day.completed + day.pending)) * 100}%`,
                       }}
                     />
                   </div>

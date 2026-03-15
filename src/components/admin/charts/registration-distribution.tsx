@@ -134,10 +134,23 @@ export function RegistrationDistribution() {
                 ))}
               </Pie>
               <Tooltip 
-                formatter={(value: number) => [
-                  `${value} (${((value / total) * 100).toFixed(1)}%)`, 
-                  'Count'
-                ]}
+                formatter={
+                  ((value: any, name: any) => {
+                    let val = value;
+
+                    if (Array.isArray(val)) {
+                      val = val[0];
+                    }
+
+                    const num = Number(val) || 0;
+
+                    if (name === "new") {
+                      return [`${num} companies`, "New Registrations"];
+                    }
+
+                    return [num, name ?? ""];
+                  }) as any
+                }
               />
               <Legend />
             </PieChart>
