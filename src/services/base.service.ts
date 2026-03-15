@@ -12,14 +12,6 @@ export class BaseService {
   protected static api = api;
   protected static tokenManager = tokenManager;
 
-  // Safe environment access
-  // protected static getEnv() {
-  //   if (isServer) {
-  //     return serverEnv;
-  //   }
-  //   return clientEnv;
-  // }
-
   protected static handleError(error: any): never {
     console.error("API Error:", error);
     throw error;
