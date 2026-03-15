@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import Logo from "@/components/logo";
 import { useSidebar } from "@/contexts/sidebar-context";
+import { useAuth } from "@/hooks/useAuth";
+import { LogoutDialog } from "./logout-dialog";
 
 const navigation = [
   {
@@ -151,10 +153,20 @@ function NavItem({ item, pathname, navIsOpen, onNavClick }: NavItemProps) {
 export function AdminSidebar() {
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const pathname = usePathname();
+  const { logout, isLoggingOut } = useAuth();
 
   // For compatibility with your original naming
   const navIsOpen = !isCollapsed;
+
+  const handleLogout = async () => {
+    try {
+      logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   return (
     <>
@@ -190,12 +202,24 @@ export function AdminSidebar() {
                     onNavClick={() => setMobileOpen(false)}
                   />
                 ))}
+                {/* Logout button for mobile */}
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    setShowLogoutDialog(true);
+                  }}
+                  className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition duration-300 mt-4"
+                >
+                  <LogOut size={20} />
+                  <span>Logout</span>
+                </button>
               </nav>
             </ScrollArea>
           </div>
         </SheetContent>
       </Sheet>
 
+      {/* Desktop Sidebar */}
       <div
         className={cn(
           "fixed inset-y-0 left-0 z-50 hidden md:flex md:flex-col h-full border-r-2 bg-linear-to-b from-blue-600 via-blue-500 to-blue-400 border-gray-400 px-2",
@@ -292,9 +316,11 @@ export function AdminSidebar() {
 
               {/* Logout Button */}
               <button
+                onClick={() => setShowLogoutDialog(true)}
                 className={cn(
-                  "w-full flex items-center gap-2 p-2 pl-4 rounded-lg font-medium transition duration-300 hover:bg-red-100 hover:text-red-600 text-red-800",
+                  "w-full flex items-center gap-2 p-2 pl-4 rounded-lg font-medium transition duration-300 hover:bg-red-100 hover:text-red-600 text-white",
                   navIsOpen ? "justify-start" : "justify-center",
+                  navIsOpen ? "mt-4" : "mt-2",
                 )}
               >
                 <LogOut size={navIsOpen ? 20 : 25} />
@@ -325,6 +351,14 @@ export function AdminSidebar() {
           </Button>
         </div>
       </div>
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutDialog
+        open={showLogoutDialog}
+        onOpenChange={setShowLogoutDialog}
+        onConfirm={handleLogout}
+        isLoggingOut={isLoggingOut}
+      />
     </>
   );
 }

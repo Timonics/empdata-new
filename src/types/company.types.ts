@@ -2,7 +2,7 @@ export type CompanyStatus = "active" | "inactive" | "pending" | "suspended";
 
 export interface Company {
   id: number;
-  name: string;
+  company_name: string;
   rc_number: string;
   email: string;
   phone: string;
@@ -28,7 +28,7 @@ export interface Company {
 }
 
 export interface CreateCompanyData {
-  name: string;
+  company_name: string;
   rc_number: string;
   email: string;
   phone: string;

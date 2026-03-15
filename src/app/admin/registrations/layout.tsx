@@ -14,14 +14,13 @@ export default function RegistrationsLayout({
   const [activeTab, setActiveTab] = useState("group-life");
 
   useEffect(() => {
-    if (pathname === "/admin/registrations") {
+    // Set active tab based on current path
+    if (pathname.includes("/admin/registrations/group-life")) {
       setActiveTab("group-life");
-      router.push("/admin/registrations/group-life");
-    } else {
-      const tab = pathname.split("/").pop() || "group-life";
-      setActiveTab(tab);
+    } else if (pathname.includes("/admin/registrations/employee-group-life")) {
+      setActiveTab("employee-group-life");
     }
-  }, [pathname, router]);
+  }, [pathname]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);
@@ -30,26 +29,46 @@ export default function RegistrationsLayout({
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="text-3xl font-bold tracking-tight">Registrations</h2>
-        <p className="text-muted-foreground">
-          Manage all insurance applications and registrations
-        </p>
-      </div>
+      {pathname.endsWith("individual") ? (
+        <>
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">
+              Individual Registrations
+            </h2>
+            <p className="text-muted-foreground">
+              Manage individual insurance policy applications
+            </p>
+          </div>
+          {children}
+        </>
+      ) : (
+        <>
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">
+              Group Life Registrations
+            </h2>
+            <p className="text-muted-foreground">
+              Manage group life insurance applications for companies and
+              employees
+            </p>
+          </div>
 
-      <Tabs
-        value={activeTab}
-        onValueChange={handleTabChange}
-        className="space-y-6"
-      >
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="group-life">Group Life</TabsTrigger>
-          <TabsTrigger value="individual">Individual</TabsTrigger>
-          {/* <TabsTrigger value="corporate">Corporate</TabsTrigger> */}
-        </TabsList>
+          <Tabs
+            value={activeTab}
+            onValueChange={handleTabChange}
+            className="space-y-6"
+          >
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="group-life">Company Group Life</TabsTrigger>
+              <TabsTrigger value="employee-group-life">
+                Employee Group Life
+              </TabsTrigger>
+            </TabsList>
 
-        {children}
-      </Tabs>
+            {children}
+          </Tabs>
+        </>
+      )}{" "}
     </div>
   );
 }

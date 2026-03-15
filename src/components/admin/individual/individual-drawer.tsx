@@ -24,7 +24,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
 import {
   User,
   Mail,
@@ -40,19 +39,21 @@ import {
   Clock,
   AlertCircle,
   Hash,
-  Building2,
   Heart,
   Loader2,
+  Globe,
+  Briefcase,
+  CreditCard,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow, format } from "date-fns";
-// import {
-//   useApproveEmployeeRegistration,
-//   useRejectEmployeeRegistration,
-//   useSendEmployeeInvitation,
-// } from "@/hooks/queries/useGroupLifeEmployees";
+import {
+  useApproveIndividualRegistration,
+  useRejectIndividualRegistration,
+  useSendIndividualInvitation,
+  useVerifyIndividualRegistration,
+} from "@/hooks/queries/useIndividualRegistrations";
 import { toast } from "sonner";
-import { useApproveEmployeeRegistration, useRejectEmployeeRegistration, useSendEmployeeInvitation } from "@/hooks/queries/useGroupLifeEmployees";
 
 interface IndividualDrawerProps {
   registration: any;
@@ -63,20 +64,16 @@ interface IndividualDrawerProps {
 }
 
 const statusStyles = {
-  pending_approval: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
   approved: "bg-green-100 text-green-800 border-green-200",
   rejected: "bg-red-100 text-red-800 border-red-200",
+  verified: "bg-purple-100 text-purple-800 border-purple-200",
 };
 
 const accountStatusStyles = {
   pending: "bg-gray-100 text-gray-800 border-gray-200",
   invited: "bg-blue-100 text-blue-800 border-blue-200",
-  active: "bg-blue-100 text-blue-800 border-blue-200",
-};
-
-const verificationStatusStyles = {
-  not_verified: "bg-orange-100 text-orange-800 border-orange-200",
-  verified: "bg-purple-100 text-purple-800 border-purple-200",
+  active: "bg-emerald-100 text-emerald-800 border-emerald-200",
 };
 
 export function IndividualDrawer({
@@ -88,18 +85,21 @@ export function IndividualDrawer({
   const [activeTab, setActiveTab] = useState("details");
   const [showApproveDialog, setShowApproveDialog] = useState(false);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [showVerifyDialog, setShowVerifyDialog] = useState(false);
+  const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
 
-  const approveMutation = useApproveEmployeeRegistration();
-  const rejectMutation = useRejectEmployeeRegistration();
-  const sendInviteMutation = useSendEmployeeInvitation();
+  const approveMutation = useApproveIndividualRegistration();
+  const rejectMutation = useRejectIndividualRegistration();
+  const verifyMutation = useVerifyIndividualRegistration();
+  const sendInviteMutation = useSendIndividualInvitation();
 
   if (!registration) return null;
 
   const handleApprove = () => {
     approveMutation.mutate(registration.id, {
       onSuccess: () => {
-        toast.success("Registration approved successfully");
         setShowApproveDialog(false);
       },
     });
@@ -114,7 +114,6 @@ export function IndividualDrawer({
       { id: registration.id, data: { rejection_reason: rejectionReason } },
       {
         onSuccess: () => {
-          toast.success("Registration rejected");
           setShowRejectDialog(false);
           setRejectionReason("");
         },
@@ -122,12 +121,21 @@ export function IndividualDrawer({
     );
   };
 
+  const handleVerify = () => {
+    verifyMutation.mutate(registration.id, {
+      onSuccess: () => {
+        setShowVerifyDialog(false);
+      },
+    });
+  };
+
   const handleSendInvite = () => {
     sendInviteMutation.mutate(
-      { id: registration.id },
+      { id: registration.id, email: inviteEmail || undefined },
       {
         onSuccess: () => {
-          toast.success("Invitation sent successfully");
+          setShowInviteDialog(false);
+          setInviteEmail("");
         },
       }
     );
@@ -189,10 +197,8 @@ export function IndividualDrawer({
                   variant="outline"
                   className={cn(
                     "text-xs",
-                    status === "verified" &&
-                      "bg-green-50 text-green-700 border-green-200",
-                    status === "not_verified" &&
-                      "bg-orange-50 text-orange-700 border-orange-200",
+                    status === "verified" && "bg-green-50 text-green-700 border-green-200",
+                    status === "not_verified" && "bg-orange-50 text-orange-700 border-orange-200"
                   )}
                 >
                   {status === "verified" ? "Verified" : "Pending"}
@@ -226,28 +232,19 @@ export function IndividualDrawer({
         <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
           <Icon className="h-4 w-4 text-gray-600" />
         </div>
-        {!isLast && (
-          <div className="absolute top-8 left-4 h-12 w-px bg-gray-200" />
-        )}
+        {!isLast && <div className="absolute top-8 left-4 h-12 w-px bg-gray-200" />}
       </div>
       <div className="flex-1 pb-4">
         <p className="font-medium">{title}</p>
-        {date && (
-          <p className="text-sm text-gray-500">
-            {format(new Date(date), "PPP p")}
-          </p>
-        )}
-        {description && (
-          <p className="text-sm text-gray-600 mt-1">{description}</p>
-        )}
+        {date && <p className="text-sm text-gray-500">{format(new Date(date), 'PPP p')}</p>}
+        {description && <p className="text-sm text-gray-600 mt-1">{description}</p>}
       </div>
     </div>
   );
 
   // Calculate days pending
   const daysPending = Math.ceil(
-    (new Date().getTime() - new Date(registration.submitted_at).getTime()) /
-      (1000 * 60 * 60 * 24),
+    (new Date().getTime() - new Date(registration.submitted_at).getTime()) / (1000 * 60 * 60 * 24)
   );
 
   return (
@@ -267,9 +264,7 @@ export function IndividualDrawer({
                   </SheetTitle>
                   <p className="text-blue-100 text-sm mt-1">
                     {registration.email_address} • Submitted{" "}
-                    {formatDistanceToNow(new Date(registration.submitted_at), {
-                      addSuffix: true,
-                    })}
+                    {formatDistanceToNow(new Date(registration.submitted_at), { addSuffix: true })}
                   </p>
                 </div>
               </div>
@@ -291,90 +286,69 @@ export function IndividualDrawer({
                   className={cn(
                     "px-3 py-1 text-sm",
                     "bg-white/20 text-white border-white/30",
-                    statusStyles[
-                      registration.status as keyof typeof statusStyles
-                    ],
+                    statusStyles[registration.status as keyof typeof statusStyles]
                   )}
                 >
-                  {registration.status?.replace("_", " ")}
+                  {registration.status}
                 </Badge>
                 <Badge
                   variant="outline"
                   className={cn(
                     "px-3 py-1 text-sm",
                     "bg-white/20 text-white border-white/30",
-                    accountStatusStyles[
-                      registration.account_status as keyof typeof accountStatusStyles
-                    ],
+                    accountStatusStyles[registration.account_status as keyof typeof accountStatusStyles]
                   )}
                 >
                   {registration.account_status}
                 </Badge>
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    "px-3 py-1 text-sm",
-                    "bg-white/20 text-white border-white/30",
-                    verificationStatusStyles[
-                      registration.verification_status as keyof typeof verificationStatusStyles
-                    ],
-                  )}
-                >
-                  {registration.verification_status === "not_verified"
-                    ? "Not Verified"
-                    : "Verified"}
-                </Badge>
               </div>
+              
+              <div className="flex items-center gap-2">
+                {registration.status === 'pending' && (
+                  <>
+                    <Button
+                      className="bg-green-600 hover:bg-green-700"
+                      onClick={() => setShowApproveDialog(true)}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Approve
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowRejectDialog(true)}
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      Reject
+                    </Button>
+                  </>
+                )}
 
-              {registration.status === "pending_approval" && (
-                <div className="flex items-center gap-2">
+                {registration.status === 'approved' && (
                   <Button
-                    className="bg-green-600 hover:bg-green-700"
-                    onClick={() => setShowApproveDialog(true)}
+                    className="bg-purple-600 hover:bg-purple-700"
+                    onClick={() => setShowVerifyDialog(true)}
                   >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Approve
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={() => setShowRejectDialog(true)}
-                  >
-                    <XCircle className="h-4 w-4 mr-2" />
-                    Reject
-                  </Button>
-                </div>
-              )}
-
-              {registration.status === "approved" &&
-                registration.account_status === "pending" && (
-                  <Button
-                    className="bg-blue-600 hover:bg-blue-700"
-                    onClick={handleSendInvite}
-                    // disabled={sendInviteMutation.isPending}
-                  >
-                    {/* {sendInviteMutation.isPending ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Sending...
-                    </>
-                  ) : ( */}
-                    <>
-                      <Mail className="h-4 w-4 mr-2" />
-                      Send Invitation
-                    </>
-                    {/* )} */}
+                    <Shield className="h-4 w-4 mr-2" />
+                    Verify
                   </Button>
                 )}
+
+                {registration.status === 'approved' && registration.account_status === 'pending' && (
+                  <Button
+                    className="bg-blue-600 hover:bg-blue-700"
+                    onClick={() => setShowInviteDialog(true)}
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    Send Invitation
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Tabs */}
-          <div className="border-b px-8 sticky top-45 bg-white z-10">
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-full"
-            >
+          <div className="border-b px-8 sticky top-50 bg-white z-10">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="w-full justify-start h-auto p-0 bg-transparent">
                 <TabsTrigger
                   value="details"
@@ -406,11 +380,9 @@ export function IndividualDrawer({
                 {/* Key Statistics */}
                 <div className="grid grid-cols-4 gap-4">
                   <div className="bg-blue-50 p-4 rounded-lg text-center">
-                    <Building2 className="h-6 w-6 text-blue-500 mx-auto mb-2" />
-                    <p className="text-2xl font-bold">
-                      {registration.company_name || "N/A"}
-                    </p>
-                    <p className="text-xs text-gray-600">Company</p>
+                    <User className="h-6 w-6 text-blue-500 mx-auto mb-2" />
+                    <p className="text-2xl font-bold">1</p>
+                    <p className="text-xs text-gray-600">Individual</p>
                   </div>
                   <div className="bg-purple-50 p-4 rounded-lg text-center">
                     <FileText className="h-6 w-6 text-purple-500 mx-auto mb-2" />
@@ -435,7 +407,7 @@ export function IndividualDrawer({
                     <SectionCard title="Personal Information">
                       <InfoRow
                         label="Full Name"
-                        value={`${registration.first_name || ""} ${registration.middle_name || ""} ${registration.last_name || ""}`}
+                        value={`${registration.title || ''} ${registration.first_name || ''} ${registration.middle_name || ''} ${registration.last_name || ''}`.trim()}
                         icon={User}
                       />
                       <InfoRow
@@ -450,14 +422,7 @@ export function IndividualDrawer({
                       />
                       <InfoRow
                         label="Date of Birth"
-                        value={
-                          registration.date_of_birth
-                            ? format(
-                                new Date(registration.date_of_birth),
-                                "PPP",
-                              )
-                            : "N/A"
-                        }
+                        value={registration.date_of_birth ? format(new Date(registration.date_of_birth), 'PPP') : 'N/A'}
                         icon={Calendar}
                       />
                       <InfoRow
@@ -468,20 +433,25 @@ export function IndividualDrawer({
                       <InfoRow
                         label="Nationality"
                         value={registration.nationality}
-                        icon={Shield}
+                        icon={Globe}
                       />
                     </SectionCard>
 
-                    <SectionCard title="Company Information">
+                    <SectionCard title="Bank Information">
                       <InfoRow
-                        label="Company"
-                        value={registration.company_name}
-                        icon={Building2}
+                        label="Bank Name"
+                        value={registration.bank_name}
+                        icon={CreditCard}
                       />
                       <InfoRow
-                        label="Company ID"
-                        value={registration.company_id}
+                        label="Account Number"
+                        value={registration.bank_account_number}
                         icon={Hash}
+                      />
+                      <InfoRow
+                        label="TIN/PIN"
+                        value={registration.tin_or_pin}
+                        icon={Briefcase}
                       />
                     </SectionCard>
                   </div>
@@ -492,7 +462,7 @@ export function IndividualDrawer({
                       <InfoRow
                         label="Country"
                         value={registration.country}
-                        icon={MapPin}
+                        icon={Globe}
                       />
                       <InfoRow
                         label="State"
@@ -509,6 +479,13 @@ export function IndividualDrawer({
                         value={registration.house_address}
                         icon={MapPin}
                       />
+                      {registration.chn && (
+                        <InfoRow
+                          label="CHN"
+                          value={registration.chn}
+                          icon={Hash}
+                        />
+                      )}
                     </SectionCard>
 
                     <SectionCard title="Identity Information">
@@ -518,8 +495,8 @@ export function IndividualDrawer({
                         icon={Shield}
                       />
                       <InfoRow
-                        label="Identity Number"
-                        value={registration.identity_card_number}
+                        label="ID Number"
+                        value={registration.identity_card_number || (registration.nin_number_data ? '•••••••••••' : null)}
                         icon={Hash}
                       />
                     </SectionCard>
@@ -527,34 +504,32 @@ export function IndividualDrawer({
                     <SectionCard title="Submission Details">
                       <InfoRow
                         label="Submission Type"
-                        value={registration.submission_type?.replace("_", " ")}
+                        value={registration.submission_type?.replace('_', ' ')}
                         icon={FileText}
                       />
                       <InfoRow
                         label="Submitted On"
-                        value={format(
-                          new Date(registration.submitted_at),
-                          "PPP p",
-                        )}
+                        value={format(new Date(registration.submitted_at), 'PPP p')}
                         icon={Calendar}
                       />
                       {registration.approved_at && (
                         <InfoRow
                           label="Approved On"
-                          value={format(
-                            new Date(registration.approved_at),
-                            "PPP p",
-                          )}
+                          value={format(new Date(registration.approved_at), 'PPP p')}
                           icon={CheckCircle}
+                        />
+                      )}
+                      {registration.verified_at && (
+                        <InfoRow
+                          label="Verified On"
+                          value={format(new Date(registration.verified_at), 'PPP p')}
+                          icon={Shield}
                         />
                       )}
                       {registration.rejected_at && (
                         <InfoRow
                           label="Rejected On"
-                          value={format(
-                            new Date(registration.rejected_at),
-                            "PPP p",
-                          )}
+                          value={format(new Date(registration.rejected_at), 'PPP p')}
                           icon={XCircle}
                         />
                       )}
@@ -576,36 +551,23 @@ export function IndividualDrawer({
                   <div className="space-y-3">
                     <DocumentCard
                       name="Identity Card"
-                      date={format(
-                        new Date(registration.submitted_at),
-                        "MMM d, yyyy",
-                      )}
+                      date={format(new Date(registration.submitted_at), 'MMM d, yyyy')}
                       status={registration.verification_status}
                     />
                     <DocumentCard
                       name="Passport Photograph"
-                      date={format(
-                        new Date(registration.submitted_at),
-                        "MMM d, yyyy",
-                      )}
+                      date={format(new Date(registration.submitted_at), 'MMM d, yyyy')}
                       status={registration.verification_status}
                     />
                     <DocumentCard
-                      name="Signature"
-                      date={format(
-                        new Date(registration.submitted_at),
-                        "MMM d, yyyy",
-                      )}
+                      name="Scanned Signature"
+                      date={format(new Date(registration.submitted_at), 'MMM d, yyyy')}
                       status={registration.verification_status}
                     />
-                    {registration.identity_card_type ===
-                      "National Identity Number" && (
+                    {registration.identity_card_type === 'National Identity Number' && (
                       <DocumentCard
                         name="NIN Document"
-                        date={format(
-                          new Date(registration.submitted_at),
-                          "MMM d, yyyy",
-                        )}
+                        date={format(new Date(registration.submitted_at), 'MMM d, yyyy')}
                         status={registration.verification_status}
                       />
                     )}
@@ -621,7 +583,7 @@ export function IndividualDrawer({
                       icon={FileText}
                       title="Application Submitted"
                       date={registration.submitted_at}
-                      description={`Via ${registration.submission_type?.replace("_", " ") || "public form"}`}
+                      description={`Via ${registration.submission_type?.replace('_', ' ') || 'public form'}`}
                     />
 
                     {registration.approved_at && (
@@ -629,11 +591,16 @@ export function IndividualDrawer({
                         icon={CheckCircle}
                         title="Application Approved"
                         date={registration.approved_at}
-                        description={
-                          registration.approved_by
-                            ? `By Admin #${registration.approved_by}`
-                            : undefined
-                        }
+                        description={registration.approved_by ? `By Admin #${registration.approved_by}` : undefined}
+                      />
+                    )}
+
+                    {registration.verified_at && (
+                      <TimelineItem
+                        icon={Shield}
+                        title="Identity Verified"
+                        date={registration.verified_at}
+                        description="Documents verified successfully"
                       />
                     )}
 
@@ -646,25 +613,25 @@ export function IndividualDrawer({
                       />
                     )}
 
-                    {registration.account_status === "invited" && (
+                    {registration.account_status === 'invited' && (
                       <TimelineItem
                         icon={Mail}
                         title="Invitation Sent"
                         date={registration.approved_at}
-                        description="Invitation email sent to employee"
+                        description="Invitation email sent to individual"
                       />
                     )}
 
-                    {registration.account_status === "active" && (
+                    {registration.account_status === 'active' && (
                       <TimelineItem
                         icon={User}
                         title="Account Activated"
-                        description="Employee set up password and activated account"
+                        description="Individual set up password and activated account"
                         isLast={true}
                       />
                     )}
 
-                    {registration.status === "pending_approval" && (
+                    {registration.status === 'pending' && (
                       <TimelineItem
                         icon={Clock}
                         title="Awaiting Review"
@@ -698,19 +665,28 @@ export function IndividualDrawer({
                   ?
                 </p>
                 <p className="text-sm text-gray-600">
-                  This will mark the registration as approved. You can then send
-                  an invitation to the individual to create their account.
+                  This will mark the registration as approved. You can then send an invitation to the individual to create their account.
                 </p>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={approveMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleApprove}
+              disabled={approveMutation.isPending}
               className="bg-green-600 hover:bg-green-700"
             >
-              Approve Registration
+              {approveMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Approving...
+                </>
+              ) : (
+                'Approve Registration'
+              )}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -753,15 +729,130 @@ export function IndividualDrawer({
                 setShowRejectDialog(false);
                 setRejectionReason("");
               }}
+              disabled={rejectMutation.isPending}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
               onClick={handleReject}
-              disabled={!rejectionReason.trim()}
+              disabled={rejectMutation.isPending || !rejectionReason.trim()}
             >
-              Reject Registration
+              {rejectMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Rejecting...
+                </>
+              ) : (
+                'Reject Registration'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Verify Dialog */}
+      <AlertDialog open={showVerifyDialog} onOpenChange={setShowVerifyDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-purple-600">
+              <Shield className="h-5 w-5" />
+              Verify Individual Registration
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-3">
+                <p>
+                  Are you sure you want to verify{" "}
+                  <span className="font-semibold">
+                    {registration?.first_name} {registration?.last_name}
+                  </span>
+                  ?
+                </p>
+                <p className="text-sm text-gray-600">
+                  This will mark the identity documents as verified.
+                </p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={verifyMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleVerify}
+              disabled={verifyMutation.isPending}
+              className="bg-purple-600 hover:bg-purple-700"
+            >
+              {verifyMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Verifying...
+                </>
+              ) : (
+                'Verify Registration'
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Send Invitation Dialog */}
+      <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-blue-600">
+              <Mail className="h-5 w-5" />
+              Send Invitation
+            </DialogTitle>
+            <DialogDescription>
+              Send an invitation email to{" "}
+              <span className="font-semibold">
+                {registration?.first_name} {registration?.last_name}
+              </span>
+              .
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Email Address (Optional)</label>
+              <input
+                type="email"
+                placeholder={registration?.email_address}
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <p className="text-xs text-muted-foreground">
+                If left blank, the invitation will be sent to {registration?.email_address}
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-2 sm:gap-0">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowInviteDialog(false);
+                setInviteEmail("");
+              }}
+              disabled={sendInviteMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendInvite}
+              disabled={sendInviteMutation.isPending}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              {sendInviteMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                'Send Invitation'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

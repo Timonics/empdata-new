@@ -1,11 +1,11 @@
-import { GroupLifeRegistrations } from "@/components/admin/registrations/group-life-registrations";
-import { Metadata } from "next";
+import { Metadata } from 'next';
+import { GroupLifeRegistrations } from '@/components/admin/registrations/group-life-registrations';
 
 export const metadata: Metadata = {
-  title: "Group Life Registrations - EMPDATA Admin",
-  description: "Manage group life insurance registrations",
+  title: 'Company Group Life Registrations - EMPDATA Admin',
+  description: 'Manage company group life insurance registrations',
 };
 
-export default function GroupLifePage() {
+export default function CompanyGroupLifePage() {
   return <GroupLifeRegistrations />;
 }

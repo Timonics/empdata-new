@@ -31,12 +31,15 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Building2, Mail, Phone, MapPin, User, Briefcase } from "lucide-react";
+import { useCreateCompany } from "@/hooks/queries/useCompanies";
+import { toast } from "sonner";
 
+// Define the schema with proper types
 const companySchema = z.object({
   // Company Information
-  companyName: z.string().min(2, "Company name is required"),
-  rcNumber: z.string().min(5, "RC Number is required"),
-  taxId: z.string().optional(),
+  company_name: z.string().min(2, "Company name is required"),
+  rc_number: z.string().min(5, "RC Number is required"),
+  tax_id: z.string().optional(),
   website: z.string().url().optional().or(z.literal("")),
 
   // Contact Information
@@ -45,17 +48,17 @@ const companySchema = z.object({
   address: z.string().min(5, "Address is required"),
   city: z.string().min(2, "City is required"),
   state: z.string().min(2, "State is required"),
-  country: z.string().default("Nigeria"),
+  country: z.string().min(2, "Country is required"),
 
   // Insurance Details
-  insuranceType: z.string().min(1, "Insurance type is required"),
-  employeeCount: z.string().min(1, "Number of employees is required"),
+  insurance_type: z.string().min(1, "Insurance type is required"),
+  employee_count: z.string().min(1, "Number of employees is required"),
 
   // Admin Information
-  adminName: z.string().min(2, "Admin name is required"),
-  adminEmail: z.string().email("Valid admin email is required"),
-  adminPhone: z.string().min(10, "Valid admin phone is required"),
-  adminPosition: z.string().min(2, "Admin position is required"),
+  admin_name: z.string().min(2, "Admin name is required"),
+  admin_email: z.string().email("Valid admin email is required"),
+  admin_phone: z.string().min(10, "Valid admin phone is required"),
+  admin_position: z.string().min(2, "Admin position is required"),
 });
 
 type CompanyFormValues = z.infer<typeof companySchema>;
@@ -67,24 +70,46 @@ interface AddCompanyModalProps {
 
 export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const createCompany = useCreateCompany();
 
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companySchema),
     defaultValues: {
       country: "Nigeria",
+      company_name: "",
+      rc_number: "",
+      tax_id: "",
+      website: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      insurance_type: "",
+      employee_count: "",
+      admin_name: "",
+      admin_email: "",
+      admin_phone: "",
+      admin_position: "",
     },
   });
 
   const onSubmit = async (data: CompanyFormValues) => {
     setIsSubmitting(true);
     try {
-      // TODO: Implement API call
-      console.log("Form data:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API call
+      // Convert employee_count from string to number if needed
+      const payload = {
+        ...data,
+        employee_count: parseInt(data.employee_count),
+      };
+
+      await createCompany.mutateAsync(payload);
       onOpenChange(false);
       form.reset();
+      toast.success("Company created successfully");
     } catch (error) {
       console.error("Error adding company:", error);
+      toast.error("Failed to create company");
     } finally {
       setIsSubmitting(false);
     }
@@ -109,7 +134,9 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <Tabs defaultValue="company" className="w-full mt-4">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="company" className="text-sm">Company Info</TabsTrigger>
+                <TabsTrigger value="company" className="text-sm">
+                  Company Info
+                </TabsTrigger>
                 <TabsTrigger value="contact">Contact Details</TabsTrigger>
                 <TabsTrigger value="admin">Admin Account</TabsTrigger>
               </TabsList>
@@ -119,7 +146,7 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="companyName"
+                    name="company_name"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs">Company Name</FormLabel>
@@ -140,7 +167,7 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
 
                   <FormField
                     control={form.control}
-                    name="rcNumber"
+                    name="rc_number"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs">RC Number</FormLabel>
@@ -154,10 +181,12 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
 
                   <FormField
                     control={form.control}
-                    name="taxId"
+                    name="tax_id"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Tax ID (Optional)</FormLabel>
+                        <FormLabel className="text-xs">
+                          Tax ID (Optional)
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="e.g., 12345678-0001" {...field} />
                         </FormControl>
@@ -171,7 +200,9 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
                     name="website"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Website (Optional)</FormLabel>
+                        <FormLabel className="text-xs">
+                          Website (Optional)
+                        </FormLabel>
                         <FormControl>
                           <Input placeholder="https://example.com" {...field} />
                         </FormControl>
@@ -182,10 +213,12 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
 
                   <FormField
                     control={form.control}
-                    name="insuranceType"
+                    name="insurance_type"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Insurance Type</FormLabel>
+                        <FormLabel className="text-xs">
+                          Insurance Type
+                        </FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
@@ -218,10 +251,12 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
 
                   <FormField
                     control={form.control}
-                    name="employeeCount"
+                    name="employee_count"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Number of Employees</FormLabel>
+                        <FormLabel className="text-xs">
+                          Number of Employees
+                        </FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -244,7 +279,9 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
                     name="email"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs">Business Email</FormLabel>
+                        <FormLabel className="text-xs">
+                          Business Email
+                        </FormLabel>
                         <FormControl>
                           <div className="relative">
                             <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -287,7 +324,9 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
                     name="address"
                     render={({ field }) => (
                       <FormItem className="col-span-2">
-                        <FormLabel className="text-xs">Street Address</FormLabel>
+                        <FormLabel className="text-xs">
+                          Street Address
+                        </FormLabel>
                         <FormControl>
                           <div className="relative">
                             <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
@@ -352,7 +391,7 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
-                    name="adminName"
+                    name="admin_name"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs">Admin Name</FormLabel>
@@ -373,7 +412,7 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
 
                   <FormField
                     control={form.control}
-                    name="adminPosition"
+                    name="admin_position"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs">Position</FormLabel>
@@ -394,7 +433,7 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
 
                   <FormField
                     control={form.control}
-                    name="adminEmail"
+                    name="admin_email"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs">Admin Email</FormLabel>
@@ -416,7 +455,7 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
 
                   <FormField
                     control={form.control}
-                    name="adminPhone"
+                    name="admin_phone"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs">Admin Phone</FormLabel>
@@ -451,11 +490,17 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                disabled={isSubmitting || createCompany.isPending}
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Creating..." : "Create Company"}
+              <Button
+                type="submit"
+                disabled={isSubmitting || createCompany.isPending}
+              >
+                {isSubmitting || createCompany.isPending
+                  ? "Creating..."
+                  : "Create Company"}
               </Button>
             </DialogFooter>
           </form>

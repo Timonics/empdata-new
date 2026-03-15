@@ -16,6 +16,7 @@ import {
   Plus,
   Search,
   SlidersHorizontal,
+  Upload,
 } from "lucide-react";
 import { ExportModal } from "@/components/export-modal";
 import { useCompanies } from "@/hooks/queries/useCompanies";
@@ -33,8 +34,8 @@ interface CompaniesHeaderProps {
   filteredCount?: number;
 }
 
-export function CompaniesHeader({ 
-  onSearch, 
+export function CompaniesHeader({
+  onSearch,
   onFilterChange,
   filters = {},
   selectedRows = [],
@@ -83,18 +84,18 @@ export function CompaniesHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
+          <Button size="sm">
+            <Upload className="mr-2 h-4 w-4" />
+            Import
+          </Button>
+          <Button
+            variant="outline"
             size="sm"
             onClick={() => setShowExportModal(true)}
           >
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          {/* <Button size="sm" onClick={() => setShowAddModal(true)}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Company
-          </Button> */}
         </div>
       </div>
       <div className="flex flex-col gap-4 md:flex-row md:items-center">
@@ -109,7 +110,7 @@ export function CompaniesHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <Select 
+          <Select
             defaultValue="all"
             value={filters.status || "all"}
             onValueChange={(value) => onFilterChange?.("status", value)}
@@ -127,7 +128,7 @@ export function CompaniesHeader({
             </SelectContent>
           </Select>
 
-          <Select 
+          <Select
             defaultValue="all"
             value={filters.insurance_type || "all"}
             onValueChange={(value) => onFilterChange?.("insurance_type", value)}
@@ -163,11 +164,11 @@ export function CompaniesHeader({
         totalCount={totalCount}
         filteredCount={filteredCount}
         columns={exportColumns}
-        formats={['csv', 'excel']}
+        formats={["csv", "excel"]}
         showDateRange={true}
         showColumnSelection={true}
         onSuccess={() => {
-          console.log('Companies export completed');
+          console.log("Companies export completed");
         }}
       />
     </>

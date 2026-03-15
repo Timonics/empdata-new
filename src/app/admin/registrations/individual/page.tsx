@@ -1,5 +1,5 @@
-import { IndividualRegistrations } from "@/components/admin/registrations/individual-registrations";
 import { Metadata } from "next";
+import { IndividualRegistrations } from "@/components/admin/individual/individual-registrations";
 
 export const metadata: Metadata = {
   title: "Individual Registrations - EMPDATA Admin",
@@ -7,5 +7,9 @@ export const metadata: Metadata = {
 };
 
 export default function IndividualPage() {
-  return <IndividualRegistrations />;
+  return (
+    <div className="space-y-6">
+      <IndividualRegistrations />
+    </div>
+  );
 }

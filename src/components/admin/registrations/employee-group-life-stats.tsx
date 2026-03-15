@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useRegistrationStatusSummary } from "@/hooks/queries/useAnalytics";
 
-export function IndividualStats() {
+export function EmployeeGroupLifeStats() {
   const { data, isLoading, error } = useRegistrationStatusSummary();
 
   if (isLoading) {
@@ -144,7 +144,10 @@ export function IndividualStats() {
         const colors = colorClasses[stat.color as keyof typeof colorClasses];
 
         return (
-          <Card key={stat.title} className={cn("hover:shadow-lg transition-shadow", colors.bg)}>
+          <Card
+            key={stat.title}
+            className={cn("hover:shadow-lg transition-shadow", colors.bg)}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium text-muted-foreground">
                 {stat.title}

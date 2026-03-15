@@ -1,134 +1,104 @@
-type UserRole = 'admin' | 'company' | 'employee';
+import { UserRole } from "@/types/auth.types";
 
 class TokenManager {
-  private tokens: Map<UserRole, string | null> = new Map();
-  private refreshTokens: Map<UserRole, string | null> = new Map();
   private userRole: UserRole | null = null;
   private userData: any = null;
 
   constructor() {
     // Initialize from localStorage on client side only
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       this.loadFromStorage();
     }
   }
 
   private loadFromStorage() {
-    const roles: UserRole[] = ['admin', 'company', 'employee'];
-    roles.forEach(role => {
-      const token = localStorage.getItem(`token_${role}`);
-      const refreshToken = localStorage.getItem(`refresh_${role}`);
-      if (token) this.tokens.set(role, token);
-      if (refreshToken) this.refreshTokens.set(role, refreshToken);
-    });
-    
-    const storedRole = localStorage.getItem('userRole') as UserRole | null;
+    // Load user role
+    const storedRole = localStorage.getItem("userRole") as UserRole | null;
     if (storedRole) {
       this.userRole = storedRole;
     }
-  }
 
-  setToken(role: UserRole, token: string | null) {
-    this.tokens.set(role, token);
-    if (typeof window !== 'undefined') {
-      if (token) {
-        localStorage.setItem(`token_${role}`, token);
-      } else {
-        localStorage.removeItem(`token_${role}`);
+    // Load user data
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        this.userData = JSON.parse(storedUser);
+      } catch (e) {
+        console.error("Failed to parse user data", e);
       }
     }
-  }
-
-  getToken(role?: UserRole): string | null {
-    if (role) {
-      return this.tokens.get(role) || null;
-    }
-    // If no role provided, try to get token for current user role
-    if (this.userRole) {
-      return this.tokens.get(this.userRole) || null;
-    }
-    return null;
-  }
-
-  setRefreshToken(role: UserRole, token: string | null) {
-    this.refreshTokens.set(role, token);
-    if (typeof window !== 'undefined') {
-      if (token) {
-        localStorage.setItem(`refresh_${role}`, token);
-      } else {
-        localStorage.removeItem(`refresh_${role}`);
-      }
-    }
-  }
-
-  getRefreshToken(role: UserRole): string | null {
-    return this.refreshTokens.get(role) || null;
   }
 
   setUserRole(role: UserRole | null) {
     this.userRole = role;
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       if (role) {
-        localStorage.setItem('userRole', role);
+        localStorage.setItem("userRole", role);
       } else {
-        localStorage.removeItem('userRole');
+        localStorage.removeItem("userRole");
       }
     }
   }
 
   getUserRole(): UserRole | null {
-    return this.userRole;
+    const storedRole = localStorage.getItem("userRole") as UserRole | null;
+    if (storedRole) {
+      this.userRole = storedRole;
+      return storedRole;
+    }
+    
+    return null;
   }
 
   setUserData(data: any) {
     this.userData = data;
+    if (typeof window !== "undefined") {
+      if (data) {
+        localStorage.setItem("user", JSON.stringify(data));
+      } else {
+        localStorage.removeItem("user");
+      }
+    }
   }
 
   getUserData(): any {
-    return this.userData;
-  }
-
-  clearTokens(role?: UserRole) {
-    if (role) {
-      this.setToken(role, null);
-      this.setRefreshToken(role, null);
-      if (this.userRole === role) {
-        this.userRole = null;
-        this.userData = null;
+    // Try from memory first
+    if (this.userData) return this.userData;
+    
+    // Fallback to localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        this.userData = JSON.parse(storedUser);
+        return this.userData;
+      } catch (e) {
+        console.error("Failed to parse user data", e);
       }
-    } else {
-      const roles: UserRole[] = ['admin', 'company', 'employee'];
-      roles.forEach(r => {
-        this.setToken(r, null);
-        this.setRefreshToken(r, null);
-      });
-      this.userRole = null;
-      this.userData = null;
     }
+    
+    return null;
   }
 
-  clearAllTokens() {
-    const roles: UserRole[] = ['admin', 'company', 'employee'];
-    roles.forEach(r => {
-      this.setToken(r, null);
-      this.setRefreshToken(r, null);
-    });
+  // We don't store tokens in localStorage anymore - they're in HTTP-only cookies
+  // These methods are kept for compatibility but don't actually store anything
+  getToken(): string | null {
+    // Tokens are in HTTP-only cookies, not accessible via JavaScript
+    // This method returns null as tokens cannot be accessed from client
+    return null;
+  }
+
+  clearUserData() {
     this.userRole = null;
     this.userData = null;
+    
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("user");
+    }
   }
 
-  hasValidToken(role?: UserRole): boolean {
-    if (role) {
-      return !!this.getToken(role);
-    }
-    if (this.userRole) {
-      return !!this.getToken(this.userRole);
-    }
-    return false;
-  }
-
-  getCurrentRole(): UserRole | null {
-    return this.userRole;
+  hasValidSession(): boolean {
+    return !!this.getUserRole();
   }
 }
 

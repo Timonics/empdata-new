@@ -32,7 +32,7 @@ export function useAuth() {
   });
 
   // Get current role
-  const userRole = tokenManager.getCurrentRole();
+  const userRole = tokenManager.getUserRole();
 
   // Admin login mutation
   const adminLoginMutation = useMutation({
@@ -74,6 +74,7 @@ export function useAuth() {
 
           // Store user data
           tokenManager.setUserData(data.user);
+          tokenManager.setUserRole(data.user.role);
 
           toast.success("Login successful!", {
             description: `Welcome back, Admin`,
@@ -230,44 +231,41 @@ export function useAuth() {
   });
 
   // Logout mutation
-  // const logoutMutation = useMutation({
-  //   mutationFn: async () => {
-  //     const role = tokenManager.getCurrentRole();
-  //     if (role) {
-  //       await AuthService.logout(role);
-  //     } else {
-  //       await AuthService.logout();
-  //     }
-  //   },
-  //   onSuccess: () => {
-  //     // Clear cache
-  //     queryClient.setQueryData(authKeys.user(), null);
-  //     queryClient.invalidateQueries({ queryKey: authKeys.all });
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const role = tokenManager.getUserRole();
+      if (role) {
+        await AuthService.logout(role);
+      } else {
+        await AuthService.logout();
+      }
+    },
+    onSuccess: () => {
+      // Clear cache
+      // queryClient.setQueryData(authKeys.user(), null);
+      // queryClient.invalidateQueries({ queryKey: authKeys.all });
+      // // Clear token manager
+      // tokenManager.clearUserData();
+      // toast.success("Logged out successfully");
+      // // Redirect to appropriate login page
+      // const lastRole = tokenManager.getUserRole();
+      // if (lastRole === "admin") {
+      //   router.push("/admin/login");
+      // } else {
+      //   router.push("/portal/auth");
+      // }
+    },
+    onError: (error: any) => {
+      toast.error("Logout failed", {
+        description: error.message || "An error occurred during logout",
+      });
 
-  //     // Clear token manager
-  //     tokenManager.clearUserData();
-
-  //     toast.success("Logged out successfully");
-
-  //     // Redirect to appropriate login page
-  //     const lastRole = tokenManager.getCurrentRole();
-  //     if (lastRole === "admin") {
-  //       router.push("/admin/login");
-  //     } else {
-  //       router.push("/portal/login");
-  //     }
-  //   },
-  //   onError: (error: any) => {
-  //     toast.error("Logout failed", {
-  //       description: error.message || "An error occurred during logout",
-  //     });
-
-  //     // Still clear local state and redirect
-  //     queryClient.setQueryData(authKeys.user(), null);
-  //     tokenManager.clearUserData();
-  //     router.push("/");
-  //   },
-  // });
+      // Still clear local state and redirect
+      queryClient.setQueryData(authKeys.user(), null);
+      tokenManager.clearUserData();
+      router.push("/");
+    },
+  });
 
   // Forgot password mutation
   const forgotPasswordMutation = useMutation({
@@ -359,7 +357,7 @@ export function useAuth() {
       portalVerify2faMutation.mutate(verifyData),
 
     // Logout
-    // logout: () => logoutMutation.mutate(),
+    logout: () => logoutMutation.mutate(),
 
     // Password management
     forgotPassword: (email: string) => forgotPasswordMutation.mutate(email),
@@ -367,6 +365,7 @@ export function useAuth() {
     setPassword: (data: any) => setPasswordMutation.mutate(data),
 
     // Mutation states for UI
+    isLoggingOut: logoutMutation.isPending,
     isLoggingIn: adminLoginMutation.isPending || portalLoginMutation.isPending,
     isVerifying:
       adminVerify2faMutation.isPending || portalVerify2faMutation.isPending,
@@ -378,6 +377,6 @@ export function useAuth() {
     // Errors
     loginError: adminLoginMutation.error || portalLoginMutation.error,
     verifyError: adminVerify2faMutation.error || portalVerify2faMutation.error,
-    // logoutError: logoutMutation.error,
+    logoutError: logoutMutation.error,
   };
 }
