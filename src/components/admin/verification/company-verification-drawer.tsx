@@ -245,7 +245,10 @@ export function CompanyVerificationDrawer({
                       <Badge
                         variant="outline"
                         className={cn(
-                          statusStyles[company.documents.cac.status],
+                          statusStyles[
+                            company.documents.cac
+                              .status as keyof typeof statusStyles
+                          ],
                         )}
                       >
                         {company.documents.cac.status}
@@ -253,7 +256,7 @@ export function CompanyVerificationDrawer({
                     </div>
                     <p className="text-sm font-medium">CAC Registration</p>
                   </div>
-                  <div className="bg-white p-3 rounded-lg border">
+                  {/* <div className="bg-white p-3 rounded-lg border">
                     <div className="flex items-center justify-between mb-2">
                       <FileText className="h-4 w-4 text-blue-600" />
                       <Badge
@@ -266,14 +269,17 @@ export function CompanyVerificationDrawer({
                       </Badge>
                     </div>
                     <p className="text-sm font-medium">Tax Certificate</p>
-                  </div>
+                  </div> */}
                   <div className="bg-white p-3 rounded-lg border">
                     <div className="flex items-center justify-between mb-2">
                       <FileText className="h-4 w-4 text-blue-600" />
                       <Badge
                         variant="outline"
                         className={cn(
-                          statusStyles[company.documents.address.status],
+                          statusStyles[
+                            company.documents.address
+                              .status as keyof typeof statusStyles
+                          ],
                         )}
                       >
                         {company.documents.address.status}
@@ -281,7 +287,7 @@ export function CompanyVerificationDrawer({
                     </div>
                     <p className="text-sm font-medium">Address Proof</p>
                   </div>
-                  <div className="bg-white p-3 rounded-lg border">
+                  {/* <div className="bg-white p-3 rounded-lg border">
                     <div className="flex items-center justify-between mb-2">
                       <FileText className="h-4 w-4 text-blue-600" />
                       <Badge
@@ -294,7 +300,7 @@ export function CompanyVerificationDrawer({
                       </Badge>
                     </div>
                     <p className="text-sm font-medium">Director ID</p>
-                  </div>
+                  </div> */}
                 </div>
               </SectionCard>
             </TabsContent>
