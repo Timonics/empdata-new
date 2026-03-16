@@ -56,7 +56,7 @@ export function validateOnboardingData(
     }
   }
 
-  if (accountType === "corporate" || accountType === "employee-group-life") {
+  if (accountType === "corporate") {
     const required = [
       "company_name",
       "rc_number",
@@ -93,12 +93,6 @@ export function validateOnboardingData(
       if (!data.identity_card_number) {
         return false;
       }
-    }
-  }
-
-  if (accountType === "employee-group-life") {
-    if (!data.company_id) {
-      return false;
     }
   }
 
