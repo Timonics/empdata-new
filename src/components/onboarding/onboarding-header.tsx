@@ -26,6 +26,7 @@ export function OnboardingHeader({
 
   const getAccountTypeLabel = () => {
     if (accountType === 'corporate') return 'Corporate';
+    if(accountType === "employee-group-life") return 'Employee Group Life'
     return 'Individual';
   };
 
