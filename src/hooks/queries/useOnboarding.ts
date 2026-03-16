@@ -91,27 +91,21 @@ export function useSubmitCompanyRegistration() {
 export function useSubmitEmployeeRegistration() {
   return useMutation({
     mutationFn: async (data: EmployeeGroupLifeOnboardingData) => {
-      // Encrypt BVN
-      if (data.bvn_number) {
-        const encrypted = await encryptData(data.bvn_number);
-        data.bvn_iv = encrypted.iv;
-        data.bvn_data = encrypted.data;
-        data.bvn_tag = encrypted.tag;
-        delete data.bvn_number;
-      }
+      const submissionData = { ...data };
 
       // Encrypt NIN if present
       if (
         data.identity_card_type === "National Identity Number" &&
         data.national_identification_number
       ) {
-        const encrypted = await encryptData(
+        const encrypted = await EncryptionService.encryptNin(
           data.national_identification_number,
         );
-        data.nin_number_iv = encrypted.iv;
-        data.nin_number_data = encrypted.data;
-        data.nin_number_tag = encrypted.tag;
-        delete data.national_identification_number;
+        submissionData.nin_number_iv = encrypted.nin_number_iv;
+        submissionData.nin_number_data = encrypted.nin_number_data;
+        submissionData.nin_number_tag = encrypted.nin_number_tag;
+
+          delete submissionData.national_identification_number;
       }
 
       const formData = buildFormData(data, "employee-group-life");

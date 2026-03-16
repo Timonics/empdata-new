@@ -24,6 +24,7 @@ import {
   Globe,
   Lock,
 } from "lucide-react";
+import Logo from "@/components/logo";
 
 export default function HomePage() {
   return (
@@ -38,15 +39,7 @@ export default function HomePage() {
       {/* Navigation */}
       <nav className="relative z-10 container mx-auto px-6 py-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            {/* Logo placeholder - you'll add your actual logo */}
-            <div className="h-10 w-10 bg-linear-to-br from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-xl">S</span>
-            </div>
-            <span className="text-xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              SCIB Client Onboarding
-            </span>
-          </div>
+          <Logo />
           <div className="flex items-center space-x-4">
             <Link
               href="/onboarding"
@@ -55,7 +48,7 @@ export default function HomePage() {
               Get Started
             </Link>
             <Link
-              href="/portal/login"
+              href="/portal/auth"
               className="bg-white border border-gray-200 hover:border-blue-600 text-gray-700 hover:text-blue-600 px-4 py-2 rounded-lg transition-all shadow-sm hover:shadow-md font-medium"
             >
               Portal Login
@@ -74,7 +67,9 @@ export default function HomePage() {
           </div>
 
           {/* Main Heading */}
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+          <h1 style={{
+            fontFamily: "Poppins"
+          }} className="pops text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
             <span className="bg-linear-to-r from-blue-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent bg-300% animate-gradient">
               Seamless Onboarding
             </span>
