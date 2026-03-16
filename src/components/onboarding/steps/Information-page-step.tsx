@@ -136,40 +136,40 @@ export function InformationPage({
 
   // Validation states
   const [validation, setValidation] = useState({
-    personal: false,
-    bank: false,
-    identity: false,
-    company: false,
-    directorIdentity: false,
+    personal: true,
+    bank: true,
+    identity: true,
+    company: true,
+    directorIdentity: true,
   });
 
   // Update validation when data changes
-  useEffect(() => {
-    if (isIndividual) {
-      setValidation({
-        personal: validatePersonalInfo(onBoardingData),
-        bank: validateBankInfo(onBoardingData),
-        identity: validateIdentityInfo(onBoardingData),
-        company: false,
-        directorIdentity: false,
-      });
-    } else if (isCorporate) {
-      setValidation({
-        personal: false,
-        bank: false,
-        identity: false,
-        company: validateCompanyInfo(onBoardingData),
-        directorIdentity: true
-      });
-      setValidation({
-        personal: false,
-        bank: false,
-        identity: false,
-        company: validateCompanyInfo(onBoardingData),
-        directorIdentity: true
-      })
-    }
-  }, [onBoardingData, isIndividual, isCorporate]);
+  // useEffect(() => {
+  //   if (isIndividual) {
+  //     setValidation({
+  //       personal: validatePersonalInfo(onBoardingData),
+  //       bank: validateBankInfo(onBoardingData),
+  //       identity: validateIdentityInfo(onBoardingData),
+  //       company: false,
+  //       directorIdentity: false,
+  //     });
+  //   } else if (isCorporate) {
+  //     setValidation({
+  //       personal: false,
+  //       bank: false,
+  //       identity: false,
+  //       company: validateCompanyInfo(onBoardingData),
+  //       directorIdentity: true
+  //     });
+  //     setValidation({
+  //       personal: false,
+  //       bank: false,
+  //       identity: false,
+  //       company: validateCompanyInfo(onBoardingData),
+  //       directorIdentity: true
+  //     })
+  //   }
+  // }, [onBoardingData, isIndividual, isCorporate]);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({
