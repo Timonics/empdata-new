@@ -21,13 +21,11 @@ export function OnboardingHeader({
 }: OnboardingHeaderProps) {
   const getAccountTypeIcon = () => {
     if (accountType === 'corporate') return <Building2 className="w-5 h-5" />;
-    if (accountType === 'employee-group-life') return <Users className="w-5 h-5" />;
     return <User className="w-5 h-5" />;
   };
 
   const getAccountTypeLabel = () => {
     if (accountType === 'corporate') return 'Corporate';
-    if (accountType === 'employee-group-life') return 'Employee Group Life';
     return 'Individual';
   };
 

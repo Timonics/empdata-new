@@ -50,7 +50,7 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
 
   // Determine if this is admin or portal
   const isAdmin = role === "admin";
-  const theme = isAdmin ? "blue" : "emerald";
+  const theme = isAdmin ? "blue" : "blue";
 
   // Get the appropriate back link based on role
   const getBackLink = () => {
@@ -110,16 +110,16 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
     return (
       <Card className={cn(
         "w-full shadow-lg border-0",
-        isAdmin ? "border-blue-100" : "border-emerald-100"
+        isAdmin ? "border-blue-100" : "border-blue-100"
       )}>
         <CardHeader>
           <div className="flex items-center gap-2">
             <CheckCircle className={cn(
               "h-6 w-6",
-              isAdmin ? "text-blue-600" : "text-emerald-600"
+              isAdmin ? "text-blue-600" : "text-blue-600"
             )} />
             <CardTitle className={cn(
-              isAdmin ? "text-blue-600" : "text-emerald-600"
+              isAdmin ? "text-blue-600" : "text-blue-600"
             )}>
               Check your email
             </CardTitle>
@@ -130,14 +130,14 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert className={cn(
-            isAdmin ? "bg-blue-50 border-blue-200" : "bg-emerald-50 border-emerald-200"
+            isAdmin ? "bg-blue-50 border-blue-200" : "bg-blue-50 border-blue-200"
           )}>
             <Mail className={cn(
               "h-4 w-4",
-              isAdmin ? "text-blue-600" : "text-emerald-600"
+              isAdmin ? "text-blue-600" : "text-blue-600"
             )} />
             <AlertDescription className={cn(
-              isAdmin ? "text-blue-800" : "text-emerald-800"
+              isAdmin ? "text-blue-800" : "text-blue-800"
             )}>
               Click the link in the email to reset your password. The link will
               expire in 1 hour.
@@ -160,7 +160,7 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
             onClick={() => setSuccess(false)}
             className={cn(
               isAdmin && "hover:bg-blue-50 hover:text-blue-600",
-              !isAdmin && "hover:bg-emerald-50 hover:text-emerald-600"
+              !isAdmin && "hover:bg-blue-50 hover:text-blue-600"
             )}
           >
             Try again
@@ -169,7 +169,7 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
             href={getBackLink()}
             className={cn(
               "text-sm transition-colors",
-              isAdmin ? "text-blue-600 hover:text-blue-800" : "text-emerald-600 hover:text-emerald-800"
+              isAdmin ? "text-blue-600 hover:text-blue-800" : "text-blue-600 hover:text-blue-800"
             )}
           >
             Back to login
@@ -182,7 +182,7 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
   return (
     <Card className={cn(
       "w-full shadow-lg border-0",
-      isAdmin ? "border-blue-100" : "border-emerald-100"
+      isAdmin ? "border-blue-100" : "border-blue-100"
     )}>
       <CardHeader>
         <CardTitle>
@@ -191,7 +191,7 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
               "text-2xl font-semibold tracking-tight bg-linear-to-r bg-clip-text text-transparent",
               isAdmin
                 ? "from-blue-600 to-blue-800"
-                : "from-emerald-600 to-emerald-800",
+                : "from-blue-600 to-blue-800",
             )}
           >
             {getTitle()}
@@ -230,7 +230,7 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
               "w-full",
               isAdmin 
                 ? "bg-blue-600 hover:bg-blue-700" 
-                : "bg-emerald-600 hover:bg-emerald-700"
+                : "bg-blue-600 hover:bg-blue-700"
             )}
             disabled={isLoading}
           >
@@ -256,7 +256,7 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
             "flex items-center text-sm transition-colors",
             isAdmin
               ? "text-blue-600 hover:text-blue-800"
-              : "text-emerald-600 hover:text-emerald-800",
+              : "text-blue-600 hover:text-blue-800",
           )}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Building2,
   Mail,
@@ -14,13 +14,14 @@ import {
   Calendar,
   Shield,
   FileText,
-} from 'lucide-react';
-import { useCompanyProfile } from '@/hooks/queries/usePortalDashboard';
+} from "lucide-react";
+import {
+  useCompanyEmployeesTotal,
+  useCompanyProfile,
+} from "@/hooks/queries/usePortalDashboard";
 
 export function CompanyOverview() {
-  const { data: company, isLoading, error } = useCompanyProfile();
-
-  console.log(company);
+  const { data, isLoading, error } = useCompanyEmployeesTotal();
 
   if (isLoading) {
     return (
@@ -50,7 +51,7 @@ export function CompanyOverview() {
     );
   }
 
-  if (error || !company) {
+  if (error || !data) {
     return (
       <Card>
         <CardHeader>
@@ -72,11 +73,15 @@ export function CompanyOverview() {
         {/* Company Header */}
         <div className="flex items-start gap-4">
           <div className="h-16 w-16 rounded-lg bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white text-xl font-bold">
-            {company.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+            {data.name
+              .split(" ")
+              .map((n) => n[0])
+              .join("")
+              .slice(0, 2)}
           </div>
           <div>
-            <h3 className="text-xl font-bold">{company.name}</h3>
-            <p className="text-sm text-muted-foreground">{company.rc_number}</p>
+            <h3 className="text-xl font-bold">{data.name}</h3>
+            <p className="text-sm text-muted-foreground">{data.rc_number}</p>
           </div>
         </div>
 
@@ -84,68 +89,73 @@ export function CompanyOverview() {
         <div className="space-y-3">
           <div className="flex items-center gap-3 text-sm">
             <Mail className="h-4 w-4 text-gray-400" />
-            <span>{company.email}</span>
+            <span>{data.email}</span>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <Phone className="h-4 w-4 text-gray-400" />
-            <span>{company.phone}</span>
+            <span>{data.phone}</span>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <MapPin className="h-4 w-4 text-gray-400" />
-            <span>{company.address}</span>
+            <span>{data.address}</span>
           </div>
-          {company.website && (
+          {/* {data.website && (
             <div className="flex items-center gap-3 text-sm">
               <Globe className="h-4 w-4 text-gray-400" />
-              <a href={company.website} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
-                {company.website}
+              <a href={data.website} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                {data.website}
               </a>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-blue-50 p-3 rounded-lg text-center">
             <Building2 className="h-5 w-5 text-blue-600 mx-auto mb-1" />
-            <p className="text-2xl font-bold">{company.employees_count}</p>
+            <p className="text-2xl font-bold">{data.employee_stats.total}</p>
             <p className="text-xs text-gray-600">Total Employees</p>
           </div>
           <div className="bg-green-50 p-3 rounded-lg text-center">
             <Shield className="h-5 w-5 text-green-600 mx-auto mb-1" />
-            <p className="text-2xl font-bold">{company.verified_employees}</p>
+            <p className="text-2xl font-bold">
+              {data.employee_stats.nin_verified}
+            </p>
             <p className="text-xs text-gray-600">Verified</p>
           </div>
         </div>
 
-        {/* Completion Progress */}
+        {/* Completion Progress
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Profile Completion</span>
-            <span className="text-sm text-muted-foreground">{company.completion_rate}%</span>
+            <span className="text-sm text-muted-foreground">{data.completion_rate}%</span>
           </div>
-          <Progress value={company.completion_rate} className="h-2" />
-        </div>
+          <Progress value={data.completion_rate} className="h-2" />
+        </div> */}
 
         {/* Insurance Info */}
         <div className="bg-gray-50 p-4 rounded-lg">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium">Insurance Plan</span>
-            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+            <Badge
+              variant="outline"
+              className="bg-blue-50 text-blue-700 border-blue-200"
+            >
               Active
             </Badge>
           </div>
-          <p className="text-sm">{company.insurance_type}</p>
+          <p className="text-sm">{data.insurance_type}</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Member since {new Date(company.member_since).getFullYear()}
+            Member since {new Date(data.registration_date ?? 0).getFullYear()}
           </p>
         </div>
 
         {/* Admin Info */}
         <div className="bg-gray-50 p-3 rounded-lg">
           <p className="text-xs text-muted-foreground">Admin Contact</p>
-          <p className="text-sm font-medium mt-1">{company.admin_name}</p>
-          <p className="text-xs text-gray-600">{company.admin_email}</p>
+          <p className="text-sm font-medium mt-1">{data.admins[0].name}</p>
+          <p className="text-xs text-gray-600">{data.admins[0].email}</p>
         </div>
 
         {/* Action Buttons */}
@@ -154,9 +164,7 @@ export function CompanyOverview() {
             <FileText className="h-4 w-4 mr-2" />
             Documents
           </Button>
-          <Button className="flex-1">
-            Edit Profile
-          </Button>
+          <Button className="flex-1">Edit Profile</Button>
         </div>
       </CardContent>
     </Card>

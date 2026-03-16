@@ -1,12 +1,15 @@
-import { useQuery } from '@tanstack/react-query';
-import { PortalDashboardService } from '@/services/portal.service';
+import { useQuery } from "@tanstack/react-query";
+import { PortalDashboardService } from "@/services/portal.service";
+import { CompanyProfile } from "@/types/profile.types";
+import { tokenManager } from "@/lib/token-manager";
 
 export const dashboardKeys = {
-  all: ['portal-dashboard'] as const,
-  profile: () => [...dashboardKeys.all, 'profile'] as const,
-  stats: () => [...dashboardKeys.all, 'stats'] as const,
-  recentEmployees: () => [...dashboardKeys.all, 'recent-employees'] as const,
-  pendingInvitations: () => [...dashboardKeys.all, 'pending-invitations'] as const,
+  all: ["portal-dashboard"] as const,
+  profile: () => [...dashboardKeys.all, "profile"] as const,
+  stats: () => [...dashboardKeys.all, "stats"] as const,
+  recentEmployees: () => [...dashboardKeys.all, "recent-employees"] as const,
+  pendingInvitations: () =>
+    [...dashboardKeys.all, "pending-invitations"] as const,
 };
 
 /**
@@ -18,7 +21,7 @@ export function useCompanyProfile() {
     queryFn: async () => {
       const response = await PortalDashboardService.getCompanyProfile();
       if (!response.success) {
-        throw new Error('Failed to fetch company profile');
+        throw new Error("Failed to fetch company profile");
       }
       return response.data;
     },
@@ -35,7 +38,27 @@ export function useDashboardStats() {
     queryFn: async () => {
       const response = await PortalDashboardService.getDashboardStats();
       if (!response.success) {
-        throw new Error('Failed to fetch dashboard stats');
+        throw new Error("Failed to fetch dashboard stats");
+      }
+      return response.data;
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+/**
+ * Get Full Employees
+ */
+export function useCompanyEmployeesTotal() {
+  return useQuery({
+    queryKey: dashboardKeys.stats(),
+    queryFn: async () => {
+      const company_data = tokenManager.getUserData() as CompanyProfile;
+
+      const response = await PortalDashboardService.getFullCompanyEmployees(
+        company_data.company_id.toString(),
+      );
+      if (!response.success) {
+        throw new Error("Failed to fetch dashboard stats");
       }
       return response.data;
     },
@@ -52,7 +75,7 @@ export function useRecentEmployees() {
     queryFn: async () => {
       const response = await PortalDashboardService.getRecentEmployees();
       if (!response.success) {
-        throw new Error('Failed to fetch recent employees');
+        throw new Error("Failed to fetch recent employees");
       }
       return response.data;
     },
@@ -69,7 +92,7 @@ export function usePendingInvitations() {
     queryFn: async () => {
       const response = await PortalDashboardService.getPendingInvitations();
       if (!response.success) {
-        throw new Error('Failed to fetch pending invitations');
+        throw new Error("Failed to fetch pending invitations");
       }
       return response.data;
     },

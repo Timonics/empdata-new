@@ -40,10 +40,10 @@ export function CompanyDocumentsHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowExportModal(true)}>
+          {/* <Button variant="outline" size="sm" onClick={() => setShowExportModal(true)}>
             <Download className="mr-2 h-4 w-4" />
             Export
-          </Button>
+          </Button> */}
           <Button variant="outline" size="sm" onClick={() => setShowCreateFolder(true)}>
             <FolderPlus className="mr-2 h-4 w-4" />
             New Folder

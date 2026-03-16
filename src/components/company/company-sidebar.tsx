@@ -115,7 +115,7 @@ export function CompanySidebar() {
       {/* Mobile Sheet */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="w-64 p-0">
-          <div className="flex h-full flex-col bg-linear-to-b from-emerald-600 via-emerald-500 to-emerald-400 text-white">
+          <div className="flex h-full flex-col bg-linear-to-b from-blue-600 via-blue-500 to-blue-400 text-white">
             <div className="flex justify-between items-center p-4 border-b border-white/10">
               <Logo />
               <X
@@ -151,7 +151,7 @@ export function CompanySidebar() {
       {/* Desktop Sidebar */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-50 hidden md:flex md:flex-col h-full border-r-2 bg-linear-to-b from-emerald-600 via-emerald-500 to-emerald-400 border-gray-400 px-2",
+          "fixed inset-y-0 left-0 z-50 hidden md:flex md:flex-col h-full border-r-2 bg-linear-to-b from-blue-600 via-blue-500 to-blue-400 border-gray-400 px-2",
           "transition-all duration-300 ease-in-out overflow-auto scrollbar",
           navIsOpen ? "w-55" : "w-24",
         )}

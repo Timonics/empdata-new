@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowRight, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useRecentEmployees } from "@/hooks/queries/usePortalDashboard";
+import { useCompanyEmployeesTotal, useRecentEmployees } from "@/hooks/queries/usePortalDashboard";
 import { formatDistanceToNow, isValid } from "date-fns";
 
 const statusStyles = {
@@ -31,7 +31,7 @@ const formatDateSafely = (dateString: string | null | undefined) => {
 };
 
 export function RecentEmployees() {
-  const { data: employees, isLoading, error } = useRecentEmployees();
+  const { data, isLoading, error } = useCompanyEmployeesTotal();
 
   if (isLoading) {
     return (
@@ -55,7 +55,7 @@ export function RecentEmployees() {
     );
   }
 
-  if (error || !employees) {
+  if (error || !data) {
     return (
       <Card>
         <CardHeader>
@@ -71,7 +71,7 @@ export function RecentEmployees() {
   }
 
   // Ensure employees is an array
-  const employeeList = Array.isArray(employees) ? employees : [];
+  const employeeList = Array.isArray(data) ? data : [];
 
   return (
     <Card>

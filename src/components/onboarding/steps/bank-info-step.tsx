@@ -18,8 +18,6 @@ import type { AccountType } from "@/types/onboarding.types";
 
 interface BankInfoStepProps {
   accountType: AccountType | null;
-  onNext: () => void;
-  onBack: () => void;
   onBoardingData: any;
   setOnBoardingData: (data: any) => void;
 }
@@ -52,16 +50,13 @@ const banks = [
 
 export function BankInfoStep({
   accountType,
-  onNext,
-  onBack,
   onBoardingData,
   setOnBoardingData,
 }: BankInfoStepProps) {
   const [openBank, setOpenBank] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const isIndividual =
-    accountType === "individual" || accountType === "employee-group-life";
+  const isIndividual = accountType === "individual";
   const isCorporate = accountType === "corporate";
 
   const handleChange = (field: string, value: any) => {
@@ -288,25 +283,6 @@ export function BankInfoStep({
             </div>
           </div>
         )}
-
-        {/* Bank Details Consent (for individuals) */}
-        {isIndividual && (
-          <div className="md:col-span-2 flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-            <input
-              type="checkbox"
-              id="bank_consent"
-              checked={onBoardingData?.bank_details_consent || false}
-              onChange={(e) =>
-                handleChange("bank_details_consent", e.target.checked)
-              }
-              className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-            />
-            <label htmlFor="bank_consent" className="text-sm text-gray-600">
-              I consent to the use of my bank details for premium payments and
-              claims processing.
-            </label>
-          </div>
-        )}
       </div>
 
       {/* Security Notice */}
@@ -325,28 +301,6 @@ export function BankInfoStep({
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-        <button
-          onClick={onBack}
-          className="px-8 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition-colors"
-        >
-          Back
-        </button>
-        <button
-          onClick={onNext}
-          disabled={!isFormValid()}
-          className={cn(
-            "px-8 py-3 rounded-xl font-medium transition-all",
-            isFormValid()
-              ? "bg-linear-to-r from-blue-600 to-emerald-600 text-white hover:shadow-lg hover:scale-105"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed",
-          )}
-        >
-          Continue
-        </button>
       </div>
     </div>
   );

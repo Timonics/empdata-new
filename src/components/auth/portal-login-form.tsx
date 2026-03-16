@@ -85,12 +85,12 @@ export function PortalLoginForm() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl">
-            <h1 className="text-3xl font-semibold tracking-tight bg-linear-to-r from-emerald-600 to-emerald-800 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-semibold tracking-tight bg-linear-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
               Portal Login
             </h1>
           </CardTitle>
-          <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-            <RoleIcon className="h-5 w-5 text-emerald-600" />
+          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+            <RoleIcon className="h-5 w-5 text-blue-600" />
           </div>
         </div>
         <CardDescription>Sign in to your portal account</CardDescription>
@@ -156,7 +156,7 @@ export function PortalLoginForm() {
               <Label htmlFor="password">Password</Label>
               <Link
                 href={getForgotPasswordLink()}
-                className="text-sm text-emerald-600 hover:text-emerald-800 transition-colors"
+                className="text-sm text-blue-600 hover:text-blue-800 transition-colors"
               >
                 Forgot password?
               </Link>
@@ -203,14 +203,14 @@ export function PortalLoginForm() {
 
         {/* Role-specific info */}
         <div className="bg-blue-50 p-4 rounded-lg mt-4">
-          <p className="text-xs text-emerald-800 flex items-start gap-2">
+          <p className="text-xs text-blue-800 flex items-start gap-2">
             <Building2 className="h-4 w-4 mt-0.5 shrink-0" />
             <span>
               <strong>Company admins:</strong> Manage your employees, send
               invitations, and view reports
             </span>
           </p>
-          <p className="text-xs text-green-800 flex items-start gap-2 mt-2">
+          <p className="text-xs text-blue-800 flex items-start gap-2 mt-2">
             <Briefcase className="h-4 w-4 mt-0.5 shrink-0" />
             <span>
               <strong>Employees:</strong> View your profile, manage
@@ -223,7 +223,7 @@ export function PortalLoginForm() {
         <div className="flex items-center justify-center w-full">
           {/* <Link
             href="/"
-            className="text-sm text-muted-foreground hover:text-emerald-600 flex items-center gap-1"
+            className="text-sm text-muted-foreground hover:text-blue-600 flex items-center gap-1"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to home
@@ -232,7 +232,7 @@ export function PortalLoginForm() {
             New here?{" "}
             <Link
               href="/onboarding"
-              className="text-emerald-600 hover:text-emerald-800 font-medium"
+              className="text-blue-600 hover:text-blue-800 font-medium"
             >
               Start onboarding
             </Link>

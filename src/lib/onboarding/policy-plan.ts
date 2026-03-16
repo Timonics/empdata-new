@@ -22,6 +22,7 @@ export const individualPolicyPlans = [
 ];
 
 export const corporatePolicyPlans = [
+  {name: "Group Life Insurance Plan", description: "Group Life"},
   { name: 'Marine Insurance (Cargo) Plan', description: 'Cargo protection' },
   { name: 'Service Hull & Machinery Insurance', description: 'Vessel coverage' },
   { name: 'Machinery Loss of Profit (MLOP)', description: 'Business interruption' },

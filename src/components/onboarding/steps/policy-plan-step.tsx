@@ -33,8 +33,7 @@ export function PolicyPlanStep({
 
   const getPlans = () => {
     if (accountType === "individual") return individualPolicyPlans;
-    if (accountType === "corporate" || accountType === "employee-group-life")
-      return corporatePolicyPlans;
+    if (accountType === "corporate") return corporatePolicyPlans;
     return [];
   };
 

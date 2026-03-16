@@ -79,13 +79,13 @@ export function CompanyEmployeesHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setShowExportModal(true)}>
+          {/* <Button variant="outline" size="sm" onClick={() => setShowExportModal(true)}>
             <Download className="mr-2 h-4 w-4" />
             Export
-          </Button>
+          </Button> */}
           <Button size="sm" onClick={() => setShowAddDrawer(true)}>
             <UserPlus className="mr-2 h-4 w-4" />
-            Add Employee
+            Invite Employee
           </Button>
         </div>
       </div>

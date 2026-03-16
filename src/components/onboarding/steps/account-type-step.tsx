@@ -30,14 +30,14 @@ const accountTypes = [
     color: 'purple',
     gradient: 'from-purple-600 to-purple-400',
   },
-  {
-    id: 'employee-group-life' as AccountType,
-    title: 'Employee Group Life',
-    description: 'For employees registering under their company',
-    icon: Users,
-    color: 'emerald',
-    gradient: 'from-emerald-600 to-emerald-400',
-  },
+  // {
+  //   id: 'employee-group-life' as AccountType,
+  //   title: 'Employee Group Life',
+  //   description: 'For employees registering under their company',
+  //   icon: Users,
+  //   color: 'emerald',
+  //   gradient: 'from-emerald-600 to-emerald-400',
+  // },
 ];
 
 export function AccountTypeStep({
@@ -69,7 +69,7 @@ export function AccountTypeStep({
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {accountTypes.map((type) => {
           const Icon = type.icon;
           const isSelected = accountType === type.id;

@@ -37,13 +37,13 @@ export function InvitationsHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          {/* <Button variant="outline" size="sm">
             <Download
               className="mr-2 h-4 w-4"
               onClick={() => setShowExportModal(true)}
             />
             Export
-          </Button>
+          </Button> */}
           <Button size="sm" onClick={() => setShowSendDrawer(true)}>
             <Mail className="mr-2 h-4 w-4" />
             Send Invitation

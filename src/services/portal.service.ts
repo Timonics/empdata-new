@@ -1,10 +1,13 @@
+// services/portal-dashboard.service.ts
 import { api } from "@/lib/axios";
 import type {
   CompanyProfile,
   DashboardStats,
   EmployeeSummary,
   InvitationSummary,
+  ProtalCompanyFull,
 } from "@/types/company-portal.types";
+import { PortalEmployee } from "@/types/employee.types";
 
 export class PortalDashboardService {
   private static readonly BASE_PATH = "/api/portal";
@@ -17,6 +20,18 @@ export class PortalDashboardService {
     const response = await api.get<{ success: boolean; data: CompanyProfile }>(
       `${this.BASE_PATH}/company/profile`,
     );
+    return response.data;
+  }
+
+  /**
+   * Get full company employees by company ID
+   * GET /api/portal/company/[id]/full
+   */
+  static async getFullCompanyEmployees(companyId: string) {
+    const response = await api.get<{
+      success: boolean;
+      data: ProtalCompanyFull;
+    }>(`${this.BASE_PATH}/companies/${companyId}/full`);
     return response.data;
   }
 

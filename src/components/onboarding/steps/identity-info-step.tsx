@@ -12,8 +12,6 @@ import type { AccountType } from "@/types/onboarding.types";
 
 interface IdentityInfoStepProps {
   accountType: AccountType | null;
-  onNext: () => void;
-  onBack: () => void;
   onBoardingData: any;
   setOnBoardingData: (data: any) => void;
 }
@@ -41,8 +39,6 @@ const identityCardTypes = [
 
 export function IdentityInfoStep({
   accountType,
-  onNext,
-  onBack,
   onBoardingData,
   setOnBoardingData,
 }: IdentityInfoStepProps) {
@@ -50,8 +46,7 @@ export function IdentityInfoStep({
   const [searchQuery, setSearchQuery] = useState("");
 
   const isCorporate = accountType === "corporate";
-  const isIndividual =
-    accountType === "individual" || accountType === "employee-group-life";
+  const isIndividual = accountType === "individual";
 
   const handleChange = (field: string, value: any) => {
     setOnBoardingData((prev: any) => ({
@@ -237,28 +232,6 @@ export function IdentityInfoStep({
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-        <button
-          onClick={onBack}
-          className="px-8 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition-colors"
-        >
-          Back
-        </button>
-        <button
-          onClick={onNext}
-          disabled={!isFormValid()}
-          className={cn(
-            "px-8 py-3 rounded-xl font-medium transition-all",
-            isFormValid()
-              ? "bg-linear-to-r from-blue-600 to-emerald-600 text-white hover:shadow-lg hover:scale-105"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed",
-          )}
-        >
-          Continue
-        </button>
       </div>
     </div>
   );

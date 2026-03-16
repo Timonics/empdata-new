@@ -1,11 +1,18 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { CheckCircle, Mail, ArrowRight, Building2, User, Users } from 'lucide-react';
-import confetti from 'canvas-confetti';
-import type { AccountType } from '@/types/onboarding.types';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  CheckCircle,
+  Mail,
+  ArrowRight,
+  Building2,
+  User,
+  Users,
+} from "lucide-react";
+import confetti from "canvas-confetti";
+import type { AccountType } from "@/types/onboarding.types";
 
 interface SuccessScreenProps {
   accountType: AccountType | null;
@@ -20,12 +27,12 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
       particleCount: 100,
       spread: 70,
       origin: { y: 0.6 },
-      colors: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b'],
+      colors: ["#3b82f6", "#10b981", "#8b5cf6", "#f59e0b"],
     });
 
     // Auto redirect after 5 seconds
     const timer = setTimeout(() => {
-      router.push('/');
+      router.push("/");
     }, 5000);
 
     return () => clearTimeout(timer);
@@ -33,10 +40,8 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
 
   const getIcon = () => {
     switch (accountType) {
-      case 'corporate':
+      case "corporate":
         return Building2;
-      case 'employee-group-life':
-        return Users;
       default:
         return User;
     }
@@ -44,45 +49,34 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
 
   const getTitle = () => {
     switch (accountType) {
-      case 'corporate':
-        return 'Company Registration Submitted!';
-      case 'employee-group-life':
-        return 'Employee Registration Submitted!';
+      case "corporate":
+        return "Company Registration Submitted!";
       default:
-        return 'Individual Registration Submitted!';
+        return "Individual Registration Submitted!";
     }
   };
 
   const getMessage = () => {
     switch (accountType) {
-      case 'corporate':
-        return 'Your company registration has been submitted successfully!';
-      case 'employee-group-life':
-        return 'Your employee registration has been submitted successfully!';
-      default:
-        return 'Your individual registration has been submitted successfully!';
+      case "corporate":
+        return "Your company registration has been submitted successfully!";
+        return "Your individual registration has been submitted successfully!";
     }
   };
 
   const getNextSteps = () => {
     switch (accountType) {
-      case 'corporate':
+      case "corporate":
         return [
-          'You\'ll receive a confirmation email with your application details',
-          'Our team will review your company documents within 24-48 hours',
-          'Once approved, the company admin will receive login credentials via email',
-        ];
-      case 'employee-group-life':
-        return [
-          'You\'ll receive a confirmation email with your application details',
-          'The company admin will be notified of your registration',
-          'Your company will activate your account and you\'ll receive access instructions',
+          "You'll receive a confirmation email with your application details",
+          "Our team will review your company documents within 24-48 hours",
+          "Once approved, the company admin will receive login credentials via email",
         ];
       default:
         return [
-          'You\'ll receive a confirmation email with your application details',
-          'Our team will review your documents within 24-48 hours',
-          'Once approved, you\'ll receive login credentials via email',
+          "You'll receive a confirmation email with your application details",
+          "Our team will review your documents within 24-48 hours",
+          "Once approved, you'll receive login credentials via email",
         ];
     }
   };
@@ -100,7 +94,7 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
           className="mb-8"
         >
           <div className="w-24 h-24 rounded-full bg-linear-to-r from-green-400 to-emerald-500 mx-auto flex items-center justify-center">
@@ -138,9 +132,8 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
             <Icon className="w-8 h-8" />
           </div>
           <p className="text-lg font-semibold mb-2">
-            {accountType === 'individual' && 'Individual Account'}
-            {accountType === 'corporate' && 'Corporate Account'}
-            {accountType === 'employee-group-life' && 'Employee Registration'}
+            {accountType === "individual" && "Individual Account"}
+            {accountType === "corporate" && "Corporate Account"}
           </p>
           <p className="text-sm text-white/80">
             Your application is being reviewed
@@ -159,7 +152,9 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
             {getNextSteps().map((step, index) => (
               <div key={index} className="flex items-start gap-3">
                 <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-xs font-bold text-blue-600">{index + 1}</span>
+                  <span className="text-xs font-bold text-blue-600">
+                    {index + 1}
+                  </span>
                 </div>
                 <p className="text-sm text-gray-600 text-left">{step}</p>
               </div>
@@ -183,7 +178,7 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.8 }}
-          onClick={() => router.push('/')}
+          onClick={() => router.push("/")}
           className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors"
         >
           Go to Home

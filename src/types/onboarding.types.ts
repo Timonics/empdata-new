@@ -1,4 +1,4 @@
-export type AccountType = "individual" | "corporate" | "employee-group-life";
+export type AccountType = "individual" | "corporate"
 
 export type IdentityCardType =
   | "National Identity Number"

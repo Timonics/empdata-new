@@ -4,7 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Users, UserPlus, CheckCircle2, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useDashboardStats } from "@/hooks/queries/usePortalDashboard";
+import {
+  useCompanyEmployeesTotal,
+  useDashboardStats,
+} from "@/hooks/queries/usePortalDashboard";
 
 const colorClasses = {
   blue: { bg: "bg-blue-50", text: "text-blue-600", iconBg: "bg-blue-100" },
@@ -17,7 +20,7 @@ const colorClasses = {
 };
 
 export function CompanyStats() {
-  const { data: stats, isLoading, error } = useDashboardStats();
+  const { data, isLoading, error } = useCompanyEmployeesTotal();
 
   if (isLoading) {
     return (
@@ -38,7 +41,7 @@ export function CompanyStats() {
     );
   }
 
-  if (error || !stats) {
+  if (error || !data) {
     return (
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {[1, 2, 3].map((i) => (
@@ -57,8 +60,8 @@ export function CompanyStats() {
   const statCards = [
     {
       title: "Total Employees",
-      value: stats.total_employees.toLocaleString(),
-      change: `+${Math.round(stats.total_employees * 0.08)}`, // 8% growth
+      value: data?.employee_stats.total,
+      change: `+${Math.round(data?.employee_stats.total ? data?.employee_stats.total : 0 * 0.08)}`, // 8% growth
       changeType: "positive" as const,
       icon: Users,
       color: "blue",
@@ -66,8 +69,8 @@ export function CompanyStats() {
     },
     {
       title: "Pending Invitations",
-      value: stats.pending_invitations.toLocaleString(),
-      change: `-${Math.round(stats.pending_invitations * 0.2)}`, // 20% decrease
+      value: data?.employee_stats.invitation_sent,
+      change: `-${Math.round(data?.employee_stats.invitation_sent ? data?.employee_stats.invitation_sent : 0 * 0.2)}`, // 20% decrease
       changeType: "positive" as const,
       icon: UserPlus,
       color: "yellow",
@@ -75,12 +78,12 @@ export function CompanyStats() {
     },
     {
       title: "Verified NIN",
-      value: stats.verified_nin.toLocaleString(),
-      change: `+${Math.round(stats.verified_nin * 0.1)}`, // 10% growth
+      value: data?.employee_stats.nin_verified,
+      change: `+${Math.round(data?.employee_stats.nin_verified ? data?.employee_stats.nin_verified : 0 * 0.1)}`, // 10% growth
       changeType: "positive" as const,
       icon: CheckCircle2,
       color: "green",
-      subtitle: `${stats.verification_rate}% verification rate`,
+      subtitle: `${0}% verification rate`,
     },
   ];
 

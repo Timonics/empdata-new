@@ -21,7 +21,7 @@ export default function AuthLayout({
           {/* Background Image */}
           <div className="absolute inset-0">
             <Image
-              src={isAdmin ? "/auth/admin-sidebar.png" : "/auth/portal-sidebar.png"}
+              src={"/auth/admin-sidebar.png"}
               alt={isAdmin ? "Admin Background" : "Portal Background"}
               fill
               className="object-cover"
@@ -30,8 +30,7 @@ export default function AuthLayout({
             {/* Different overlays based on path */}
             <div 
               className={cn(
-                "absolute inset-0",
-                isAdmin ? "bg-blue-900/60" : "bg-emerald-900/60"
+                "absolute inset-0 bg-blue-900/60"
               )} 
             />
           </div>

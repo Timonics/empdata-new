@@ -39,6 +39,7 @@ const navigation = [
     icon: StickyNote,
     children: [
       { name: "Group Life", link: "/admin/registrations/group-life" },
+      { name: "Corporate", link: "/admin/registrations/corporate" },
       { name: "Individual", link: "/admin/registrations/individual" },
     ],
   },

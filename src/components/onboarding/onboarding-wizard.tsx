@@ -1,34 +1,18 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOnboardingWizard } from "@/hooks/queries/useOnboarding";
 import { OnboardingHeader } from "./onboarding-header";
 import { SuccessScreen } from "./success-screen";
 import { AccountTypeStep } from "./steps/account-type-step";
 import { PolicyPlanStep } from "./steps/policy-plan-step";
-import { CompanySelectStep } from "./steps/company-select-step";
-import { PersonalInfoStep } from "./steps/personal-info-step";
 import { CompanyInfoStep } from "./steps/company-info-step";
-import { BankInfoStep } from "./steps/bank-info-step";
-import { IdentityInfoStep } from "./steps/identity-info-step";
 import { DocumentUploadStep } from "./steps/document-upload-step";
 import { BeneficiariesStep } from "./steps/beneficiaries-step";
 import { ConsentStep } from "./steps/consent-step";
 import { ReviewStep } from "./steps/review-step";
-
-const steps = [
-  { id: "account-type", title: "Account Type", icon: "👤" },
-  { id: "policy-plan", title: "Policy Plan", icon: "📋" },
-  { id: "company-select", title: "Select Company", icon: "🏢" },
-  { id: "personal-info", title: "Personal Info", icon: "👤" },
-  { id: "company-info", title: "Company Info", icon: "🏢" },
-  { id: "bank-info", title: "Bank Details", icon: "🏦" },
-  { id: "identity", title: "Identity", icon: "🆔" },
-  { id: "documents", title: "Documents", icon: "📄" },
-  { id: "beneficiaries", title: "Beneficiaries", icon: "👨‍👩‍👧" },
-  { id: "consent", title: "Consent", icon: "✓" },
-  { id: "review", title: "Review", icon: "🔍" },
-];
+import { InformationPage } from "./steps/Information-page-step";
 
 export function OnboardingWizard() {
   const {
@@ -47,45 +31,84 @@ export function OnboardingWizard() {
     handleSubmit,
   } = useOnboardingWizard();
 
-  // Filter steps based on account type
-  const getVisibleSteps = () => {
-    if (!accountType) return steps.slice(0, 1);
+  console.log(selectedPlan);
 
-    const visibleSteps = steps.filter((step) => {
-      if (step.id === "account-type") return true;
-      if (step.id === "policy-plan") return true;
-      if (step.id === "company-select")
-        return accountType === "employee-group-life";
-      if (step.id === "personal-info")
-        return (
-          accountType === "individual" || accountType === "employee-group-life"
-        );
-      if (step.id === "company-info") return accountType === "corporate";
-      if (step.id === "bank-info") return true;
-      if (step.id === "identity") return true;
-      if (step.id === "documents") return true;
-      if (step.id === "beneficiaries")
-        return accountType === "employee-group-life";
-      if (step.id === "consent") return true;
-      if (step.id === "review") return true;
-      return false;
-    });
+  // Define steps based on account type
+  const getSteps = () => {
+    // Base steps that are always shown
+    const baseSteps = [
+      { id: "account-type", title: "Register your account", icon: "👤" },
+    ];
 
-    return visibleSteps;
+    // If no account type selected yet, only show account type step
+    if (!accountType) {
+      return baseSteps;
+    }
+
+    // Build steps based on account type
+    const steps = [...baseSteps];
+
+    steps.push({ id: "consent", title: "Consent", icon: "✓" });
+
+    // Add policy plan step for all account types
+    steps.push({ id: "policy-plan", title: "Policy Plan", icon: "📋" });
+
+    // Add type-specific steps
+    if (accountType === "individual") {
+      steps.push({
+        id: "information",
+        title: "Personal Information",
+        icon: "👤",
+      });
+    }
+
+    if (accountType === "corporate") {
+      steps.push({
+        id: "company-info",
+        title: "Company Information",
+        icon: "🏢",
+      });
+    }
+
+    // Add beneficiaries step only for employee group life
+    if (
+      accountType === "corporate" &&
+      selectedPlan === "Group Life Insurance Plan"
+    ) {
+      steps.push({ id: "beneficiaries", title: "Beneficiaries", icon: "👨‍👩‍👧" });
+    }
+
+    // Add documents step for all account types
+    steps.push({ id: "documents", title: "Documents", icon: "📄" });
+
+    steps.push({ id: "review", title: "Review", icon: "🔍" });
+
+    return steps;
   };
 
-  const visibleSteps = getVisibleSteps();
-  const currentStepIndex = visibleSteps.findIndex(
-    (s) => s.id === steps[currentStep].id,
+  const steps = getSteps();
+  const currentStepData = steps[currentStep] || steps[0];
+  const progress = ((currentStep + 1) / steps.length) * 100;
+
+  console.log("Account Type:", accountType);
+  console.log(
+    "All Steps:",
+    steps.map((s) => s.id),
   );
-  const progress = ((currentStepIndex + 1) / visibleSteps.length) * 100;
+  console.log("Current Step:", currentStep, currentStepData?.id);
+  console.log("Progress:", progress);
+
+  // Reset to first step when account type changes
+  useEffect(() => {
+    setCurrentStep(0);
+  }, [accountType, setCurrentStep]);
 
   if (isSuccess) {
     return <SuccessScreen accountType={accountType} />;
   }
 
   const renderStep = () => {
-    const stepId = steps[currentStep].id;
+    const stepId = currentStepData?.id;
 
     switch (stepId) {
       case "account-type":
@@ -112,19 +135,9 @@ export function OnboardingWizard() {
           />
         );
 
-      case "company-select":
+      case "information":
         return (
-          <CompanySelectStep
-            onNext={handleNext}
-            onBack={handleBack}
-            onBoardingData={onboardingData}
-            setOnBoardingData={setOnboardingData}
-          />
-        );
-
-      case "personal-info":
-        return (
-          <PersonalInfoStep
+          <InformationPage
             accountType={accountType}
             onNext={handleNext}
             onBack={handleBack}
@@ -136,28 +149,6 @@ export function OnboardingWizard() {
       case "company-info":
         return (
           <CompanyInfoStep
-            onNext={handleNext}
-            onBack={handleBack}
-            onBoardingData={onboardingData}
-            setOnBoardingData={setOnboardingData}
-          />
-        );
-
-      case "bank-info":
-        return (
-          <BankInfoStep
-            accountType={accountType}
-            onNext={handleNext}
-            onBack={handleBack}
-            onBoardingData={onboardingData}
-            setOnBoardingData={setOnboardingData}
-          />
-        );
-
-      case "identity":
-        return (
-          <IdentityInfoStep
-            accountType={accountType}
             onNext={handleNext}
             onBack={handleBack}
             onBoardingData={onboardingData}
@@ -208,7 +199,7 @@ export function OnboardingWizard() {
         );
 
       default:
-        return null;
+        return <div>Unknown step</div>;
     }
   };
 
@@ -225,19 +216,10 @@ export function OnboardingWizard() {
       </div>
 
       <div className="p-6 md:p-8">
-        {/* Step Indicator */}
-        {/* {accountType && (
-          <OnboardingProgress
-            steps={visibleSteps}
-            currentStep={currentStepIndex}
-            accountType={accountType}
-          />
-        )} */}
-
         {/* Form Header */}
         <OnboardingHeader
-          title={steps[currentStep].title}
-          icon={steps[currentStep].icon}
+          title={currentStepData?.title || "Onboarding"}
+          icon={currentStepData?.icon || "📝"}
           stepNumber={currentStep + 1}
           totalSteps={steps.length}
           accountType={accountType}

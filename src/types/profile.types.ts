@@ -11,6 +11,17 @@ export interface AdminProfile {
   updated_at?: string;
 }
 
+export interface CompanyProfile {
+  company_id: number;
+  created_at: string;
+  email: string;
+  email_verified_at: string;
+  id: number;
+  name: string;
+  role: string;
+  two_factor_enabled: boolean;
+}
+
 export interface UpdateProfileData {
   name?: string;
   email?: string;

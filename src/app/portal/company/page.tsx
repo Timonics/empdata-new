@@ -6,16 +6,17 @@ import { CompanyStats } from "@/components/company/company-stats";
 import { PendingInvitations } from "@/components/company/pending-invitations";
 import { RecentEmployees } from "@/components/company/recent-employees";
 import { useCompanyProfile } from "@/hooks/queries/usePortalDashboard";
+import { tokenManager } from "@/lib/token-manager";
 
 export default function CompanyDashboardPage() {
-  const { data: company, isLoading } = useCompanyProfile();
+  const name = tokenManager.getUserData().name
 
   return (
     <div className="space-y-6">
       {/* Welcome Section */}
       <div>
         <h2 className="text-3xl font-bold tracking-tight">
-          Welcome back, {isLoading ? "..." : company?.name || "Company"}
+          Welcome back, {name || "Company"}
         </h2>
         <p className="text-muted-foreground">
           Here's what's happening with your organization today.
@@ -37,7 +38,7 @@ export default function CompanyDashboardPage() {
           <CompanyOverview />
         </div>
         <div>
-          <QuickActions />
+          {/* <QuickActions /> */}
         </div>
       </div>
     </div>

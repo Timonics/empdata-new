@@ -49,22 +49,6 @@ const stats: Stat[] = [
     subtitle: 'Awaiting verification',
   },
   {
-    title: 'Expiring Soon',
-    value: '12',
-    change: '+3',
-    icon: FileWarning,
-    color: 'red',
-    subtitle: 'Within 30 days',
-  },
-  {
-    title: 'Storage Used',
-    value: '2.4 GB',
-    change: '+0.3 GB',
-    icon: HardDrive,
-    color: 'purple',
-    subtitle: 'of 10 GB',
-  },
-  {
     title: 'This Month',
     value: '24',
     change: '+8',
@@ -93,8 +77,8 @@ export function CompanyDocumentsStats() {
 
   if (isLoading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
+      <div className="grid gap-4 md:grid-cols-2">
+        {[1, 2, 3, 4].map((i) => (
           <Card key={i}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <Skeleton className="h-4 w-24" />
@@ -111,7 +95,7 @@ export function CompanyDocumentsStats() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2">
       {stats.map((stat) => {
         const colors = colorClasses[stat.color as keyof typeof colorClasses];
         

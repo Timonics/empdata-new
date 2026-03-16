@@ -41,6 +41,18 @@ export default function RegistrationsLayout({
           </div>
           {children}
         </>
+      ) : pathname.endsWith("corporate") ? (
+        <>
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight">
+              Corporate Registrations
+            </h2>
+            <p className="text-muted-foreground">
+              Manage corporate insurance policy applications
+            </p>
+          </div>
+          {children}
+        </>
       ) : (
         <>
           <div>
