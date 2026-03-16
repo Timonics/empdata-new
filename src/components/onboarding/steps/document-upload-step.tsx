@@ -35,7 +35,6 @@ export function DocumentUploadStep({
 
   const isIndividual = accountType === 'individual';
   const isCorporate = accountType === 'corporate';
-  const isEmployee = accountType === 'employee-group-life';
   const requiresNIN = onBoardingData?.identity_card_type === 'National Identity Number';
 
   const onDrop = useCallback((acceptedFiles: File[], fileType: UploadedFile['type']) => {
@@ -185,7 +184,7 @@ export function DocumentUploadStep({
   const isFormValid = () => {
     const requiredDocs = [];
     
-    if (isIndividual || isEmployee) {
+    if (isIndividual) {
       requiredDocs.push('identity', 'passport', 'signature');
       if (requiresNIN) requiredDocs.push('nin');
     }
@@ -271,7 +270,7 @@ export function DocumentUploadStep({
         </div>
 
         {/* Scanned Signature (for individuals) */}
-        {(isIndividual || isEmployee) && (
+        {(isIndividual) && (
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-orange-100 text-orange-600 text-xs flex items-center justify-center font-bold">
@@ -293,7 +292,7 @@ export function DocumentUploadStep({
         )}
 
         {/* NIN Document (if applicable) */}
-        {requiresNIN && (isIndividual || isEmployee) && (
+        {requiresNIN && (isIndividual) && (
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 text-xs flex items-center justify-center font-bold">
