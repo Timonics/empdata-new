@@ -248,7 +248,7 @@ interface ReportsPageProps {
   role: "admin" | "company" | "employee";
 }
 
-export function ReportsPage({ role }: ReportsPageProps) {
+export default function ReportsPage({ role }: ReportsPageProps) {
   const [dateRange, setDateRange] = useState<
     "7days" | "30days" | "month" | "custom"
   >("30days");
@@ -313,7 +313,7 @@ export function ReportsPage({ role }: ReportsPageProps) {
         <div>
           <h1
             className={cn(
-              "text-3xl font-bold tracking-tight bg-gradient-to-r bg-clip-text text-transparent",
+              "text-3xl font-bold tracking-tight bg-linear-to-r bg-clip-text text-transparent",
               isAdmin
                 ? "from-blue-600 to-blue-800"
                 : "from-emerald-600 to-emerald-800",
@@ -330,7 +330,7 @@ export function ReportsPage({ role }: ReportsPageProps) {
             value={dateRange}
             onValueChange={(value: any) => setDateRange(value)}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-45">
               <Calendar className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Select date range" />
             </SelectTrigger>
@@ -342,7 +342,7 @@ export function ReportsPage({ role }: ReportsPageProps) {
             </SelectContent>
           </Select>
           <Select value={selectedChart} onValueChange={setSelectedChart}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-45">
               <FileText className="mr-2 h-4 w-4" />
               <SelectValue placeholder="Report type" />
             </SelectTrigger>
