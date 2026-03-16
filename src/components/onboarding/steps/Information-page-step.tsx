@@ -309,11 +309,11 @@ export function InformationPage({
                 <h3 className="text-lg font-semibold text-gray-900">
                   Company Information
                 </h3>
-                {validation.company && (
+                {/* {validation.company && (
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
                     Completed
                   </span>
-                )}
+                )} */}
               </div>
               {expandedSections.company ? (
                 <ChevronUp className="w-5 h-5 text-gray-500" />
@@ -354,11 +354,11 @@ export function InformationPage({
                 <h3 className="text-lg font-semibold text-gray-900">
                   Director's Identity
                 </h3>
-                {validation.directorIdentity && (
+                {/* {validation.directorIdentity && (
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
                     Completed
                   </span>
-                )}
+                )} */}
               </div>
               {expandedSections.directorIdentity ? (
                 <ChevronUp className="w-5 h-5 text-gray-500" />
@@ -403,11 +403,11 @@ export function InformationPage({
                 <h3 className="text-lg font-semibold text-gray-900">
                   Personal Information
                 </h3>
-                {validation.personal && (
+                {/* {validation.personal && (
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
                     Completed
                   </span>
-                )}
+                )} */}
               </div>
               {expandedSections.personal ? (
                 <ChevronUp className="w-5 h-5 text-gray-500" />
@@ -449,11 +449,11 @@ export function InformationPage({
                 <h3 className="text-lg font-semibold text-gray-900">
                   Bank Information
                 </h3>
-                {validation.bank && (
+                {/* {validation.bank && (
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
                     Completed
                   </span>
-                )}
+                )} */}
               </div>
               {expandedSections.bank ? (
                 <ChevronUp className="w-5 h-5 text-gray-500" />
@@ -495,11 +495,11 @@ export function InformationPage({
                 <h3 className="text-lg font-semibold text-gray-900">
                   Identity Information
                 </h3>
-                {validation.identity && (
+                {/* {validation.identity && (
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
                     Completed
                   </span>
-                )}
+                )} */}
               </div>
               {expandedSections.identity ? (
                 <ChevronUp className="w-5 h-5 text-gray-500" />

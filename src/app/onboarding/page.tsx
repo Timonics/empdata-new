@@ -15,7 +15,7 @@ export default function OnboardingPage() {
           <Logo width={150} />
         </div>
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold tracking-tight bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold tracking-tight bg-linear-to-r from-blue-800 to-blue-900 bg-clip-text text-transparent">
            CLIENT ONBOARDING KYC FORM
           </h1>
           <p className="mt-3 text-lg text-muted-foreground">
