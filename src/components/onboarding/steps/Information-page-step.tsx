@@ -228,7 +228,7 @@ export function InformationPage({
       </div>
 
       {/* Progress Overview */}
-      <div className="bg-linear-to-r from-blue-50 to-emerald-50 p-6 rounded-xl">
+      {/* <div className="bg-linear-to-r from-blue-50 to-emerald-50 p-6 rounded-xl">
         <div className="flex items-center justify-between mb-3">
           <span className="font-semibold text-gray-900">Section Progress</span>
           <span className="text-sm font-medium text-blue-600">
@@ -290,7 +290,7 @@ export function InformationPage({
             </>
           )}
         </div>
-      </div>
+      </div> */}
 
       {isCorporate ? (
         /* Corporate View - Two Sections */
