@@ -39,7 +39,7 @@ export default function HomePage() {
       {/* Navigation */}
       <nav className="relative z-10 container mx-auto px-6 py-6">
         <div className="flex items-center justify-between">
-          <Logo />
+          <Logo width={150}/>
           <div className="flex items-center space-x-4">
             <Link
               href="/onboarding"
@@ -68,11 +68,11 @@ export default function HomePage() {
 
           {/* Main Heading */}
           <h1 className="pops text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            <span className="bg-linear-to-r from-blue-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent bg-300% animate-gradient">
-              Seamless Onboarding
+            <span className="bg-linear-to-r from-blue-800 via-indigo-690 to-blue-600 bg-clip-text text-transparent bg-300% animate-gradient">
+              Seamless Secure
             </span>
             <br />
-            <span className="text-gray-900">for Insurance & Group Life</span>
+            <span className="text-gray-900">Client Onboarding Platform</span>
           </h1>
 
           {/* Subheading */}
@@ -88,7 +88,7 @@ export default function HomePage() {
                 size="lg"
                 className="group bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all"
               >
-                Start Onboarding Now
+                Start Client Onboarding
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
@@ -96,10 +96,10 @@ export default function HomePage() {
               <Button
                 size="lg"
                 variant="outline"
-                className="group border-2 border-blue-200 hover:border-blue-600 px-8 py-6 text-lg bg-white/50 backdrop-blur-sm"
+                className="group border-2 border-blue-200 hover:border-blue-800 px-8 py-6 text-lg bg-white/50 backdrop-blur-sm"
               >
                 <Building2 className="mr-2 h-5 w-5 text-blue-600" />
-                Company Portal
+                Existing Client Login
                 <ChevronRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
@@ -149,15 +149,15 @@ export default function HomePage() {
       {/* Features Section */}
       <section className="relative z-10 container mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-          <span className="bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Choose Your Onboarding Path
+          <span className="bg-linear-to-r from-blue-800 to-indigo-900 bg-clip-text text-transparent">
+            Choose Your Client Onboarding Path
           </span>
         </h2>
 
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Individual Insurance Card */}
           <div className="group bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
-            <div className="h-2 bg-linear-to-r from-blue-600 to-indigo-600"></div>
+            <div className="h-2 bg-linear-to-r from-blue-800 to-indigo-900"></div>
             <div className="p-8">
               <div className="h-16 w-16 rounded-2xl bg-blue-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <Users className="h-8 w-8 text-blue-600" />
@@ -181,7 +181,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <Link href="/onboarding?type=individual">
-                <Button size={"lg"} className="w-full bg-blue-600 hover:bg-blue-700 text-white group-hover:shadow-lg transition-all">
+                <Button size={"lg"} className="w-full bg-blue-800 hover:bg-blue-900 text-white group-hover:shadow-lg transition-all">
                   Start Individual Onboarding
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -201,7 +201,7 @@ export default function HomePage() {
               <div className="h-16 w-16 rounded-2xl bg-emerald-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <Building2 className="h-8 w-8 text-emerald-600" />
               </div>
-              <h3 className="text-2xl font-bold mb-3">Employee Group Life</h3>
+              <h3 className="text-2xl font-bold mb-3">Corporate Insurance</h3>
               <p className="text-gray-600 mb-6">
                 Register as an employee under your company's group life
                 insurance policy.
@@ -219,9 +219,9 @@ export default function HomePage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/onboarding?type=employee-group-life">
+              <Link href="/onboarding?type=corporate">
                 <Button size={"lg"} className="w-full bg-linear-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white group-hover:shadow-lg transition-all">
-                  Start Employee Registration
+                  Start Corporate Registration
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>

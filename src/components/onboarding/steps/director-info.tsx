@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, IdCard, Hash, HelpCircle } from "lucide-react";
+import { ChevronDown, IdCard, Hash, HelpCircle, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Tooltip,
@@ -22,19 +22,19 @@ const identityCardTypes = [
     label: "National Identification Number (NIN)",
     icon: "🇳🇬",
   },
-  // { value: "National ID", label: "National ID Card", icon: "🆔" },
-  // { value: "Driver's License", label: "Driver's License", icon: "🚗" },
-  // {
-  //   value: "International Passport",
-  //   label: "International Passport",
-  //   icon: "🛂",
-  // },
-  // { value: "Voter's Card", label: "Voter's Card", icon: "🗳️" },
-  // {
-  //   value: "Permanent Voter's Card",
-  //   label: "Permanent Voter's Card",
-  //   icon: "🗳️",
-  // },
+//   { value: "National ID", label: "National ID Card", icon: "🆔" },
+//   { value: "Driver's License", label: "Driver's License", icon: "🚗" },
+//   {
+//     value: "International Passport",
+//     label: "International Passport",
+//     icon: "🛂",
+//   },
+//   { value: "Voter's Card", label: "Voter's Card", icon: "🗳️" },
+//   {
+//     value: "Permanent Voter's Card",
+//     label: "Permanent Voter's Card",
+//     icon: "🗳️",
+//   },
 ];
 
 export function IdentityInfoStep({
@@ -46,7 +46,6 @@ export function IdentityInfoStep({
   const [searchQuery, setSearchQuery] = useState("");
 
   const isCorporate = accountType === "corporate";
-  const isIndividual = accountType === "individual";
 
   const handleChange = (field: string, value: any) => {
     setOnBoardingData((prev: any) => ({
@@ -67,7 +66,7 @@ export function IdentityInfoStep({
     if (!onBoardingData?.identity_card_type) return false;
 
     if (onBoardingData?.identity_card_type === "National Identity Number") {
-      return onBoardingData?.national_identification_number;
+      return onBoardingData?.director_national_identification_number; // Changed for corporate
     } else {
       return onBoardingData?.identity_card_number;
     }
@@ -82,16 +81,40 @@ export function IdentityInfoStep({
             : "Identity Information"}
         </h3>
         <p className="text-sm text-gray-500">
-          Provide your identification details for verification purposes
+          {isCorporate
+            ? "Provide the director's identification details for verification"
+            : "Provide your identification details for verification purposes"}
         </p>
       </div>
+
+      {/* Director Name - Only for Corporate */}
+      {isCorporate && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">
+              Director's Full Name <span className="text-red-500">*</span>
+            </label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                value={onBoardingData?.director_name || ""}
+                onChange={(e) => handleChange("director_name", e.target.value)}
+                placeholder="Enter director's full name"
+                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Identity Card Type */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <label className="text-sm font-medium text-gray-700">
-              Identity Card Type <span className="text-red-500">*</span>
+              {isCorporate ? "Director's ID Type" : "Identity Card Type"}{" "}
+              <span className="text-red-500">*</span>
             </label>
             <Tooltip>
               <TooltipTrigger>
@@ -144,7 +167,9 @@ export function IdentityInfoStep({
                         // Clear NIN fields if not NIN
                         if (type.value !== "National Identity Number") {
                           handleChange(
-                            "national_identification_number",
+                            isCorporate
+                              ? "director_national_identification_number"
+                              : "national_identification_number",
                             undefined,
                           );
                           handleChange("nin_number_iv", undefined);
@@ -174,7 +199,7 @@ export function IdentityInfoStep({
         {selectedType?.value === "National Identity Number" ? (
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
-              NIN (National Identification Number){" "}
+              {isCorporate ? "Director's NIN" : "NIN (National Identification Number)"}{" "}
               <span className="text-red-500">*</span>
             </label>
             <div className="relative">
@@ -182,23 +207,33 @@ export function IdentityInfoStep({
               <input
                 type="text"
                 maxLength={11}
-                value={onBoardingData?.national_identification_number || ""}
+                value={
+                  isCorporate
+                    ? onBoardingData?.director_national_identification_number || ""
+                    : onBoardingData?.national_identification_number || ""
+                }
                 onChange={(e) => {
                   const value = e.target.value.replace(/\D/g, "");
-                  handleChange("national_identification_number", value);
+                  handleChange(
+                    isCorporate
+                      ? "director_national_identification_number"
+                      : "national_identification_number",
+                    value,
+                  );
                 }}
                 placeholder="Enter 11-digit NIN"
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
             <p className="text-xs text-gray-500">
-              Your NIN will be encrypted before transmission
+              The NIN will be encrypted before transmission
             </p>
           </div>
         ) : (
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
-              ID Number <span className="text-red-500">*</span>
+              {isCorporate ? "Director's ID Number" : "ID Number"}{" "}
+              <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -227,8 +262,9 @@ export function IdentityInfoStep({
               Important Information
             </p>
             <p className="text-xs text-amber-700 mt-1">
-              Your identity information will be verified against official
-              databases. Ensure the details match exactly with your chosen ID.
+              {isCorporate
+                ? "The director's identity information will be verified against official databases. Ensure the details match exactly with the chosen ID."
+                : "Your identity information will be verified against official databases. Ensure the details match exactly with your chosen ID."}
             </p>
           </div>
         </div>

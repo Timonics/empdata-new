@@ -71,12 +71,12 @@ export function OnboardingWizard() {
     }
 
     // Add beneficiaries step only for employee group life
-    if (
-      accountType === "corporate" &&
-      selectedPlan === "Group Life Insurance Plan"
-    ) {
-      steps.push({ id: "beneficiaries", title: "Beneficiaries", icon: "👨‍👩‍👧" });
-    }
+    // if (
+    //   accountType === "corporate" &&
+    //   selectedPlan === "Group Life Insurance Plan"
+    // ) {
+    //   steps.push({ id: "beneficiaries", title: "Beneficiaries", icon: "👨‍👩‍👧" });
+    // }
 
     // Add documents step for all account types
     steps.push({ id: "documents", title: "Documents", icon: "📄" });
@@ -148,7 +148,8 @@ export function OnboardingWizard() {
 
       case "company-info":
         return (
-          <CompanyInfoStep
+          <InformationPage
+            accountType={"corporate"}
             onNext={handleNext}
             onBack={handleBack}
             onBoardingData={onboardingData}

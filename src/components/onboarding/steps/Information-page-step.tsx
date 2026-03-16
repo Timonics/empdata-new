@@ -8,6 +8,7 @@ import type { AccountType } from "@/types/onboarding.types";
 import { PersonalInfoSection } from "./personal-info-step";
 import { BankInfoStep } from "./bank-info-step";
 import { IdentityInfoStep } from "./identity-info-step";
+import { CompanyInfoStep } from "./company-info-step";
 
 interface InformationPageProps {
   accountType: AccountType | null;
@@ -17,9 +18,8 @@ interface InformationPageProps {
   setOnBoardingData: (data: any) => void;
 }
 
-// Validation functions
-const validatePersonalInfo = (data: any, accountType: AccountType | null) => {
-  // Common required fields
+// Validation functions for individual
+const validatePersonalInfo = (data: any) => {
   const required = [
     "first_name",
     "last_name",
@@ -35,7 +35,6 @@ const validatePersonalInfo = (data: any, accountType: AccountType | null) => {
     "house_address",
   ];
 
-  // Check each required field
   const missingFields: string[] = [];
   required.forEach((field) => {
     const value = data?.[field];
@@ -44,13 +43,11 @@ const validatePersonalInfo = (data: any, accountType: AccountType | null) => {
     }
   });
 
-  // Special check for date_of_birth (can be Date object)
   const hasDateOfBirth =
     data?.date_of_birth !== undefined &&
     data?.date_of_birth !== null &&
     data?.date_of_birth !== "";
 
-  // Check email and phone match
   const emailMatch = data?.email_address === data?.confirm_email_address;
   const phoneMatch = data?.phone_number === data?.confirm_phone_number;
 
@@ -59,26 +56,11 @@ const validatePersonalInfo = (data: any, accountType: AccountType | null) => {
   return allFieldsPresent && emailMatch && phoneMatch;
 };
 
-const validateBankInfo = (data: any, accountType: AccountType | null) => {
-  const isIndividual = accountType === "individual";
-  const isCorporate = accountType === "corporate";
-
-  if (isIndividual) {
-    return !!data?.bank_name && !!data?.bank_account_number;
-  }
-
-  if (isCorporate) {
-    return (
-      !!data?.director_bank_name &&
-      !!data?.director_bank_acct_number &&
-      !!data?.director_tax_identification_number
-    );
-  }
-
-  return true;
+const validateBankInfo = (data: any) => {
+  return !!data?.bank_name && !!data?.bank_account_number;
 };
 
-const validateIdentityInfo = (data: any, accountType: AccountType | null) => {
+const validateIdentityInfo = (data: any) => {
   if (!data?.identity_card_type) return false;
 
   if (data.identity_card_type === "National Identity Number") {
@@ -87,6 +69,51 @@ const validateIdentityInfo = (data: any, accountType: AccountType | null) => {
     return !!data?.identity_card_number;
   }
 };
+
+// Validation function for corporate
+const validateCompanyInfo = (data: any) => {
+  const required = [
+    "company_name",
+    "rc_number",
+    "email_address",
+    "confirm_email_address",
+    "phone_number",
+    "confirm_phone_number",
+    "house_address",
+    "city",
+    "state",
+    "country",
+  ];
+
+  // Check all required fields
+  const allFieldsPresent = required.every(
+    (field) => data?.[field] !== undefined && data?.[field] !== null && data?.[field] !== ""
+  );
+
+  // Email confirmation
+  const emailMatch = data?.email_address === data?.confirm_email_address;
+  
+  // Phone confirmation
+  const phoneMatch = data?.phone_number === data?.confirm_phone_number;
+
+  return allFieldsPresent && emailMatch && phoneMatch;
+};
+
+// Validation function for corporate director's identity
+// const validateDirectorIdentity = (data: any) => {  
+//   console.log(data);
+
+//   // Identity card type is required
+//   if (!data?.identity_card_type) return false;
+
+//   // If NIN is selected, check for director's NIN
+//   if (data.identity_card_type === "National Identity Number") {
+//     return !!data?.director_national_identification_number;
+//   } else {
+//     // For other ID types, check identity card number
+//     return !!data?.identity_card_number;
+//   }
+// };
 
 export function InformationPage({
   accountType,
@@ -99,32 +126,43 @@ export function InformationPage({
     personal: true,
     bank: false,
     identity: false,
+    company: true,
+    directorIdentity: false,
   });
 
   // Determine account type
   const isIndividual = accountType === "individual";
   const isCorporate = accountType === "corporate";
 
-  // Log for debugging
-  console.log("InformationPage - accountType:", accountType);
-  console.log("isIndividual:", isIndividual);
-  console.log("isCorporate:", isCorporate);
-
   // Validation states
   const [validation, setValidation] = useState({
     personal: false,
     bank: false,
     identity: false,
+    company: false,
+    directorIdentity: false,
   });
 
   // Update validation when data changes
   useEffect(() => {
-    setValidation({
-      personal: validatePersonalInfo(onBoardingData, accountType),
-      bank: validateBankInfo(onBoardingData, accountType),
-      identity: validateIdentityInfo(onBoardingData, accountType),
-    });
-  }, [onBoardingData, accountType]);
+    if (isIndividual) {
+      setValidation({
+        personal: validatePersonalInfo(onBoardingData),
+        bank: validateBankInfo(onBoardingData),
+        identity: validateIdentityInfo(onBoardingData),
+        company: false,
+        directorIdentity: false,
+      });
+    } else if (isCorporate) {
+      setValidation({
+        personal: false,
+        bank: false,
+        identity: false,
+        company: validateCompanyInfo(onBoardingData),
+        directorIdentity: true
+      });
+    }
+  }, [onBoardingData, isIndividual, isCorporate]);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections((prev) => ({
@@ -133,11 +171,16 @@ export function InformationPage({
     }));
   };
 
-  const allValid =
-    validation.personal && validation.bank && validation.identity;
+  // For corporate, we have two sections
+  const allValid = isCorporate 
+    ? (validation.company && validation.directorIdentity)
+    : (validation.personal && validation.bank && validation.identity);
 
-  const completedCount = Object.values(validation).filter(Boolean).length;
-  const totalCount = 3;
+  const completedCount = isCorporate 
+    ? (validation.company ? 1 : 0) + (validation.directorIdentity ? 1 : 0)
+    : Object.values(validation).filter(Boolean).length;
+  
+  const totalCount = isCorporate ? 2 : 3;
 
   const SectionStatus = ({ isValid }: { isValid: boolean }) => {
     if (isValid) {
@@ -161,34 +204,9 @@ export function InformationPage({
     if (isIndividual) {
       return "Tell us about yourself. This information helps us personalize your insurance coverage.";
     } else if (isCorporate) {
-      return "Provide your company and director details for verification.";
+      return "Provide your company details and director's information for verification.";
     } else {
       return "Please provide your information to continue.";
-    }
-  };
-
-  // Determine section titles based on account type
-  const getPersonalInfoTitle = () => {
-    if (isCorporate) {
-      return "Director's Personal Information";
-    } else {
-      return "Personal Information";
-    }
-  };
-
-  const getBankInfoTitle = () => {
-    if (isCorporate) {
-      return "Director's Bank Information";
-    } else {
-      return "Bank Information";
-    }
-  };
-
-  const getIdentityInfoTitle = () => {
-    if (isCorporate) {
-      return "Director's Identity Information";
-    } else {
-      return "Identity Information";
     }
   };
 
@@ -211,169 +229,298 @@ export function InformationPage({
           </span>
         </div>
         <div className="flex gap-1 h-2">
-          <div
-            className={cn(
-              "flex-1 rounded-full transition-all duration-300",
-              validation.personal ? "bg-green-500" : "bg-gray-200",
-            )}
-          />
-          <div
-            className={cn(
-              "flex-1 rounded-full transition-all duration-300",
-              validation.bank ? "bg-green-500" : "bg-gray-200",
-            )}
-          />
-          <div
-            className={cn(
-              "flex-1 rounded-full transition-all duration-300",
-              validation.identity ? "bg-green-500" : "bg-gray-200",
-            )}
-          />
+          {isCorporate ? (
+            // Two progress bars for corporate
+            <>
+              <div
+                className={cn(
+                  "flex-1 rounded-full transition-all duration-300",
+                  validation.company ? "bg-green-500" : "bg-gray-200",
+                )}
+              />
+              <div
+                className={cn(
+                  "flex-1 rounded-full transition-all duration-300",
+                  validation.directorIdentity ? "bg-green-500" : "bg-gray-200",
+                )}
+              />
+            </>
+          ) : (
+            // Three progress bars for individual
+            <>
+              <div
+                className={cn(
+                  "flex-1 rounded-full transition-all duration-300",
+                  validation.personal ? "bg-green-500" : "bg-gray-200",
+                )}
+              />
+              <div
+                className={cn(
+                  "flex-1 rounded-full transition-all duration-300",
+                  validation.bank ? "bg-green-500" : "bg-gray-200",
+                )}
+              />
+              <div
+                className={cn(
+                  "flex-1 rounded-full transition-all duration-300",
+                  validation.identity ? "bg-green-500" : "bg-gray-200",
+                )}
+              />
+            </>
+          )}
         </div>
         <div className="flex justify-between mt-2 text-xs text-gray-500">
-          <span>Personal Info</span>
-          <span>Bank Details</span>
-          <span>Identity</span>
+          {isCorporate ? (
+            <>
+              <span>Company Information</span>
+              <span>Director's Identity</span>
+            </>
+          ) : (
+            <>
+              <span>Personal Info</span>
+              <span>Bank Details</span>
+              <span>Identity</span>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Personal Information Section */}
-      <motion.div
-        layout
-        className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm"
-      >
-        <button
-          onClick={() => toggleSection("personal")}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <SectionStatus isValid={validation.personal} />
-            <h3 className="text-lg font-semibold text-gray-900">
-              {getPersonalInfoTitle()}
-            </h3>
-            {validation.personal && (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                Completed
-              </span>
-            )}
-          </div>
-          {expandedSections.personal ? (
-            <ChevronUp className="w-5 h-5 text-gray-500" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-gray-500" />
-          )}
-        </button>
-
-        {expandedSections.personal && (
+      {isCorporate ? (
+        /* Corporate View - Two Sections */
+        <>
+          {/* Company Information Section */}
           <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="border-t border-gray-200"
+            layout
+            className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm"
           >
-            <div className="p-6">
-              <PersonalInfoSection
-                accountType={accountType}
-                onBoardingData={onBoardingData}
-                setOnBoardingData={setOnBoardingData}
-              />
-            </div>
-          </motion.div>
-        )}
-      </motion.div>
+            <button
+              onClick={() => toggleSection("company")}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <SectionStatus isValid={validation.company} />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Company Information
+                </h3>
+                {validation.company && (
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    Completed
+                  </span>
+                )}
+              </div>
+              {expandedSections.company ? (
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              )}
+            </button>
 
-      {/* Bank Information Section */}
-      <motion.div
-        layout
-        className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm"
-      >
-        <button
-          onClick={() => toggleSection("bank")}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <SectionStatus isValid={validation.bank} />
-            <h3 className="text-lg font-semibold text-gray-900">
-              {getBankInfoTitle()}
-            </h3>
-            {validation.bank && (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                Completed
-              </span>
+            {expandedSections.company && (
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: "auto" }}
+                exit={{ height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="border-t border-gray-200"
+              >
+                <div className="p-6">
+                  <CompanyInfoStep
+                    onBoardingData={onBoardingData}
+                    setOnBoardingData={setOnBoardingData}
+                  />
+                </div>
+              </motion.div>
             )}
-          </div>
-          {expandedSections.bank ? (
-            <ChevronUp className="w-5 h-5 text-gray-500" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-gray-500" />
-          )}
-        </button>
-
-        {expandedSections.bank && (
-          <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="border-t border-gray-200"
-          >
-            <div className="p-6">
-              <BankInfoStep
-                accountType={accountType}
-                onBoardingData={onBoardingData}
-                setOnBoardingData={setOnBoardingData}
-              />
-            </div>
           </motion.div>
-        )}
-      </motion.div>
 
-      {/* Identity Information Section */}
-      <motion.div
-        layout
-        className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm"
-      >
-        <button
-          onClick={() => toggleSection("identity")}
-          className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-        >
-          <div className="flex items-center gap-3">
-            <SectionStatus isValid={validation.identity} />
-            <h3 className="text-lg font-semibold text-gray-900">
-              {getIdentityInfoTitle()}
-            </h3>
-            {validation.identity && (
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                Completed
-              </span>
+          {/* Director's Identity Section */}
+          <motion.div
+            layout
+            className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm"
+          >
+            <button
+              onClick={() => toggleSection("directorIdentity")}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <SectionStatus isValid={validation.directorIdentity} />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Director's Identity
+                </h3>
+                {validation.directorIdentity && (
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    Completed
+                  </span>
+                )}
+              </div>
+              {expandedSections.directorIdentity ? (
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              )}
+            </button>
+
+            {expandedSections.directorIdentity && (
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: "auto" }}
+                exit={{ height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="border-t border-gray-200"
+              >
+                <div className="p-6">
+                  <IdentityInfoStep
+                    accountType={accountType}
+                    onBoardingData={onBoardingData}
+                    setOnBoardingData={setOnBoardingData}
+                  />
+                </div>
+              </motion.div>
             )}
-          </div>
-          {expandedSections.identity ? (
-            <ChevronUp className="w-5 h-5 text-gray-500" />
-          ) : (
-            <ChevronDown className="w-5 h-5 text-gray-500" />
-          )}
-        </button>
-
-        {expandedSections.identity && (
-          <motion.div
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="border-t border-gray-200"
-          >
-            <div className="p-6">
-              <IdentityInfoStep
-                accountType={accountType}
-                onBoardingData={onBoardingData}
-                setOnBoardingData={setOnBoardingData}
-              />
-            </div>
           </motion.div>
-        )}
-      </motion.div>
+        </>
+      ) : (
+        /* Individual View - Three Sections */
+        <>
+          {/* Personal Information Section */}
+          <motion.div
+            layout
+            className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm"
+          >
+            <button
+              onClick={() => toggleSection("personal")}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <SectionStatus isValid={validation.personal} />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Personal Information
+                </h3>
+                {validation.personal && (
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    Completed
+                  </span>
+                )}
+              </div>
+              {expandedSections.personal ? (
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              )}
+            </button>
+
+            {expandedSections.personal && (
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: "auto" }}
+                exit={{ height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="border-t border-gray-200"
+              >
+                <div className="p-6">
+                  <PersonalInfoSection
+                    accountType={accountType}
+                    onBoardingData={onBoardingData}
+                    setOnBoardingData={setOnBoardingData}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* Bank Information Section */}
+          <motion.div
+            layout
+            className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm"
+          >
+            <button
+              onClick={() => toggleSection("bank")}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <SectionStatus isValid={validation.bank} />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Bank Information
+                </h3>
+                {validation.bank && (
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    Completed
+                  </span>
+                )}
+              </div>
+              {expandedSections.bank ? (
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              )}
+            </button>
+
+            {expandedSections.bank && (
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: "auto" }}
+                exit={{ height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="border-t border-gray-200"
+              >
+                <div className="p-6">
+                  <BankInfoStep
+                    accountType={accountType}
+                    onBoardingData={onBoardingData}
+                    setOnBoardingData={setOnBoardingData}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* Identity Information Section */}
+          <motion.div
+            layout
+            className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm"
+          >
+            <button
+              onClick={() => toggleSection("identity")}
+              className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <SectionStatus isValid={validation.identity} />
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Identity Information
+                </h3>
+                {validation.identity && (
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                    Completed
+                  </span>
+                )}
+              </div>
+              {expandedSections.identity ? (
+                <ChevronUp className="w-5 h-5 text-gray-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-gray-500" />
+              )}
+            </button>
+
+            {expandedSections.identity && (
+              <motion.div
+                initial={{ height: 0 }}
+                animate={{ height: "auto" }}
+                exit={{ height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="border-t border-gray-200"
+              >
+                <div className="p-6">
+                  <IdentityInfoStep
+                    accountType={accountType}
+                    onBoardingData={onBoardingData}
+                    setOnBoardingData={setOnBoardingData}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </motion.div>
+        </>
+      )}
 
       {/* Summary Card */}
       <div className="bg-gray-50 p-4 rounded-lg">
@@ -386,7 +533,9 @@ export function InformationPage({
             )}
             <span className="text-sm font-medium">
               {allValid
-                ? "All sections completed! You're ready to continue."
+                ? isCorporate 
+                  ? "All information completed! You're ready to continue."
+                  : "All sections completed! You're ready to continue."
                 : `Please complete all required fields (${completedCount}/${totalCount} sections)`}
             </span>
           </div>
