@@ -61,15 +61,13 @@ export default function HomePage() {
       <section className="relative z-10 container mx-auto px-6 pt-20 pb-16">
         <div className="text-center max-w-4xl mx-auto">
           {/* Badge */}
-          <div className="inline-flex items-center bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-8 animate-fade-in">
+          {/* <div className="inline-flex items-center bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-8 animate-fade-in">
             <Sparkles className="h-4 w-4 mr-2" />
             Welcome to the Future of Client Onboarding
-          </div>
+          </div> */}
 
           {/* Main Heading */}
-          <h1 style={{
-            fontFamily: "Poppins"
-          }} className="pops text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+          <h1 className="pops text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
             <span className="bg-linear-to-r from-blue-600 via-indigo-600 to-blue-600 bg-clip-text text-transparent bg-300% animate-gradient">
               Seamless Onboarding
             </span>
@@ -94,7 +92,7 @@ export default function HomePage() {
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link href="/portal/login">
+            <Link href="/portal/auth">
               <Button
                 size="lg"
                 variant="outline"
@@ -183,7 +181,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <Link href="/onboarding?type=individual">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white group-hover:shadow-lg transition-all">
+                <Button size={"lg"} className="w-full bg-blue-600 hover:bg-blue-700 text-white group-hover:shadow-lg transition-all">
                   Start Individual Onboarding
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -222,7 +220,7 @@ export default function HomePage() {
                 ))}
               </ul>
               <Link href="/onboarding?type=employee-group-life">
-                <Button className="w-full bg-linear-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white group-hover:shadow-lg transition-all">
+                <Button size={"lg"} className="w-full bg-linear-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white group-hover:shadow-lg transition-all">
                   Start Employee Registration
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -249,7 +247,7 @@ export default function HomePage() {
       {/* How It Works */}
       <section className="relative z-10 container mx-auto px-6 py-16">
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-          <span className="bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <span className="bg-linear-to-r from-blue-300 to-indigo-600 bg-clip-text text-transparent">
             How It Works
           </span>
         </h2>
@@ -296,7 +294,7 @@ export default function HomePage() {
 
       {/* Benefits */}
       <section className="relative z-10 container mx-auto px-6 py-16">
-        <div className="bg-linear-to-br from-blue-600 to-indigo-600 rounded-3xl p-12 text-white">
+        <div className="bg-linear-to-br from-blue-500 to-indigo-500 rounded-3xl p-12 text-white">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
             Why Choose SCIB?
           </h2>
