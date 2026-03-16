@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSearchParams } from "next/navigation";
 import { useOnboardingWizard } from "@/hooks/queries/useOnboarding";
 import { OnboardingHeader } from "./onboarding-header";
 import { SuccessScreen } from "./success-screen";
@@ -13,8 +14,14 @@ import { BeneficiariesStep } from "./steps/beneficiaries-step";
 import { ConsentStep } from "./steps/consent-step";
 import { ReviewStep } from "./steps/review-step";
 import { InformationPage } from "./steps/Information-page-step";
+import type { AccountType } from "@/types/onboarding.types";
 
 export function OnboardingWizard() {
+  const searchParams = useSearchParams();
+  const urlType = searchParams.get("type") as AccountType | null;
+  
+  const [initialized, setInitialized] = useState(false);
+
   const {
     currentStep,
     setCurrentStep,
@@ -31,7 +38,25 @@ export function OnboardingWizard() {
     handleSubmit,
   } = useOnboardingWizard();
 
-  console.log(selectedPlan);
+  // Handle URL parameter for employee-group-life
+  useEffect(() => {
+    if (urlType === "employee-group-life" && !initialized) {
+      // Set account type
+      setAccountType("employee-group-life");
+      
+      // Set default plan to group life
+      setSelectedPlan("Group Life Insurance Plan");
+      
+      // Skip to consent step (index 1 since account-type is step 0)
+      setCurrentStep(1);
+      
+      setInitialized(true);
+    } else if (urlType && !initialized) {
+      // Handle other direct types if needed
+      setAccountType(urlType);
+      setInitialized(true);
+    }
+  }, [urlType, initialized, setAccountType, setSelectedPlan, setCurrentStep]);
 
   // Define steps based on account type
   const getSteps = () => {
@@ -64,19 +89,24 @@ export function OnboardingWizard() {
 
     if (accountType === "corporate") {
       steps.push({
-        id: "company-info",
+        id: "information",
         title: "Company Information",
         icon: "🏢",
       });
     }
 
+    if (accountType === "employee-group-life") {
+      steps.push({
+        id: "information",
+        title: "Personal Information",
+        icon: "👤",
+      });
+    }
+
     // Add beneficiaries step only for employee group life
-    // if (
-    //   accountType === "corporate" &&
-    //   selectedPlan === "Group Life Insurance Plan"
-    // ) {
-    //   steps.push({ id: "beneficiaries", title: "Beneficiaries", icon: "👨‍👩‍👧" });
-    // }
+    if (accountType === "employee-group-life") {
+      steps.push({ id: "beneficiaries", title: "Beneficiaries", icon: "👨‍👩‍👧" });
+    }
 
     // Add documents step for all account types
     steps.push({ id: "documents", title: "Documents", icon: "📄" });
@@ -87,21 +117,28 @@ export function OnboardingWizard() {
   };
 
   const steps = getSteps();
-  const currentStepData = steps[currentStep] || steps[0];
-  const progress = ((currentStep + 1) / steps.length) * 100;
+  
+  // Ensure current step is within bounds
+  const safeCurrentStep = Math.min(currentStep, steps.length - 1);
+  const currentStepData = steps[safeCurrentStep] || steps[0];
+  const progress = ((safeCurrentStep + 1) / steps.length) * 100;
 
+  console.log("URL Type:", urlType);
   console.log("Account Type:", accountType);
+  console.log("Selected Plan:", selectedPlan);
   console.log(
     "All Steps:",
     steps.map((s) => s.id),
   );
-  console.log("Current Step:", currentStep, currentStepData?.id);
+  console.log("Current Step:", safeCurrentStep, currentStepData?.id);
   console.log("Progress:", progress);
 
-  // Reset to first step when account type changes
+  // Reset to first step when account type changes (but not from URL init)
   useEffect(() => {
-    setCurrentStep(0);
-  }, [accountType, setCurrentStep]);
+    if (!urlType) {
+      setCurrentStep(0);
+    }
+  }, [accountType, setCurrentStep, urlType]);
 
   if (isSuccess) {
     return <SuccessScreen accountType={accountType} />;
@@ -136,20 +173,10 @@ export function OnboardingWizard() {
         );
 
       case "information":
+        // Information page handles different account types internally
         return (
           <InformationPage
             accountType={accountType}
-            onNext={handleNext}
-            onBack={handleBack}
-            onBoardingData={onboardingData}
-            setOnBoardingData={setOnboardingData}
-          />
-        );
-
-      case "company-info":
-        return (
-          <InformationPage
-            accountType={"corporate"}
             onNext={handleNext}
             onBack={handleBack}
             onBoardingData={onboardingData}
@@ -209,7 +236,7 @@ export function OnboardingWizard() {
       {/* Progress Bar */}
       <div className="h-2 bg-gray-100">
         <motion.div
-          className="h-full bg-linear-to-r from-blue-600 to-emerald-600"
+          className="h-full bg-gradient-to-r from-blue-600 to-emerald-600"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.3 }}
@@ -221,7 +248,7 @@ export function OnboardingWizard() {
         <OnboardingHeader
           title={currentStepData?.title || "Onboarding"}
           icon={currentStepData?.icon || "📝"}
-          stepNumber={currentStep + 1}
+          stepNumber={safeCurrentStep + 1}
           totalSteps={steps.length}
           accountType={accountType}
         />
@@ -230,7 +257,7 @@ export function OnboardingWizard() {
         <div className="mt-8">
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentStep}
+              key={safeCurrentStep}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}

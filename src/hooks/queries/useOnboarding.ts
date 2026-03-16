@@ -235,10 +235,10 @@ export function useOnboardingWizard() {
         await submitCompany.mutateAsync(
           onboardingData as CompanyGroupLifeOnboardingData,
         );
-        // } else if (accountType === "employee-group-life") {
-        //   await submitEmployee.mutateAsync(
-        //     onboardingData as EmployeeGroupLifeOnboardingData,
-        //   );
+        } else if (accountType === "employee-group-life") {
+          await submitEmployee.mutateAsync(
+            onboardingData as EmployeeGroupLifeOnboardingData,
+          );
       } else {
         await submitIndividual.mutateAsync(
           onboardingData as IndividualOnboardingData,

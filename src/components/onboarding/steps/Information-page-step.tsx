@@ -161,6 +161,13 @@ export function InformationPage({
         company: validateCompanyInfo(onBoardingData),
         directorIdentity: true
       });
+      setValidation({
+        personal: false,
+        bank: false,
+        identity: false,
+        company: validateCompanyInfo(onBoardingData),
+        directorIdentity: true
+      })
     }
   }, [onBoardingData, isIndividual, isCorporate]);
 

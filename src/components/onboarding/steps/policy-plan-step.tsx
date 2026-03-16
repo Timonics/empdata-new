@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Search, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -30,6 +30,12 @@ export function PolicyPlanStep({
 }: PolicyPlanStepProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (accountType === "employee-group-life" && !selectedPlan) {
+      setSelectedPlan("Employee Group Life Insurance Plan");
+    }
+  }, [accountType, selectedPlan, setSelectedPlan]);
 
   const getPlans = () => {
     if (accountType === "individual") return individualPolicyPlans;
