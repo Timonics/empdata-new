@@ -1,4 +1,3 @@
-// app/api/portal/company/[id]/full/route.ts
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { callBackend } from "@/lib/server-api";

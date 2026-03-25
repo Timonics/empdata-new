@@ -173,7 +173,6 @@ export function OnboardingWizard() {
         );
 
       case "information":
-        // Information page handles different account types internally
         return (
           <InformationPage
             accountType={accountType}
@@ -236,7 +235,7 @@ export function OnboardingWizard() {
       {/* Progress Bar */}
       <div className="h-2 bg-gray-100">
         <motion.div
-          className="h-full bg-gradient-to-r from-blue-600 to-emerald-600"
+          className="h-full bg-linear-to-r from-blue-600 to-emerald-600"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.3 }}

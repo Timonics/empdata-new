@@ -51,6 +51,8 @@ export function ReviewStep({
     await onSubmit();
   };
 
+  console.log(onBoardingData);
+
   const renderValue = (value: any) => {
     if (value instanceof Date) return value.toLocaleDateString();
     if (typeof value === "boolean") return value ? "Yes" : "No";
@@ -144,7 +146,7 @@ export function ReviewStep({
           : "Not provided",
         "Bank Name": onBoardingData?.bank_name,
         "Account Number": onBoardingData?.bank_account_number,
-        "Bank Consent": onBoardingData?.bank_details_consent ? "Yes" : "No",
+        // "Bank Consent": onBoardingData?.bank_details_consent ? "Yes" : "No",
       },
     });
   }

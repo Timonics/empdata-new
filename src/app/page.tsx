@@ -1,9 +1,3 @@
-// import { redirect } from "next/navigation";
-
-// export default function AuthIndexPage() {
-//   redirect("/admin/login");
-// }
-
 "use client"
 
 import Link from "next/link";
@@ -13,11 +7,9 @@ import {
   Building2,
   ShieldCheck,
   ArrowRight,
-  Sparkles,
   ChevronRight,
   CheckCircle2,
   FileCheck,
-  Clock,
   BadgeCheck,
   HeartHandshake,
   Zap,

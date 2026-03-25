@@ -16,7 +16,7 @@ export interface BackendCallOptions {
   headers?: Record<string, string>;
 }
 
-export async function callBackend<T = any>(
+export async function callBackend(
   options: BackendCallOptions,
 ): Promise<any> {
   const { method, path, data, authType, token, headers = {} } = options;

@@ -1,21 +1,17 @@
 import { BaseService } from "@/services/base.service";
 
 interface EncryptedNinResponse {
-  nin_number_iv: string; // Empty string for RSA
-  nin_number_data: string; // Base64 encrypted NIN
-  nin_number_tag: string; // Empty string for RSA
+  nin_number_data: string; // Base64 encrypted NIN (RSA)
 }
 
 export class EncryptionService extends BaseService {
-  private static readonly BASE_PATH = "/portal/nin";
+  private static readonly BASE_PATH = "/api/nin";
 
   /**
    * Fetch the RSA public key for NIN encryption
-   * Uses the authenticated api instance from BaseService
    */
   static async getPublicKey(): Promise<string> {
     try {
-      // This will automatically include the auth token via axios interceptor
       const response = await this.get<{ public_key: string }>(
         `${this.BASE_PATH}/public-key`,
       );
@@ -33,10 +29,10 @@ export class EncryptionService extends BaseService {
 
   /**
    * Encrypt NIN using RSA public key
+   * Returns only the encrypted data (RSA doesn't use IV/tag)
    */
   static async encryptNin(nin: string): Promise<EncryptedNinResponse> {
     try {
-      // Get public key - token automatically included via BaseService
       const publicKeyPem = await this.getPublicKey();
 
       // Clean and prepare the PEM public key
@@ -55,7 +51,7 @@ export class EncryptionService extends BaseService {
         binaryDer.buffer,
         {
           name: "RSA-OAEP",
-          hash: "SHA-1", // Match your PHP backend
+          hash: "SHA-1", // Match PHP backend
         },
         false,
         ["encrypt"],
@@ -74,11 +70,8 @@ export class EncryptionService extends BaseService {
         String.fromCharCode(...new Uint8Array(encrypted)),
       );
 
-      // Return in the format expected by the API
       return {
-        nin_number_iv: "", // Empty string for RSA
         nin_number_data: encryptedBase64,
-        nin_number_tag: "", // Empty string for RSA
       };
     } catch (error) {
       console.error("NIN encryption failed:", error);

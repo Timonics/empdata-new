@@ -43,25 +43,23 @@ export function useSubmitCompanyRegistration() {
       const submissionData = { ...data };
 
       // Encrypt Director's NIN if applicable
-      if (
-        data.identity_card_type === "National Identity Number" &&
-        data.director_national_identification_number
-      ) {
-        try {
-          const encrypted = await EncryptionService.encryptNin(
-            data.director_national_identification_number,
-          );
+      // if (
+      //   data.identity_card_type === "National Identity Number" &&
+      //   data.director_national_identification_number
+      // ) {
+      //   try {
+      //     const encrypted = await EncryptionService.encryptNin(
+      //       data.director_national_identification_number,
+      //     );
 
-          submissionData.nin_number_iv = encrypted.nin_number_iv;
-          submissionData.nin_number_data = encrypted.nin_number_data;
-          submissionData.nin_number_tag = encrypted.nin_number_tag;
+      //     submissionData.nin_number_data = encrypted.nin_number_data;
 
-          delete submissionData.director_national_identification_number;
-        } catch (error) {
-          toast.error("Failed to encrypt director's NIN");
-          throw error;
-        }
-      }
+      //     delete submissionData.director_national_identification_number;
+      //   } catch (error) {
+      //     toast.error("Failed to encrypt director's NIN");
+      //     throw error;
+      //   }
+      // }
 
       // Handle BVN similarly when implemented
       if (data.director_bvn_number) {
@@ -94,19 +92,17 @@ export function useSubmitEmployeeRegistration() {
       const submissionData = { ...data };
 
       // Encrypt NIN if present
-      if (
-        data.identity_card_type === "National Identity Number" &&
-        data.national_identification_number
-      ) {
-        const encrypted = await EncryptionService.encryptNin(
-          data.national_identification_number,
-        );
-        submissionData.nin_number_iv = encrypted.nin_number_iv;
-        submissionData.nin_number_data = encrypted.nin_number_data;
-        submissionData.nin_number_tag = encrypted.nin_number_tag;
+      // if (
+      //   data.identity_card_type === "National Identity Number" &&
+      //   data.national_identification_number
+      // ) {
+      //   const encrypted = await EncryptionService.encryptNin(
+      //     data.national_identification_number,
+      //   );
+      //   submissionData.nin_number_data = encrypted.nin_number_data;
 
-          delete submissionData.national_identification_number;
-      }
+      //   delete submissionData.national_identification_number;
+      // }
 
       const formData = buildFormData(data, "employee-group-life");
       return OnboardingService.submitEmployeeRegistration(formData);
@@ -144,28 +140,26 @@ export function useSubmitIndividualRegistration() {
       }
 
       // Encrypt NIN if present and identity type is National Identity Number
-      if (
-        data.identity_card_type === "National Identity Number" &&
-        data.national_identification_number
-      ) {
-        try {
-          // Encrypt the NIN using RSA
-          const encrypted = await EncryptionService.encryptNin(
-            data.national_identification_number,
-          );
+      // if (
+      //   data.identity_card_type === "National Identity Number" &&
+      //   data.national_identification_number
+      // ) {
+      //   try {
+      //     // Encrypt the NIN using RSA
+      //     const encrypted = await EncryptionService.encryptNin(
+      //       data.national_identification_number,
+      //     );
 
-          // Add the encrypted fields to submission data
-          submissionData.nin_number_iv = encrypted.nin_number_iv;
-          submissionData.nin_number_data = encrypted.nin_number_data;
-          submissionData.nin_number_tag = encrypted.nin_number_tag;
+      //     // Add the encrypted fields to submission data
+      //     submissionData.nin_number_data = encrypted.nin_number_data;
 
-          // Remove plain text NIN
-          delete submissionData.national_identification_number;
-        } catch (error) {
-          toast.error("Failed to encrypt NIN. Please try again.");
-          throw error;
-        }
-      }
+      //     // Remove plain text NIN
+      //     delete submissionData.national_identification_number;
+      //   } catch (error) {
+      //     toast.error("Failed to encrypt NIN. Please try again.");
+      //     throw error;
+      //   }
+      // }
 
       // Build FormData and submit
       const formData = buildFormData(submissionData, "individual");
@@ -235,10 +229,10 @@ export function useOnboardingWizard() {
         await submitCompany.mutateAsync(
           onboardingData as CompanyGroupLifeOnboardingData,
         );
-        } else if (accountType === "employee-group-life") {
-          await submitEmployee.mutateAsync(
-            onboardingData as EmployeeGroupLifeOnboardingData,
-          );
+      } else if (accountType === "employee-group-life") {
+        await submitEmployee.mutateAsync(
+          onboardingData as EmployeeGroupLifeOnboardingData,
+        );
       } else {
         await submitIndividual.mutateAsync(
           onboardingData as IndividualOnboardingData,

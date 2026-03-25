@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Building2, User, Users } from 'lucide-react';
-import type { AccountType } from '@/types/onboarding.types';
+import { motion } from "framer-motion";
+import { Building2, User, Users } from "lucide-react";
+import type { AccountType } from "@/types/onboarding.types";
 
 interface OnboardingHeaderProps {
   title: string;
@@ -20,14 +20,16 @@ export function OnboardingHeader({
   accountType,
 }: OnboardingHeaderProps) {
   const getAccountTypeIcon = () => {
-    if (accountType === 'corporate') return <Building2 className="w-5 h-5" />;
+    if (accountType === "corporate") return <Building2 className="w-5 h-5" />;
+    if (accountType === "employee-group-life")
+      return <Building2 className="w-5 h-5" />;
     return <User className="w-5 h-5" />;
   };
 
   const getAccountTypeLabel = () => {
-    if (accountType === 'corporate') return 'Corporate';
-    if(accountType === "employee-group-life") return 'Employee Group Life'
-    return 'Individual';
+    if (accountType === "corporate") return "Corporate";
+    if (accountType === "employee-group-life") return "Employee Group Life";
+    return "Individual";
   };
 
   return (
@@ -60,7 +62,7 @@ export function OnboardingHeader({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.2 }}
       >
-        {String(stepNumber).padStart(2, '0')}
+        {String(stepNumber).padStart(2, "0")}
       </motion.div>
     </div>
   );
