@@ -11,6 +11,7 @@ import {
   CompanyGroupLifeOnboardingData,
   EmployeeGroupLifeOnboardingData,
 } from "@/types/onboarding.types";
+import { cleanObject } from "@/lib/utils";
 
 export const onboardingKeys = {
   companies: ["active-companies"] as const,
@@ -39,35 +40,55 @@ export function useActiveCompanies() {
 export function useSubmitCompanyRegistration() {
   return useMutation({
     mutationFn: async (data: CompanyGroupLifeOnboardingData) => {
-      // Encrypt BVN
       const submissionData = { ...data };
 
-      // Encrypt Director's NIN if applicable
-      // if (
-      //   data.identity_card_type === "National Identity Number" &&
-      //   data.director_national_identification_number
-      // ) {
-      //   try {
-      //     const encrypted = await EncryptionService.encryptNin(
-      //       data.director_national_identification_number,
-      //     );
+      // Remove BVN fields (not implemented yet)
+      delete submissionData.director_bvn_number;
+      delete submissionData.director_bvn_iv;
+      delete submissionData.director_bvn_data;
+      delete submissionData.director_bvn_tag;
 
-      //     submissionData.nin_number_data = encrypted.nin_number_data;
-
-      //     delete submissionData.director_national_identification_number;
-      //   } catch (error) {
-      //     toast.error("Failed to encrypt director's NIN");
-      //     throw error;
-      //   }
-      // }
-
-      // Handle BVN similarly when implemented
-      if (data.director_bvn_number) {
-        // Will use EncryptionService.encryptBvn() when implemented
-        delete submissionData.director_bvn_number; // Remove plain text for now
+      // Handle Director's NIN based on verification status
+      if (data.identity_card_type === "National Identity Number") {
+        if (data.nin_verification_status === "pending_admin") {
+          // For pending admin: send flags and plain NIN
+          delete submissionData.nin_number_iv;
+          delete submissionData.nin_number_data;
+          delete submissionData.nin_number_tag;
+          
+          submissionData.nin_verification_pending = true;
+          delete submissionData.director_national_identification_number;
+          
+        } else if (data.nin_verification_status === "verified") {
+          // For verified: encrypt with RSA and send empty iv/tag
+          if (data.director_national_identification_number) {
+            try {
+              const encrypted = await EncryptionService.encryptNin(
+                data.director_national_identification_number,
+              );
+              
+              // Send in the format expected by the API (with empty iv and tag)
+              submissionData.nin_number_iv = "";
+              submissionData.nin_number_data = encrypted.nin_number_data;
+              submissionData.nin_number_tag = "";
+              
+              delete submissionData.director_national_identification_number;
+            } catch (error) {
+              toast.error("Failed to encrypt director's NIN");
+              throw error;
+            }
+          }
+        }
       }
 
-      const formData = buildFormData(submissionData, "corporate");
+      // Handle CAC verification status
+      if (data.cac_verification_status === "pending_admin") {
+        submissionData.cac_verification_pending = true;
+      }
+
+      // Remove any undefined/null values
+      const cleanedData = cleanObject(submissionData)
+      const formData = buildFormData(cleanedData, "corporate");
       return await OnboardingService.submitCompanyRegistration(formData);
     },
     onSuccess: (response) => {
@@ -91,20 +112,42 @@ export function useSubmitEmployeeRegistration() {
     mutationFn: async (data: EmployeeGroupLifeOnboardingData) => {
       const submissionData = { ...data };
 
-      // Encrypt NIN if present
-      // if (
-      //   data.identity_card_type === "National Identity Number" &&
-      //   data.national_identification_number
-      // ) {
-      //   const encrypted = await EncryptionService.encryptNin(
-      //     data.national_identification_number,
-      //   );
-      //   submissionData.nin_number_data = encrypted.nin_number_data;
+      // Remove BVN fields (not implemented yet)
+      delete submissionData.bvn_number;
+      delete submissionData.bvn_iv;
+      delete submissionData.bvn_data;
+      delete submissionData.bvn_tag;
 
-      //   delete submissionData.national_identification_number;
-      // }
+      // Handle Employee NIN based on verification status
+      if (data.identity_card_type === "National Identity Number") {
+        if (data.nin_verification_status === "pending_admin") {
+          // For pending admin: send flags and plain NIN
+          delete submissionData.nin_number_iv;
+          delete submissionData.nin_number_data;
+          delete submissionData.nin_number_tag;
+          
+          submissionData.nin_verification_pending = true;
+          delete submissionData.national_identification_number;
+          
+        } else if (data.nin_verification_status === "verified") {
+          // For verified: encrypt with RSA and send empty iv/tag
+          if (data.national_identification_number) {
+            const encrypted = await EncryptionService.encryptNin(
+              data.national_identification_number,
+            );
+            
+            submissionData.nin_number_iv = "";
+            submissionData.nin_number_data = encrypted.nin_number_data;
+            submissionData.nin_number_tag = "";
+            
+            delete submissionData.national_identification_number;
+          }
+        }
+      }
 
-      const formData = buildFormData(data, "employee-group-life");
+      // Remove any undefined/null values
+      const cleanedData = cleanObject(submissionData)
+      const formData = buildFormData(cleanedData, "employee-group-life");
       return OnboardingService.submitEmployeeRegistration(formData);
     },
     onSuccess: (response) => {
@@ -123,46 +166,53 @@ export function useSubmitEmployeeRegistration() {
 /**
  * Hook to submit individual registration
  */
-/**
- * Hook to submit individual registration
- */
 export function useSubmitIndividualRegistration() {
   return useMutation({
     mutationFn: async (data: IndividualOnboardingData) => {
-      // Create a copy of data to avoid mutating the original
       const submissionData = { ...data };
 
-      // Encrypt BVN if present (you'll need to implement BVN encryption similarly)
-      if (data.bvn_number) {
-        // For now, handle BVN similarly or remove if not needed
-        // You might need a separate BVN encryption function
-        delete submissionData.bvn_number; // Remove plain text
+      // Remove BVN fields (not implemented yet)
+      delete submissionData.bvn_number;
+      delete submissionData.bvn_iv;
+      delete submissionData.bvn_data;
+      delete submissionData.bvn_tag;
+
+      // Handle Individual NIN based on verification status
+      if (data.identity_card_type === "National Identity Number") {
+        if (data.nin_verification_status === "pending_admin") {
+          // For pending admin: send flags and plain NIN
+          delete submissionData.nin_number_iv;
+          delete submissionData.nin_number_data;
+          delete submissionData.nin_number_tag;
+          
+          submissionData.nin_verification_pending = true;
+          delete submissionData.national_identification_number;
+          
+        } else if (data.nin_verification_status === "verified") {
+          // For verified: encrypt with RSA and send empty iv/tag
+          if (data.national_identification_number) {
+            try {
+              const encrypted = await EncryptionService.encryptNin(
+                data.national_identification_number,
+              );
+              
+              // Send in the format expected by the API (with empty iv and tag)
+              submissionData.nin_number_iv = "";
+              submissionData.nin_number_data = encrypted.nin_number_data;
+              submissionData.nin_number_tag = "";
+              
+              delete submissionData.national_identification_number;
+            } catch (error) {
+              toast.error("Failed to encrypt NIN. Please try again.");
+              throw error;
+            }
+          }
+        }
       }
 
-      // Encrypt NIN if present and identity type is National Identity Number
-      // if (
-      //   data.identity_card_type === "National Identity Number" &&
-      //   data.national_identification_number
-      // ) {
-      //   try {
-      //     // Encrypt the NIN using RSA
-      //     const encrypted = await EncryptionService.encryptNin(
-      //       data.national_identification_number,
-      //     );
-
-      //     // Add the encrypted fields to submission data
-      //     submissionData.nin_number_data = encrypted.nin_number_data;
-
-      //     // Remove plain text NIN
-      //     delete submissionData.national_identification_number;
-      //   } catch (error) {
-      //     toast.error("Failed to encrypt NIN. Please try again.");
-      //     throw error;
-      //   }
-      // }
-
-      // Build FormData and submit
-      const formData = buildFormData(submissionData, "individual");
+      // Remove any undefined/null values
+      const cleanedData = cleanObject(submissionData)
+      const formData = buildFormData(cleanedData, "individual");
       return await OnboardingService.submitIndividualRegistration(formData);
     },
     onSuccess: (response) => {

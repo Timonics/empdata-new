@@ -1,4 +1,4 @@
-// components/admin/verifications/nin-verifications.tsx
+// components/admin/verifications/cac-verifications.tsx
 "use client";
 
 import { useState } from "react";
@@ -20,11 +20,11 @@ import {
   MoreHorizontal,
   Eye,
   CheckCircle,
-  XCircle,
   RefreshCw,
   Loader2,
   ShieldAlert,
   Download,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { VerificationDrawer } from "./verification-drawer";
@@ -45,7 +45,7 @@ const statusStyles = {
   in_progress: "bg-blue-100 text-blue-800 border-blue-200",
 };
 
-export function NINVerifications() {
+export function CACVerifications() {
   const [drawerVerification, setDrawerVerification] = useState<any | null>(
     null,
   );
@@ -61,18 +61,17 @@ export function NINVerifications() {
   const { data: currentAdmin } = useCurrentAdmin();
   const canVerify =
     currentAdmin?.data?.all_permissions?.includes(
-      "verify_employee_registrations",
+      "verify_company_registrations",
     ) || currentAdmin?.data?.roles?.includes("super-admin");
   const canReject =
     currentAdmin?.data?.all_permissions?.includes(
-      "reject_employee_registrations",
+      "reject_company_registrations",
     ) || currentAdmin?.data?.roles?.includes("super-admin");
   const canView =
     currentAdmin?.data?.all_permissions?.includes(
-      "view_employee_registrations",
+      "view_company_registrations",
     ) || currentAdmin?.data?.roles?.includes("super-admin");
 
-  //errrrrrrrrr
   const { data, isLoading, refetch, isFetching } = useEmployeeVerifications({
     status: filter === "all" ? undefined : filter,
   });
@@ -120,7 +119,7 @@ export function NINVerifications() {
         <ShieldAlert className="h-12 w-12 text-red-400 mb-4" />
         <h3 className="text-lg font-semibold text-gray-900">Access Denied</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          You don't have permission to view NIN verifications.
+          You don't have permission to view CAC verifications.
         </p>
       </div>
     );
@@ -128,41 +127,36 @@ export function NINVerifications() {
 
   const columns = [
     {
-      header: "Employee",
+      header: "Company",
       cell: (item: any) => (
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 border">
-            <AvatarFallback className="bg-blue-100 text-blue-600">
-              {item.first_name?.[0]}
-              {item.last_name?.[0]}
+            <AvatarFallback className="bg-purple-100 text-purple-600">
+              {item.company_name?.[0] || "C"}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-medium">
-              {item.first_name} {item.last_name}
-            </p>
+            <p className="font-medium">{item.company_name}</p>
             <p className="text-xs text-muted-foreground">{item.email}</p>
           </div>
         </div>
       ),
     },
     {
-      header: "Company",
+      header: "RC Number",
       cell: (item: any) => (
-        <div>
-          <p className="text-sm">{item.company_name}</p>
-          <p className="text-xs text-muted-foreground">
-            {item.employee_id || "N/A"}
-          </p>
-        </div>
+        <code className="rounded bg-gray-100 px-2 py-1 text-xs font-mono">
+          {item.rc_number}
+        </code>
       ),
     },
     {
-      header: "NIN",
+      header: "Director",
       cell: (item: any) => (
-        <code className="rounded bg-gray-100 px-2 py-1 text-xs font-mono">
-          {item.nin_value || "•••••••••••"}
-        </code>
+        <div>
+          <p className="text-sm">{item.director_name}</p>
+          <p className="text-xs text-muted-foreground">{item.director_phone}</p>
+        </div>
       ),
     },
     {
@@ -174,16 +168,16 @@ export function NINVerifications() {
             className={cn(
               "font-medium",
               statusStyles[
-                item.nin_verification_status as keyof typeof statusStyles
+                item.cac_verification_status as keyof typeof statusStyles
               ] ||
                 statusStyles[item.status as keyof typeof statusStyles] ||
                 "bg-gray-100",
             )}
           >
-            {item.nin_verification_status || item.status || "pending"}
+            {item.cac_verification_status || item.status || "pending"}
           </Badge>
           <Progress
-            value={item.nin_verification_status === "verified" ? 100 : 30}
+            value={item.cac_verification_status === "verified" ? 100 : 30}
             className="h-1 w-20"
           />
         </div>
@@ -238,10 +232,10 @@ export function NINVerifications() {
                 <CheckCircle className="mr-2 h-4 w-4" />
                 Review & Verify
               </DropdownMenuItem>
-              {item.nin_document_url && (
+              {item.cac_document_url && (
                 <DropdownMenuItem>
                   <Download className="mr-2 h-4 w-4" />
-                  Download NIN Slip
+                  Download CAC Document
                 </DropdownMenuItem>
               )}
             </DropdownMenuContent>
@@ -326,8 +320,8 @@ export function NINVerifications() {
           }
           emptyMessage={
             filter === "pending_admin"
-              ? "No pending admin verifications. All NINs have been processed."
-              : "No NIN verifications found"
+              ? "No pending admin verifications. All CACs have been processed."
+              : "No CAC verifications found"
           }
         />
       </div>
@@ -335,7 +329,7 @@ export function NINVerifications() {
       {drawerVerification && (
         <VerificationDrawer
           verification={drawerVerification}
-          type="nin"
+          type="cac"
           open={!!drawerVerification}
           onOpenChange={() => setDrawerVerification(null)}
         />
@@ -350,22 +344,20 @@ export function NINVerifications() {
           }}
           onApprove={handleApprove}
           onReject={handleReject}
-          type="nin"
+          type="cac"
           verificationData={{
-            first_name: selectedVerification.nin_data?.first_name,
-            last_name: selectedVerification.nin_data?.last_name,
-            date_of_birth: selectedVerification.nin_data?.date_of_birth,
-            gender: selectedVerification.nin_data?.gender,
-            nin: selectedVerification.nin_value,
-            email: selectedVerification.nin_data?.email,
-            phone: selectedVerification.nin_data?.phone,
+            company_name: selectedVerification.cac_data?.company_name,
+            rc_number: selectedVerification.cac_data?.rc_number,
+            address: selectedVerification.cac_data?.address,
+            registration_date: selectedVerification.cac_data?.registration_date,
+            status: selectedVerification.cac_data?.status,
           }}
           userData={{
-            first_name: selectedVerification.first_name,
-            last_name: selectedVerification.last_name,
-            date_of_birth: selectedVerification.date_of_birth,
+            company_name: selectedVerification.company_name,
+            rc_number: selectedVerification.rc_number,
             email: selectedVerification.email,
             phone: selectedVerification.phone,
+            house_address: selectedVerification.house_address,
           }}
           isSubmitting={isSubmitting}
         />

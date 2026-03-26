@@ -23,7 +23,7 @@ import { cn } from "@/lib/utils";
 
 interface VerificationDrawerProps {
   verification: any;
-  type: "nin" | "document" | "company";
+  type: "nin" | "document" | "company" | "cac";
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }

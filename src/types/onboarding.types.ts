@@ -60,6 +60,11 @@ export interface IndividualOnboardingData extends BaseOnboardingData {
   nin_number_tag?: string; // For NIN
   national_identification_number?: string;
 
+  nin_verification_status?: "pending_admin" | "verified";
+  nin_verification_pending?: boolean;
+  cac_verification_status?: "pending_admin" | "verified";
+  cac_verification_pending?: boolean;
+
   // Documents
   identity_card?: File;
   scanned_signature?: File;
@@ -100,6 +105,11 @@ export interface CompanyGroupLifeOnboardingData extends BaseOnboardingData {
   nin_number_iv?: string; // For NIN
   nin_number_data?: string; // For NIN
   nin_number_tag?: string; // For NIN
+
+  nin_verification_status?: "pending_admin" | "verified";
+  nin_verification_pending?: boolean;
+  cac_verification_status?: "pending_admin" | "verified";
+  cac_verification_pending?: boolean;
 
   // Documents
   director_identity_cards?: File;
@@ -148,6 +158,11 @@ export interface EmployeeGroupLifeOnboardingData extends BaseOnboardingData {
   nin_number_data?: string; // For NIN
   nin_number_tag?: string; // For NIN
   national_identification_number?: string;
+
+  nin_verification_status?: "pending_admin" | "verified";
+  nin_verification_pending?: boolean;
+  cac_verification_status?: "pending_admin" | "verified";
+  cac_verification_pending?: boolean;
 
   // Documents
   identity_card?: File;

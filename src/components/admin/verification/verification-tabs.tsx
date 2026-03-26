@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { NINVerifications } from "./nin-verifications";
 import { DocumentVerifications } from "./document-verification";
 import { CompanyVerifications } from "./company-verifications";
+import { CACVerifications } from "./cac-verifications";
 
 export function VerificationTabs() {
   const [activeTab, setActiveTab] = useState("nin");
@@ -19,6 +20,10 @@ export function VerificationTabs() {
 
       <TabsContent value="nin" className="space-y-6">
         <NINVerifications />
+      </TabsContent>
+
+      <TabsContent value="cac" className="space-y-6">
+        <CACVerifications />
       </TabsContent>
 
       <TabsContent value="documents" className="space-y-6">
