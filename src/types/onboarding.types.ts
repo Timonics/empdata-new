@@ -51,6 +51,7 @@ export interface IndividualOnboardingData extends BaseOnboardingData {
   bank_account_number?: string;
   tin_or_pin?: string;
   bank_details_consent?: boolean;
+  encrypted_bvn?: string;
 
   // Identity Information
   identity_card_type: IdentityCardType;
@@ -59,6 +60,7 @@ export interface IndividualOnboardingData extends BaseOnboardingData {
   nin_number_data?: string; // For NIN
   nin_number_tag?: string; // For NIN
   national_identification_number?: string;
+  encrypted_nin?: string;
 
   nin_verification_status?: "pending_admin" | "verified";
   nin_verification_pending?: boolean;
@@ -90,14 +92,12 @@ export interface CompanyGroupLifeOnboardingData extends BaseOnboardingData {
 
   // Director Information
   director_name: string;
-  director_bvn_iv?: string;
-  director_bvn_data?: string;
-  director_bvn_tag?: string;
   director_bvn_number?: string;
   director_bank_name: string;
   director_bank_acct_number: string;
   director_tax_identification_number?: string;
   director_national_identification_number?: string;
+  director_bvn_encrypted?: string
 
   // Identity Information
   identity_card_type: IdentityCardType;
@@ -202,4 +202,29 @@ export interface OnboardingResponse {
 export interface CompaniesResponse {
   success: boolean;
   data: CompanyInfo[];
+}
+
+export interface EncryptedNIN {
+  encrypted_nin: string;
+}
+
+export interface NINResponse {
+  success: boolean;
+  message: string;
+  data: {
+    first_name: string;
+    middle_name: string;
+    last_name: string;
+    phone_number: string;
+    gender: string;
+    date_of_birth: string;
+    birthcountry: string;
+    birthstate: string;
+    birthlga: string;
+    residence_state: string;
+    residence_town: string;
+    residence_lga: string;
+    residence_address: string;
+    photo: string;
+  };
 }

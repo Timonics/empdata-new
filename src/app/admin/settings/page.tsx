@@ -46,7 +46,6 @@ import {
   Lock,
   UserCog,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import {
   useCurrentAdmin,
   usePermissions,
@@ -162,6 +161,8 @@ export default function SettingsPage() {
   const createAdminUser = useCreateAdminUser();
   const assignRolesToUser = useAssignRolesToUser();
   const deleteAdminUser = useDeleteAdminUser();
+
+  console.log(currentAdmin);
 
   const isSuperAdmin = currentAdmin?.data?.roles?.includes("super-admin") || false;
 

@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       method: "POST",
       path: "/auth/verify-2fa",
       data: { email, code, session_token },
-      authType: "admin",
+      authType: "super-admin",
     });
 
     console.log("Verify 2FA result:", result);
@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
       // Set the final auth token
       cookieStore.set({
-        name: `token_admin`,
+        name: `token_super-admin`,
         value: token,
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
       if (refreshToken) {
         cookieStore.set({
-          name: `refresh_admin`,
+          name: `refresh_super-admin`,
           value: refreshToken,
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",

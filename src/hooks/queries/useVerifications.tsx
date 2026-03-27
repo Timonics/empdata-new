@@ -1,11 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { VerificationService } from "@/services/verification.service";
 import { toast } from "sonner";
+import { EncryptedNIN, NINResponse } from "@/types/onboarding.types";
 
 export const verificationKeys = {
   all: ["verifications"] as const,
   companies: () => [...verificationKeys.all, "companies"] as const,
   employees: () => [...verificationKeys.all, "employees"] as const,
+  public: () => [...verificationKeys.all, "public"] as const,
   documents: (type: string, id: number) =>
     [...verificationKeys.all, "documents", type, id] as const,
 };
@@ -23,6 +25,29 @@ export function useCompanyVerifications(filters?: any) {
         throw new Error("Failed to fetch company verifications");
       }
       return response;
+    },
+  });
+}
+
+/**
+ * Verify Public NIN
+ */
+export function usePublicVerifyNIN() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (encryptedData: EncryptedNIN) =>
+      VerificationService.verifyPublicNIN(encryptedData),
+    onSuccess: (response: NINResponse) => {
+      if (response.success) {
+        toast.success("NIN verified successfully");
+        queryClient.invalidateQueries({ queryKey: verificationKeys.public() });
+      } else {
+        toast.error("Failed to verify NIN");
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to verify NIN");
     },
   });
 }

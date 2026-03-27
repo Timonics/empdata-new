@@ -11,7 +11,7 @@ export async function POST(
     const body = await request.json().catch(() => ({}));
 
     const cookieStore = await cookies();
-    const token = cookieStore.get("token_admin")?.value;
+    const token = cookieStore.get("token_super-admin")?.value;
 
     if (!token) {
       return NextResponse.json(
@@ -24,7 +24,7 @@ export async function POST(
       method: "POST",
       path: `/admin/individual/registrations/${id}/send-invitation`,
       data: body,
-      authType: "admin",
+      authType: "super-admin",
       token,
     });
 

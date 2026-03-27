@@ -1,10 +1,12 @@
 import { api } from "@/lib/axios";
+import { EncryptedNIN } from "@/types/onboarding.types";
 
 export class VerificationService {
   private static readonly COMPANY_BASE =
     "/api/admin/grouplife/company-registrations";
   private static readonly EMPLOYEE_BASE =
     "/api/admin/grouplife/employee-registrations";
+  private static readonly PUBLIC_VERIFY_NIN = "/api/public/nin/verify";
 
   /**
    * Get company registrations (for company verifications)
@@ -48,6 +50,14 @@ export class VerificationService {
     const base = type === "company" ? this.COMPANY_BASE : this.EMPLOYEE_BASE;
     const response = await api.get(`${base}/${id}`);
     return response.data;
+  }
+
+  /**
+   * Verify NIN (Public forms)
+   */
+  static async verifyPublicNIN(encryptedNIN: EncryptedNIN) {
+    const response = await api.post(`${this.PUBLIC_VERIFY_NIN}`, encryptedNIN);
+    return response.data
   }
 
   /**

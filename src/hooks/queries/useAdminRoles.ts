@@ -15,21 +15,21 @@ export const adminRolesKeys = {
 export function useCurrentAdmin() {
   return useQuery({
     queryKey: adminRolesKeys.current(),
-    queryFn: AdminRolesService.getCurrentAdmin,
+    queryFn: () => AdminRolesService.getCurrentAdmin(),
   });
 }
 
 export function usePermissions() {
   return useQuery({
     queryKey: adminRolesKeys.permissions(),
-    queryFn: AdminRolesService.getAllPermissions,
+    queryFn: () => AdminRolesService.getAllPermissions(),
   });
 }
 
 export function useRoles() {
   return useQuery({
     queryKey: adminRolesKeys.roles(),
-    queryFn: AdminRolesService.getAllRoles,
+    queryFn: () => AdminRolesService.getAllRoles(),
   });
 }
 
@@ -68,7 +68,9 @@ export function useUpdateRolePermissions() {
       toast.success("Role permissions updated successfully");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to update role permissions");
+      toast.error(
+        error.response?.data?.message || "Failed to update role permissions",
+      );
     },
   });
 }
@@ -105,7 +107,9 @@ export function useCreateAdminUser() {
       toast.success("Admin user created successfully");
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || "Failed to create admin user");
+      toast.error(
+        error.response?.data?.message || "Failed to create admin user",
+      );
     },
   });
 }

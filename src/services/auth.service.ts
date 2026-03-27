@@ -21,21 +21,21 @@ export class AuthService {
   static async adminLogin(credentials: LoginCredentials) {
     const response = await api.post(`${this.ADMIN_BASE}/login`, credentials);
 
-    console.log("Admin login response:", response.data);
+    // console.log("Admin login response:", response.data);
 
-    // Check if login was successful and has user data
-    if (response.data?.success) {
-      // For 2FA case, user data is at root level
-      if (response.data?.user) {
-        tokenManager.setUserData(response.data.user);
-        tokenManager.setUserRole("admin");
-      }
-      // For normal login case, user might be in data.user
-      else if (response.data?.data?.user) {
-        tokenManager.setUserData(response.data.data.user);
-        tokenManager.setUserRole("admin");
-      }
-    }
+    // // Check if login was successful and has user data
+    // if (response.data?.success) {
+    //   // For 2FA case, user data is at root level
+    //   if (response.data?.user) {
+    //     tokenManager.setUserData(response.data.user);
+    //     tokenManager.setUserRole("super-admin");
+    //   }
+    //   // For normal login case, user might be in data.user
+    //   else if (response.data?.data?.user) {
+    //     tokenManager.setUserData(response.data.data.user);
+    //     tokenManager.setUserRole("super-admin");
+    //   }
+    // }
 
     return response.data;
   }
@@ -46,21 +46,21 @@ export class AuthService {
   static async portalLogin(credentials: LoginCredentials) {
     const response = await api.post(`${this.PORTAL_BASE}/login`, credentials);
 
-    console.log("Portal login response:", response.data);
+    // console.log("Portal login response:", response.data);
 
-    // Check if login was successful and has user data
-    if (response.data?.success) {
-      // For 2FA case, user data is at root level
-      if (response.data?.user) {
-        tokenManager.setUserData(response.data.user);
-        tokenManager.setUserRole(response.data.user.role);
-      }
-      // For normal login case, user might be in data.user
-      else if (response.data?.data?.user) {
-        tokenManager.setUserData(response.data.data.user);
-        tokenManager.setUserRole(response.data.data.user.role);
-      }
-    }
+    // // Check if login was successful and has user data
+    // if (response.data?.success) {
+    //   // For 2FA case, user data is at root level
+    //   if (response.data?.user) {
+    //     tokenManager.setUserData(response.data.user);
+    //     tokenManager.setUserRole(response.data.user.role);
+    //   }
+    //   // For normal login case, user might be in data.user
+    //   else if (response.data?.data?.user) {
+    //     tokenManager.setUserData(response.data.data.user);
+    //     tokenManager.setUserRole(response.data.data.user.role);
+    //   }
+    // }
 
     return response.data;
   }
@@ -71,11 +71,11 @@ export class AuthService {
   static async adminVerify2FA(data: Verify2FAData) {
     const response = await api.post(`${this.ADMIN_BASE}/verify-2fa`, data);
 
-    console.log("Admin verify 2FA response:", response.data);
+    // console.log("Admin verify 2FA response:", response.data);
 
-    if (response.data?.success && response.data?.user) {
-      tokenManager.setUserData(response.data.user);
-    }
+    // if (response.data?.success && response.data?.user) {
+    //   tokenManager.setUserData(response.data.user);
+    // }
 
     return response.data;
   }
@@ -86,11 +86,11 @@ export class AuthService {
   static async portalVerify2FA(data: Verify2FAData) {
     const response = await api.post(`${this.PORTAL_BASE}/verify-2fa`, data);
 
-    console.log("Portal verify 2FA response:", response.data);
+    // console.log("Portal verify 2FA response:", response.data);
 
-    if (response.data?.success && response.data?.user) {
-      tokenManager.setUserData(response.data.user);
-    }
+    // if (response.data?.success && response.data?.user) {
+    //   tokenManager.setUserData(response.data.user);
+    // }
 
     return response.data;
   }
@@ -161,7 +161,9 @@ export class AuthService {
    */
   static async getCurrentUser(role: UserRole) {
     const endpoint =
-      role === "admin" ? `${this.ADMIN_BASE}/me` : `${this.PORTAL_BASE}/me`;
+      role === "super-admin"
+        ? `${this.ADMIN_BASE}/me`
+        : `${this.PORTAL_BASE}/me`;
     const response = await api.get(endpoint);
     return response.data;
   }
@@ -171,45 +173,33 @@ export class AuthService {
    */
   static async logout(role?: UserRole): Promise<void> {
     try {
-      // Determine which endpoint to call
       let endpoint = "";
+      const userRole = role || tokenManager.getUserRole();
 
-      if (role === "admin") {
+      if (userRole === "super-admin") {
         endpoint = `${this.ADMIN_BASE}/logout`;
-      } else if (role === "company_admin" || role === "employee") {
+      } else if (
+        userRole === "company_admin" ||
+        userRole === "employee" ||
+        userRole === "individual"
+      ) {
         endpoint = `${this.PORTAL_BASE}/logout`;
       } else {
-        // If no role provided, try to guess from token manager
-        const userRole = tokenManager.getUserRole();
-        if (userRole === "admin") {
-          endpoint = `${this.ADMIN_BASE}/logout`;
-        } else if (userRole) {
-          endpoint = `${this.PORTAL_BASE}/logout`;
-        } else {
-          // No role, nothing to do
-          return;
-        }
+        // No role, just clear local state
+        console.log("No role found, clearing local state only");
+        tokenManager.clearUserData();
+        return;
       }
 
       // Call logout API
       await api.post(endpoint);
+      console.log(`Logout API called successfully for role: ${userRole}`);
     } catch (error) {
       console.error("Logout API error:", error);
       // Don't throw - we still want to clear local state
     } finally {
       // Always clear local state regardless of API response
       tokenManager.clearUserData();
-
-      // Clear cookies by setting expired cookies
-      // This is a client-side fallback, but the real cookie clearing happens on the server
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c
-          .replace(/^ +/, "")
-          .replace(
-            /=.*/,
-            "=; expires=" + new Date(0).toUTCString() + "; path=/",
-          );
-      });
     }
   }
 }

@@ -1,24 +1,26 @@
+import Cookies from 'js-cookie';
 import { UserRole } from "@/types/auth.types";
 
 class TokenManager {
   private userRole: UserRole | null = null;
   private userData: any = null;
+  private readonly TOKEN_PREFIX = 'token_';
 
   constructor() {
-    // Initialize from localStorage on client side only
+    // Initialize from storage on client side only
     if (typeof window !== "undefined") {
       this.loadFromStorage();
     }
   }
 
   private loadFromStorage() {
-    // Load user role
+    // Load user role from localStorage (for UI state)
     const storedRole = localStorage.getItem("userRole") as UserRole | null;
     if (storedRole) {
       this.userRole = storedRole;
     }
 
-    // Load user data
+    // Load user data from localStorage
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       try {
@@ -41,6 +43,10 @@ class TokenManager {
   }
 
   getUserRole(): UserRole | null {
+    // Check memory first
+    if (this.userRole) return this.userRole;
+    
+    // Fallback to localStorage
     const storedRole = localStorage.getItem("userRole") as UserRole | null;
     if (storedRole) {
       this.userRole = storedRole;
@@ -62,7 +68,7 @@ class TokenManager {
   }
 
   getUserData(): any {
-    // Try from memory first
+    // Check memory first
     if (this.userData) return this.userData;
     
     // Fallback to localStorage
@@ -79,26 +85,72 @@ class TokenManager {
     return null;
   }
 
-  // We don't store tokens in localStorage anymore - they're in HTTP-only cookies
-  // These methods are kept for compatibility but don't actually store anything
-  getToken(): string | null {
-    // Tokens are in HTTP-only cookies, not accessible via JavaScript
-    // This method returns null as tokens cannot be accessed from client
-    return null;
-  }
-
+  /**
+   * Clear all user data and cookies
+   */
   clearUserData() {
+    const role = this.getUserRole();
+    
+    // Clear cookies based on role
+    if (role) {
+      // Clear role-specific token cookie
+      Cookies.remove(`${this.TOKEN_PREFIX}${role}`, { path: '/' });
+    }
+    
+    // Clear all possible token cookies
+    Cookies.remove(`${this.TOKEN_PREFIX}admin`, { path: '/' });
+    Cookies.remove(`${this.TOKEN_PREFIX}company_admin`, { path: '/' });
+    Cookies.remove(`${this.TOKEN_PREFIX}employee`, { path: '/' });
+    Cookies.remove(`${this.TOKEN_PREFIX}individual`, { path: '/' });
+    
+    // Clear any other auth cookies that might exist
+    const allCookies = document.cookie.split(';');
+    allCookies.forEach(cookie => {
+      const cookieName = cookie.split('=')[0].trim();
+      if (cookieName.includes('token') || cookieName.includes('auth')) {
+        Cookies.remove(cookieName, { path: '/' });
+      }
+    });
+    
+    // Clear localStorage
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("user");
+    sessionStorage.clear();
+    
+    // Reset memory state
     this.userRole = null;
     this.userData = null;
-    
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("userRole");
-      localStorage.removeItem("user");
-    }
   }
 
+  /**
+   * Check if user has a valid session
+   */
   hasValidSession(): boolean {
-    return !!this.getUserRole();
+    const role = this.getUserRole();
+    if (!role) return false;
+    
+    // Check if the cookie exists for this role
+    const cookieExists = Cookies.get(`${this.TOKEN_PREFIX}${role}`);
+    return !!cookieExists;
+  }
+
+  /**
+   * Get the role from the URL or stored role
+   */
+  getRoleFromUrl(): UserRole | null {
+    if (typeof window === "undefined") return null;
+    
+    const path = window.location.pathname;
+    if (path.includes('/admin')) return 'super-admin';
+    if (path.includes('/portal')) {
+      // Could be company_admin or employee, check stored role
+      const storedRole = this.getUserRole();
+      if (storedRole === 'company_admin' || storedRole === 'employee') {
+        return storedRole;
+      }
+      return 'company_admin'; // Default to company_admin for portal
+    }
+    return null;
   }
 }
 

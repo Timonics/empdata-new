@@ -5,7 +5,7 @@ import { callBackend } from "@/lib/server-api";
 export async function GET(request: Request) {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("token_admin")?.value;
+    const token = cookieStore.get("token_super-admin")?.value;
 
     if (!token) {
       return NextResponse.json(
@@ -20,7 +20,7 @@ export async function GET(request: Request) {
     const result = await callBackend({
       method: "GET",
       path: `/admin/companies${queryString ? `?${queryString}` : ""}`,
-      authType: "admin",
+      authType: "super-admin",
       token,
     });
 
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("token_admin")?.value;
+    const token = cookieStore.get("token_super-admin")?.value;
 
     if (!token) {
       return NextResponse.json(
@@ -62,7 +62,7 @@ export async function POST(request: Request) {
       method: "POST",
       path: "/admin/companies",
       data: body,
-      authType: "admin",
+      authType: "super-admin",
       token,
     });
 

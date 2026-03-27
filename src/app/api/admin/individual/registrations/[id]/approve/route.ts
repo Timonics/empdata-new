@@ -10,7 +10,7 @@ export async function POST(
     const { id } = await params;
     
     const cookieStore = await cookies();
-    const token = cookieStore.get("token_admin")?.value;
+    const token = cookieStore.get("token_super-admin")?.value;
 
     if (!token) {
       return NextResponse.json(
@@ -22,7 +22,7 @@ export async function POST(
     const result = await callBackend({
       method: "POST",
       path: `/admin/individual/registrations/${id}/approve`,
-      authType: "admin",
+      authType: "super-admin",
       token,
     });
 

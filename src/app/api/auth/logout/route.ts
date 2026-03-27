@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     const cookieStore = await cookies();
 
     // Get the admin token from cookies
-    const token = cookieStore.get("token_admin")?.value;
+    const token = cookieStore.get("token_super-admin")?.value;
 
     if (!token) {
       // Already logged out
@@ -22,12 +22,12 @@ export async function POST(request: Request) {
       method: "POST",
       path: "/auth/logout",
       data: {},
-      authType: "admin",
+      authType: "super-admin",
       token, // Include the token for authentication
     });
 
     // Always clear the cookie, regardless of backend response
-    cookieStore.delete("token_admin");
+    cookieStore.delete("token_super-admin");
 
     if (result.success) {
       return NextResponse.json({

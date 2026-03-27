@@ -11,6 +11,7 @@ export class AdminRolesService {
     const response = await api.get<{ success: boolean; data: AdminUser }>(
       `${this.BASE_PATH}/me`
     );
+
     return response.data;
   }
 

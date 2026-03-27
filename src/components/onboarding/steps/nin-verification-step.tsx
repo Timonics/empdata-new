@@ -1,17 +1,32 @@
+// components/onboarding/nin-verification-step.tsx
 "use client";
 
 import { useState } from "react";
-import { Hash, ShieldCheck, Loader2, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import {
+  Hash,
+  ShieldCheck,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { VerificationModal } from "../verification-modal";
 import { cn } from "@/lib/utils";
+import { usePublicVerifyNIN } from "@/hooks/queries/useVerifications";
+import { EncryptionService } from "@/lib/encryption";
+import { toast } from "sonner";
+import { EncryptedNIN } from "@/types/onboarding.types";
 
 interface NinVerificationStepProps {
   value: string;
   onChange: (value: string) => void;
-  onVerificationComplete: (status: "verified" | "pending_admin", data?: any) => void;
+  onVerificationComplete: (
+    status: "verified" | "pending_admin",
+    data?: any,
+  ) => void;
   userData: any;
   verificationStatus?: "verified" | "pending_admin" | null;
   verificationData?: any;
@@ -30,8 +45,11 @@ export function NinVerificationStep({
   const [isVerifying, setIsVerifying] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [tempVerificationData, setTempVerificationData] = useState<any>(null);
-  const [verificationError, setVerificationError] = useState<string | null>(null);
-  const [hasAttemptedVerification, setHasAttemptedVerification] = useState(false);
+  const [verificationError, setVerificationError] = useState<string | null>(
+    null,
+  );
+
+  const verifyMutation = usePublicVerifyNIN();
 
   const handleVerify = async () => {
     if (!value || value.length !== 11) {
@@ -43,34 +61,53 @@ export function NinVerificationStep({
     setVerificationError(null);
 
     try {
-      // TODO: Replace with actual API call when ready
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const publicKey = await EncryptionService.getPublicKey();
+      
+      if (!publicKey) {
+        throw new Error("Could not retrieve encryption key");
+      }
 
-      // Simulate verification result (70% success, 30% failure for demo)
-      const isSuccess = Math.random() > 0.3;
-
-      if (isSuccess) {
+      const encryptedNIN = await EncryptionService.encryptNin(publicKey, value);
+      
+      const response = await verifyMutation.mutateAsync(encryptedNIN);
+      
+      if (response.success && response.data) {
         // SUCCESS: Verification passed
-        const dummyVerificationData = {
-          first_name: userData.first_name || "John",
-          last_name: userData.last_name || "Doe",
-          date_of_birth: userData.date_of_birth || "1990-01-01",
-          gender: userData.gender || "Male",
+        const verificationData = {
+          first_name: response.data.first_name,
+          last_name: response.data.last_name,
+          date_of_birth: response.data.date_of_birth,
+          gender: response.data.gender,
           nin: value,
-          verification_id: `VER-${Date.now()}`,
-          verified_at: new Date().toISOString(),
+          // verification_id: response.data.verification_id,
         };
-        setTempVerificationData(dummyVerificationData);
+        
+        setTempVerificationData(verificationData);
         setShowModal(true);
       } else {
         // FAILURE: Verification failed
-        setVerificationError("Unable to verify NIN. The verification service is currently unavailable. You can continue and an admin will verify your details later.");
-        setHasAttemptedVerification(true);
+        setVerificationError(
+          response.message || "Unable to verify NIN. You can continue and an admin will verify your details later."
+        );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Verification failed:", error);
-      setVerificationError("Verification service is unavailable. Please continue and an admin will verify your details.");
-      setHasAttemptedVerification(true);
+      
+      // Check for specific error types
+      if (error.message?.includes("public key") || error.message?.includes("encryption")) {
+        setVerificationError(
+          "Unable to encrypt NIN. Please check your connection and try again."
+        );
+      } else if (error.message?.includes("timeout")) {
+        setVerificationError(
+          "Verification request timed out. Please check your internet connection and try again."
+        );
+      } else {
+        setVerificationError(
+          error.response?.data?.message || 
+          "Verification service is unavailable. Please continue and an admin will verify your details."
+        );
+      }
     } finally {
       setIsVerifying(false);
     }
@@ -105,7 +142,8 @@ export function NinVerificationStep({
     return null;
   };
 
-  const isVerificationComplete = verificationStatus === "verified" || verificationStatus === "pending_admin";
+  const isVerificationComplete =
+    verificationStatus === "verified" || verificationStatus === "pending_admin";
 
   return (
     <div className="space-y-3">
@@ -130,14 +168,16 @@ export function NinVerificationStep({
                 onVerificationComplete(null as any, null);
               }
               setVerificationError(null);
-              setHasAttemptedVerification(false);
             }}
             placeholder="Enter 11-digit NIN"
             className={cn(
               "w-full pl-10 pr-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-              verificationStatus === "verified" && "border-green-500 bg-green-50",
-              verificationStatus === "pending_admin" && "border-yellow-500 bg-yellow-50"
+              verificationStatus === "verified" &&
+                "border-green-500 bg-green-50",
+              verificationStatus === "pending_admin" &&
+                "border-yellow-500 bg-yellow-50",
             )}
+            disabled={verificationStatus === "verified"}
           />
         </div>
 
@@ -145,7 +185,7 @@ export function NinVerificationStep({
           onClick={handleVerify}
           disabled={isVerifying || verificationStatus === "verified"}
           variant="outline"
-          className="px-6 my-auto"
+          className="px-6 my-auto min-w-[100px]"
         >
           {isVerifying ? (
             <>
@@ -185,7 +225,8 @@ export function NinVerificationStep({
       )}
 
       <p className="text-xs text-gray-500">
-        Your NIN will be encrypted and verified against official records. If verification fails, an admin will review your details.
+        Your NIN will be encrypted and verified against official records. If
+        verification fails, an admin will review your details.
       </p>
 
       <VerificationModal

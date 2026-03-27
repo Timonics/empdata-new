@@ -47,7 +47,7 @@ export function useAuth() {
           // Store 2FA info in session storage
           sessionStorage.setItem("2fa_email", data.user.email);
           sessionStorage.setItem("2fa_session_token", data.session_token);
-          sessionStorage.setItem("2fa_role", "admin");
+          sessionStorage.setItem("2fa_role", "super-admin");
 
           toast.info("Verification required", {
             description: "Please enter the code sent to your email",
@@ -65,29 +65,6 @@ export function useAuth() {
 
           // IMPORTANT: Return here to prevent further execution
           return;
-        }
-
-        // Normal login (2FA not enabled)
-        if (data.user) {
-          // Update cache
-          queryClient.setQueryData(authKeys.user(), data.user);
-
-          // Store user data
-          tokenManager.setUserData(data.user);
-          tokenManager.setUserRole(data.user.role);
-
-          toast.success("Login successful!", {
-            description: `Welcome back, Admin`,
-          });
-
-          console.log("Redirecting to admin dashboard");
-
-          try {
-            router.push("/admin");
-          } catch (e) {
-            console.log("router.push failed, using window.location", e);
-            window.location.href = "/admin";
-          }
         }
       } else {
         toast.error("Login failed", {
@@ -112,12 +89,8 @@ export function useAuth() {
         // Update cache with user data
         queryClient.setQueryData(authKeys.user(), data.user);
 
-        // Store the final token (the response might include a token)
-        if (data.token) {
-          // Token is already set in HTTP-only cookie by the API
-          // But we might need to store user data
-          tokenManager.setUserData(data.user);
-        }
+        tokenManager.setUserData(data.user);
+        tokenManager.setUserRole(data.user.roles[0]);
 
         toast.success("Successfully verified", {
           description: "Redirecting to your Dashboard...",
@@ -234,28 +207,54 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: async () => {
       const role = tokenManager.getUserRole();
-      if (role) {
-        await AuthService.logout(role);
-      } else {
-        await AuthService.logout();
-      }
+      await AuthService.logout(role || undefined);
     },
     onSuccess: () => {
-      // Clear cache
+      // Clear all auth-related queries from cache
       queryClient.setQueryData(authKeys.user(), null);
       queryClient.invalidateQueries({ queryKey: authKeys.all });
-      // Clear token manager
-      tokenManager.clearUserData();
-      toast.success("Logged out successfully");
-      // Redirect to appropriate login page
+
+      // Get the role before clearing token manager
       const lastRole = tokenManager.getUserRole();
-      if (lastRole === "admin") {
-        router.push("/admin/login");
+
+      // Clear token manager (this also clears cookies)
+      tokenManager.clearUserData();
+
+      toast.success("Logged out successfully");
+
+      // Determine redirect URL based on role
+      let redirectUrl = "/";
+
+      if (lastRole === "super-admin") {
+        redirectUrl = "/admin/login";
+      } else if (
+        lastRole === "company_admin" ||
+        lastRole === "employee" ||
+        lastRole === "individual"
+      ) {
+        redirectUrl = "/portal/auth";
       } else {
-        router.push("/portal/auth");
+        // Check current path to determine where user came from
+        const currentPath = window.location.pathname;
+        if (currentPath.includes("/admin")) {
+          redirectUrl = "/admin/login";
+        } else if (currentPath.includes("/portal")) {
+          redirectUrl = "/portal/auth";
+        } else {
+          redirectUrl = "/";
+        }
       }
+
+      console.log("Redirecting to:", redirectUrl);
+
+      // Small delay to ensure state is cleared before redirect
+      setTimeout(() => {
+        router.push(redirectUrl);
+      }, 100);
     },
     onError: (error: any) => {
+      console.error("Logout error:", error);
+
       toast.error("Logout failed", {
         description: error.message || "An error occurred during logout",
       });
@@ -263,7 +262,16 @@ export function useAuth() {
       // Still clear local state and redirect
       queryClient.setQueryData(authKeys.user(), null);
       tokenManager.clearUserData();
-      router.push("/");
+
+      // Determine redirect URL
+      const currentPath = window.location.pathname;
+      if (currentPath.includes("/admin")) {
+        router.push("/admin/login");
+      } else if (currentPath.includes("/portal")) {
+        router.push("/portal/auth");
+      } else {
+        router.push("/");
+      }
     },
   });
 

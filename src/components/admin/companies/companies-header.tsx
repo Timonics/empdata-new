@@ -19,7 +19,8 @@ import {
   Upload,
 } from "lucide-react";
 import { ExportModal } from "@/components/export-modal";
-import { useCompanies } from "@/hooks/queries/useCompanies";
+import { ImportModal } from "@/components/import-modal";
+import { toast } from "sonner";
 // import { AddCompanyModal } from "./add-company-modal"
 
 interface CompaniesHeaderProps {
@@ -32,6 +33,7 @@ interface CompaniesHeaderProps {
   selectedRows?: number[];
   totalCount?: number;
   filteredCount?: number;
+  data?: any[]; // For frontend export if needed
 }
 
 export function CompaniesHeader({
@@ -41,8 +43,10 @@ export function CompaniesHeader({
   selectedRows = [],
   totalCount = 0,
   filteredCount = 0,
+  data = [],
 }: CompaniesHeaderProps) {
   const [showExportModal, setShowExportModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const handleSearch = (value: string) => {
@@ -50,7 +54,7 @@ export function CompaniesHeader({
     onSearch?.(value);
   };
 
-  // Export columns definition
+  // Export columns definition (for column selection in modal)
   const exportColumns = [
     { key: "name", label: "Company Name", default: true },
     { key: "rc_number", label: "RC Number", default: true },
@@ -73,6 +77,21 @@ export function CompaniesHeader({
     { key: "created_at", label: "Created At", default: false },
   ];
 
+  // Import template columns
+  const importTemplateColumns = [
+    "name",
+    "rc_number",
+    "email",
+    "phone",
+    "address",
+    "city",
+    "state",
+    "country",
+    "insurance_type",
+    "website",
+    "tax_id",
+  ];
+
   return (
     <>
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -84,7 +103,7 @@ export function CompaniesHeader({
         </div>
 
         <div className="flex items-center gap-2">
-          <Button size="sm">
+          <Button size="sm" onClick={() => setShowImportModal(true)}>
             <Upload className="mr-2 h-4 w-4" />
             Import
           </Button>
@@ -98,6 +117,7 @@ export function CompaniesHeader({
           </Button>
         </div>
       </div>
+      
       <div className="flex flex-col gap-4 md:flex-row md:items-center">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -153,10 +173,11 @@ export function CompaniesHeader({
         </div>
       </div>
 
+      {/* Export Modal - Using correct entity type */}
       <ExportModal
         open={showExportModal}
         onOpenChange={setShowExportModal}
-        entity="companies"
+        entity="company-registrations"
         title="Export Companies"
         description="Export your companies data in various formats"
         filters={filters}
@@ -169,6 +190,38 @@ export function CompaniesHeader({
         showColumnSelection={true}
         onSuccess={() => {
           console.log("Companies export completed");
+          toast.success("Export completed successfully");
+        }}
+      />
+
+      {/* Import Modal */}
+      <ImportModal
+        open={showImportModal}
+        onOpenChange={setShowImportModal}
+        entity="company-registrations"
+        title="Import Companies"
+        description="Upload a CSV or Excel file to import companies"
+        templateColumns={importTemplateColumns}
+        templateData={[
+          {
+            name: "Example Company Ltd",
+            rc_number: "RC123456",
+            email: "info@example.com",
+            phone: "08012345678",
+            address: "123 Business Avenue",
+            city: "Lagos",
+            state: "Lagos",
+            country: "Nigeria",
+            insurance_type: "group-life",
+            website: "www.example.com",
+            tax_id: "TAX123456",
+          }
+        ]}
+        onSuccess={() => {
+          console.log("Companies import completed");
+          toast.success("Import completed successfully");
+          // Refresh the page or refetch data
+          window.location.reload();
         }}
       />
     </>

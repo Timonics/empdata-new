@@ -1,18 +1,18 @@
 import { BaseService } from "@/services/base.service";
 
 interface EncryptedNinResponse {
-  nin_number_data: string; // Base64 encrypted NIN (RSA)
+  encrypted_nin: string; // Base64 encrypted NIN (RSA)
 }
 
 export class EncryptionService extends BaseService {
-  private static readonly BASE_PATH = "/api/nin";
+  private static readonly BASE_PATH = "/api/public/nin";
 
   /**
    * Fetch the RSA public key for NIN encryption
    */
   static async getPublicKey(): Promise<string> {
     try {
-      const response = await this.get<{ public_key: string }>(
+      const response = await this.get<{ success: boolean; public_key: string }>(
         `${this.BASE_PATH}/public-key`,
       );
 
@@ -31,9 +31,12 @@ export class EncryptionService extends BaseService {
    * Encrypt NIN using RSA public key
    * Returns only the encrypted data (RSA doesn't use IV/tag)
    */
-  static async encryptNin(nin: string): Promise<EncryptedNinResponse> {
+  static async encryptNin(
+    publicKey: string,
+    nin: string,
+  ): Promise<EncryptedNinResponse> {
     try {
-      const publicKeyPem = await this.getPublicKey();
+      const publicKeyPem = publicKey;
 
       // Clean and prepare the PEM public key
       const pemBody = publicKeyPem
@@ -71,7 +74,7 @@ export class EncryptionService extends BaseService {
       );
 
       return {
-        nin_number_data: encryptedBase64,
+        encrypted_nin: encryptedBase64,
       };
     } catch (error) {
       console.error("NIN encryption failed:", error);

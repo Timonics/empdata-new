@@ -10,7 +10,7 @@ export async function GET(
     const { id } = await params;
 
     const cookieStore = await cookies();
-    const token = cookieStore.get("token_admin")?.value;
+    const token = cookieStore.get("token_super-admin")?.value;
 
     if (!token) {
       return NextResponse.json(
@@ -22,7 +22,7 @@ export async function GET(
     const result = await callBackend({
       method: "GET",
       path: `/admin/grouplife/company-registrations/${id}`,
-      authType: "admin",
+      authType: "super-admin",
       token,
     });
 
@@ -66,7 +66,7 @@ export async function PUT(
       method: "POST", // Using POST with _method=PUT for Laravel
       path: `/admin/grouplife/company-registrations/${id}`,
       data: formData,
-      authType: "admin",
+      authType: "super-admin",
       token,
       headers: {
         "Content-Type": "multipart/form-data",

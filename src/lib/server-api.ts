@@ -29,6 +29,8 @@ export async function callBackend(
   if (authType) requestHeaders["x-auth-type"] = authType;
   if (token) requestHeaders["Authorization"] = `Bearer ${token}`;
 
+  // console.log(options);
+
   try {
     console.log(`📤 Calling backend: ${method} ${BACKEND_URL}${path}`);
     
@@ -37,7 +39,7 @@ export async function callBackend(
       url: `${BACKEND_URL}${path}`,
       data,
       headers: requestHeaders,
-      timeout: 15000,
+      timeout: 60000,
     });
 
     console.log(`📥 Backend response:`, response.data);
@@ -49,6 +51,7 @@ export async function callBackend(
       status: response.status,
     };
   } catch (error: any) {
+    console.error(error)
     console.error(
       `❌ Backend API Error [${path}]:`,
       error.response?.data || error.message,
