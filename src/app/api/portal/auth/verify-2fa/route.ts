@@ -20,7 +20,7 @@ export async function POST(request: Request) {
       method: "POST",
       path: "/portal/auth/verify-2fa",
       data: { email, code, session_token },
-      authType: "admin", // or appropriate auth type
+      authType: "super-admin", // or appropriate auth type
     });
 
     console.log("Portal verify 2FA result:", result);

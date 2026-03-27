@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       method: "POST",
       path: "/portal/auth/resend-2fa-code",
       data: { email, session_token },
-      authType: "admin",
+      authType: "super-admin",
     });
 
     if (result.success) {
