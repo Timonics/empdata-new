@@ -63,51 +63,53 @@ export class VerificationService {
    * Get all NIN verifications across all registration types
    */
   static async getAllNINVerifications(filters?: {
-    status?: string;
-    from_date?: string;
-    to_date?: string;
-  }) {
-    // Fetch all three types in parallel
-    const [companies, employees, individuals] = await Promise.all([
-      this.getCompanyRegistrations(filters),
-      this.getEmployeeRegistrations(filters),
-      this.getIndividualRegistrations(filters),
-    ]);
+  status?: string;
+  from_date?: string;
+  to_date?: string;
+}) {
+  // Fetch all three types in parallel
+  const [companies, employees, individuals] = await Promise.all([
+    this.getCompanyRegistrations(filters),
+    this.getEmployeeRegistrations(filters),
+    this.getIndividualRegistrations(filters),
+  ]);
 
-    // Combine and format the data
-    const allVerifications = [
-      ...(companies?.data || []).map((item: any) => ({
-        ...item,
-        type: "company",
-        name: `${item.director_name || "N/A"}`,
-        nin_value: item.director_nin_value || item.nin_value,
-        nin_verification_status: item.nin_verification_status || item.status,
-        registration_id: item.id,
-      })),
-      ...(employees?.data || []).map((item: any) => ({
-        ...item,
-        type: "employee",
-        name: `${item.first_name} ${item.last_name}`,
-        nin_value: item.nin_value,
-        nin_verification_status: item.nin_verification_status || item.status,
-        registration_id: item.id,
-      })),
-      ...(individuals?.data || []).map((item: any) => ({
-        ...item,
-        type: "individual",
-        name: `${item.first_name} ${item.last_name}`,
-        nin_value: item.nin_value,
-        nin_verification_status: item.nin_verification_status || item.status,
-        registration_id: item.id,
-      })),
-    ];
+  // Combine and format the data
+  const allVerifications = [
+    ...(companies?.data || []).map((item: any) => ({
+      ...item,
+      type: "company",
+      name: item.director_name || "N/A",
+      encrypted_nin: item.encrypted_nin, // Use the correct field name
+      nin_verification_status: item.nin_verification_status || item.status,
+      registration_id: item.id,
+    })),
+    ...(employees?.data || []).map((item: any) => ({
+      ...item,
+      type: "employee",
+      name: `${item.first_name} ${item.last_name}`,
+      encrypted_nin: item.encrypted_nin, // Use the correct field name
+      nin_verification_status: item.nin_verification_status || item.status,
+      registration_id: item.id,
+    })),
+    ...(individuals?.data || []).map((item: any) => ({
+      ...item,
+      type: "individual",
+      name: `${item.first_name} ${item.last_name}`,
+      encrypted_nin: item.encrypted_nin, // Use the correct field name
+      nin_verification_status: item.nin_verification_status || item.status,
+      registration_id: item.id,
+    })),
+  ];
 
-    return {
-      success: true,
-      data: allVerifications,
-      total: allVerifications.length,
-    };
-  }
+  console.log(allVerifications);
+
+  return {
+    success: true,
+    data: allVerifications,
+    total: allVerifications.length,
+  };
+}
 
   /**
    * Verify NIN for a specific registration
@@ -175,6 +177,17 @@ export class VerificationService {
    */
   static async verifyPublicNIN(encryptedNIN: EncryptedNIN) {
     const response = await api.post(`${this.PUBLIC_VERIFY_NIN}`, encryptedNIN);
+    return response.data;
+  }
+
+  /**
+   * Verify NIN using encrypted value (for admin verification)
+   * This uses the same public endpoint but with the stored encrypted NIN
+   */
+  static async verifyEncryptedNIN(encryptedNIN: string) {
+    const response = await api.post(`${this.PUBLIC_VERIFY_NIN}`, {
+      encrypted_nin: encryptedNIN,
+    });
     return response.data;
   }
 

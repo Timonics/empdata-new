@@ -97,7 +97,7 @@ export interface CompanyGroupLifeOnboardingData extends BaseOnboardingData {
   director_bank_acct_number: string;
   director_tax_identification_number?: string;
   director_national_identification_number?: string;
-  director_bvn_encrypted?: string
+  director_bvn_encrypted?: string;
 
   // Identity Information
   identity_card_type: IdentityCardType;
@@ -150,6 +150,7 @@ export interface EmployeeGroupLifeOnboardingData extends BaseOnboardingData {
   bank_account_number?: string;
   tin_or_pin?: string;
   bank_details_consent?: boolean;
+  encrypted_bvn?: string;
 
   // Identity Information
   identity_card_type: IdentityCardType;
@@ -158,6 +159,7 @@ export interface EmployeeGroupLifeOnboardingData extends BaseOnboardingData {
   nin_number_data?: string; // For NIN
   nin_number_tag?: string; // For NIN
   national_identification_number?: string;
+  encrypted_nin?: string;
 
   nin_verification_status?: "pending_admin" | "verified";
   nin_verification_pending?: boolean;

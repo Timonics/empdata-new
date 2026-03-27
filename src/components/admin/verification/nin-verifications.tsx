@@ -33,11 +33,10 @@ import { VerificationDrawer } from "./verification-drawer";
 import { VerificationModal } from "./verification-modal";
 import {
   useAllNINVerifications,
-  usePublicVerifyNIN,
+  useVerifyEncryptedNIN,
 } from "@/hooks/queries/useVerifications";
 import { useCurrentAdmin } from "@/hooks/queries/useAdminRoles";
 import { formatDistanceToNow } from "date-fns";
-import { EncryptionService } from "@/lib/encryption";
 import { toast } from "sonner";
 
 const statusStyles = {
@@ -62,33 +61,51 @@ const typeLabels = {
   individual: "Individual",
 };
 
+interface VerificationState {
+  isLoading: boolean;
+  data: any | null;
+  error: string | null;
+}
+
 export function NINVerifications() {
   const queryClient = useQueryClient();
-  const [drawerVerification, setDrawerVerification] = useState<any | null>(null);
-  const [filter, setFilter] = useState<"all" | "pending_admin" | "pending" | "verified" | "rejected">("all");
-  const [typeFilter, setTypeFilter] = useState<"all" | "company" | "employee" | "individual">("all");
+  const [drawerVerification, setDrawerVerification] = useState<any | null>(
+    null,
+  );
+  const [filter, setFilter] = useState<
+    "all" | "pending_admin" | "pending" | "verified" | "rejected"
+  >("all");
+  const [typeFilter, setTypeFilter] = useState<
+    "all" | "company" | "employee" | "individual"
+  >("all");
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [selectedVerification, setSelectedVerification] = useState<any | null>(null);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [ninVerificationData, setNinVerificationData] = useState<any | null>(null);
+  const [selectedVerification, setSelectedVerification] = useState<any | null>(
+    null,
+  );
+  const [verificationStates, setVerificationStates] = useState<
+    Map<number, VerificationState>
+  >(new Map());
 
   const { data: currentAdmin } = useCurrentAdmin();
-  const canVerify = currentAdmin?.data?.all_permissions?.includes("verify_employee_registrations") ||
-                    currentAdmin?.data?.all_permissions?.includes("verify_company_registrations") ||
-                    currentAdmin?.data?.all_permissions?.includes("verify_individual_registrations") ||
-                    currentAdmin?.data?.roles?.includes("super-admin");
-  const canView = currentAdmin?.data?.all_permissions?.includes("view_employee_registrations") ||
-                  currentAdmin?.data?.all_permissions?.includes("view_company_registrations") ||
-                  currentAdmin?.data?.all_permissions?.includes("view_individual_registrations") ||
-                  currentAdmin?.data?.roles?.includes("super-admin");
+  const canView =
+    currentAdmin?.data?.all_permissions?.includes(
+      "view_employee_registrations",
+    ) ||
+    currentAdmin?.data?.all_permissions?.includes(
+      "view_company_registrations",
+    ) ||
+    currentAdmin?.data?.all_permissions?.includes(
+      "view_individual_registrations",
+    ) ||
+    currentAdmin?.data?.roles?.includes("super-admin");
 
   // Fetch all NIN verifications
   const { data, isLoading, refetch, isFetching } = useAllNINVerifications({
     status: filter === "all" ? undefined : filter,
   });
 
-  // Public verify mutation to fetch official NIN record
-  const publicVerifyMutation = usePublicVerifyNIN();
+  // Verify encrypted NIN mutation
+  const verifyEncryptedNIN = useVerifyEncryptedNIN();
 
   // Filter by type
   const verifications = (data?.data || []).filter((item: any) => {
@@ -96,73 +113,131 @@ export function NINVerifications() {
     return item.type === typeFilter;
   });
 
+  const getVerificationState = (id: number): VerificationState => {
+    return (
+      verificationStates.get(id) || {
+        isLoading: false,
+        data: null,
+        error: null,
+      }
+    );
+  };
+
+  const setVerificationState = (
+    id: number,
+    state: Partial<VerificationState>,
+  ) => {
+    setVerificationStates((prev) => {
+      const newMap = new Map(prev);
+      const current = newMap.get(id) || {
+        isLoading: false,
+        data: null,
+        error: null,
+      };
+      newMap.set(id, { ...current, ...state });
+      return newMap;
+    });
+  };
+
   const handleOpenModal = async (verification: any) => {
-    setSelectedVerification(verification);
-    setIsVerifying(true);
-    setNinVerificationData(null);
-    
-    try {
-      // Step 1: Get public key
-      const publicKey = await EncryptionService.getPublicKey();
-      if (!publicKey) {
-        throw new Error("Could not retrieve encryption key");
-      }
-      
-      // Step 2: Encrypt the NIN
-      const encryptedNIN = await EncryptionService.encryptNin(publicKey, verification.nin_value);
-      
-      // Step 3: Call public verify endpoint to fetch official NIN record
-      const response = await publicVerifyMutation.mutateAsync(encryptedNIN);
-      
-      if (response.success && response.data) {
-        // Official NIN record retrieved
-        setNinVerificationData({
-          first_name: response.data.first_name,
-          last_name: response.data.last_name,
-          date_of_birth: response.data.date_of_birth,
-          gender: response.data.gender,
-          nin: verification.nin_value,
-          // verification_id: response.data.verification_id,
-          verified_at: new Date().toISOString(),
-        });
-        setShowVerificationModal(true);
-      } else {
-        // If verification fails, still show modal with error state
-        setNinVerificationData(null);
-        setShowVerificationModal(true);
-        toast.error(response.message || "Could not fetch official NIN record");
-      }
-    } catch (error: any) {
-      console.error("NIN verification fetch failed:", error);
-      setNinVerificationData(null);
-      setShowVerificationModal(true);
-      toast.error(error.message || "Failed to fetch NIN details");
-    } finally {
-      setIsVerifying(false);
+    const verificationId = verification.registration_id || verification.id;
+    const currentState = getVerificationState(verificationId);
+
+    // Get the encrypted NIN - now stored as 'encrypted_nin'
+    const encryptedNIN = verification.encrypted_nin;
+
+    console.log("Encrypted NIN found:", encryptedNIN ? "Yes" : "No");
+
+    if (!encryptedNIN) {
+      toast.error("No encrypted NIN found for this verification");
+      return;
     }
+
+    // Only fetch if not already loaded and not currently loading
+    if (!currentState.data && !currentState.isLoading) {
+      setVerificationState(verificationId, {
+        isLoading: true,
+        data: null,
+        error: null,
+      });
+
+      try {
+        // Call the public verify endpoint with the stored encrypted NIN
+        const response = await verifyEncryptedNIN.mutateAsync(encryptedNIN);
+
+        if (response.success && response.data) {
+          // Official NIN record retrieved
+          setVerificationState(verificationId, {
+            isLoading: false,
+            data: {
+              first_name: response.data.first_name,
+              last_name: response.data.last_name,
+              date_of_birth: response.data.date_of_birth,
+              gender: response.data.gender,
+              verified_at: new Date().toISOString(),
+            },
+            error: null,
+          });
+        } else {
+          setVerificationState(verificationId, {
+            isLoading: false,
+            data: null,
+            error: response.message || "Could not fetch official NIN record",
+          });
+        }
+      } catch (error: any) {
+        console.error("NIN verification fetch failed:", error);
+        setVerificationState(verificationId, {
+          isLoading: false,
+          data: null,
+          error:
+            error.response?.data?.message ||
+            error.message ||
+            "Failed to fetch NIN details",
+        });
+      }
+    }
+
+    setSelectedVerification(verification);
+    setShowVerificationModal(true);
   };
 
   const handleApprove = async () => {
     if (!selectedVerification) return;
-    
-    // Here you would call your admin approval endpoint
-    // For now, we'll just show success and refetch
+    const verificationId =
+      selectedVerification.registration_id || selectedVerification.id;
+
+    // TODO: Call your admin approval endpoint here
+    // await approveVerification(selectedVerification.type, verificationId);
+
     toast.success("NIN verified successfully");
     setShowVerificationModal(false);
     setSelectedVerification(null);
-    setNinVerificationData(null);
+    setVerificationState(verificationId, {
+      isLoading: false,
+      data: null,
+      error: null,
+    });
     refetch();
     queryClient.invalidateQueries({ queryKey: ["verifications"] });
   };
 
   const handleReject = async (reason: string) => {
     if (!selectedVerification) return;
-    
-    // Here you would call your admin reject endpoint
+    const verificationId =
+      selectedVerification.registration_id || selectedVerification.id;
+
+    // TODO: Call your admin reject endpoint here
+    // await rejectVerification(selectedVerification.type, verificationId, reason);
+
     toast.success("NIN rejected");
     setShowVerificationModal(false);
     setSelectedVerification(null);
-    setNinVerificationData(null);
+    setVerificationState(verificationId, {
+      isLoading: false,
+      data: null,
+      error: null,
+    });
     refetch();
     queryClient.invalidateQueries({ queryKey: ["verifications"] });
   };
@@ -205,8 +280,12 @@ export function NINVerifications() {
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-medium">{item.name || `${item.first_name} ${item.last_name}`}</p>
-            <p className="text-xs text-muted-foreground">{item.email}</p>
+            <p className="font-medium">
+              {item.name || `${item.first_name} ${item.last_name}`}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {item.email_address || item.email}
+            </p>
           </div>
         </div>
       ),
@@ -228,7 +307,7 @@ export function NINVerifications() {
       header: "NIN",
       cell: (item: any) => (
         <code className="rounded bg-gray-100 px-2 py-1 text-xs font-mono">
-          {item.nin_value || "•••••••••••"}
+          {item.encrypted_nin ? "•••••••••••" : "Not provided"}
         </code>
       ),
     },
@@ -242,7 +321,7 @@ export function NINVerifications() {
               "font-medium",
               statusStyles[
                 item.nin_verification_status as keyof typeof statusStyles
-              ] || "bg-gray-100"
+              ] || "bg-gray-100",
             )}
           >
             {item.nin_verification_status || item.status || "pending"}
@@ -275,52 +354,65 @@ export function NINVerifications() {
     },
     {
       header: "Actions",
-      cell: (item: any) => (
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-            onClick={() => handleOpenModal(item)}
-            title="Review & Verify"
-            disabled={publicVerifyMutation.isPending}
-          >
-            {publicVerifyMutation.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <CheckCircle className="h-4 w-4" />
-            )}
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => handleOpenModal(item)}>
-                <CheckCircle className="mr-2 h-4 w-4" />
-                Review & Verify
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setDrawerVerification(item)}>
-                <Eye className="mr-2 h-4 w-4" />
-                View Details
-              </DropdownMenuItem>
-              {item.nin_document_url && (
-                <DropdownMenuItem>
-                  <Download className="mr-2 h-4 w-4" />
-                  Download NIN Slip
-                </DropdownMenuItem>
+      cell: (item: any) => {
+        const verificationId = item.registration_id || item.id;
+        const state = getVerificationState(verificationId);
+        const isLoadingVerification = state.isLoading;
+
+        return (
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+              onClick={() => handleOpenModal(item)}
+              title="Review & Verify"
+              disabled={isLoadingVerification}
+            >
+              {isLoadingVerification ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <CheckCircle className="h-4 w-4" />
               )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      ),
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleOpenModal(item)}>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Review & Verify
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setDrawerVerification(item)}>
+                  <Eye className="mr-2 h-4 w-4" />
+                  View Details
+                </DropdownMenuItem>
+                {item.nin_document_url && (
+                  <DropdownMenuItem>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download NIN Slip
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        );
+      },
       className: "w-32",
     },
   ];
+
+  // Prepare the verification data for the modal
+  const selectedVerificationState = selectedVerification
+    ? getVerificationState(
+        selectedVerification.registration_id || selectedVerification.id,
+      )
+    : { isLoading: false, data: null, error: null };
 
   return (
     <div className="space-y-4">
@@ -399,21 +491,22 @@ export function NINVerifications() {
           onClose={() => {
             setShowVerificationModal(false);
             setSelectedVerification(null);
-            setNinVerificationData(null);
           }}
           onApprove={handleApprove}
           onReject={handleReject}
           type="nin"
-          verificationData={ninVerificationData}
+          verificationData={selectedVerificationState.data}
           userData={{
             first_name: selectedVerification.first_name,
             last_name: selectedVerification.last_name,
             date_of_birth: selectedVerification.date_of_birth,
-            email: selectedVerification.email,
-            phone: selectedVerification.phone,
+            email:
+              selectedVerification.email_address || selectedVerification.email,
+            phone: selectedVerification.phone_number,
           }}
-          isLoading={isVerifying}
-          isSubmitting={publicVerifyMutation.isPending}
+          isLoading={selectedVerificationState.isLoading}
+          error={selectedVerificationState.error}
+          isSubmitting={verifyEncryptedNIN.isPending}
         />
       )}
     </div>

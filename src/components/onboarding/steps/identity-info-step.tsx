@@ -258,7 +258,7 @@ export function IdentityInfoStep({
         <div className="border-t border-gray-200 pt-6 mt-4">
           <CacVerificationStep
             rcNumber={onBoardingData?.rc_number || ""}
-            companyName={onBoardingData?.company_name || ""}
+            // companyName={onBoardingData?.company_name || ""}
             onRcNumberChange={(value) => handleChange("rc_number", value)}
             onCompanyNameChange={(value) => handleChange("company_name", value)}
             onVerificationComplete={handleCacVerificationComplete}

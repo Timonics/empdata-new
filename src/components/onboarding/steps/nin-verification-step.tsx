@@ -7,7 +7,6 @@ import {
   ShieldCheck,
   Loader2,
   CheckCircle2,
-  XCircle,
   AlertCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,8 +16,6 @@ import { VerificationModal } from "../verification-modal";
 import { cn } from "@/lib/utils";
 import { usePublicVerifyNIN } from "@/hooks/queries/useVerifications";
 import { EncryptionService } from "@/lib/encryption";
-import { toast } from "sonner";
-import { EncryptedNIN } from "@/types/onboarding.types";
 
 interface NinVerificationStepProps {
   value: string;
@@ -62,15 +59,15 @@ export function NinVerificationStep({
 
     try {
       const publicKey = await EncryptionService.getPublicKey();
-      
+
       if (!publicKey) {
         throw new Error("Could not retrieve encryption key");
       }
 
       const encryptedNIN = await EncryptionService.encryptNin(publicKey, value);
-      
+
       const response = await verifyMutation.mutateAsync(encryptedNIN);
-      
+
       if (response.success && response.data) {
         // SUCCESS: Verification passed
         const verificationData = {
@@ -79,35 +76,39 @@ export function NinVerificationStep({
           date_of_birth: response.data.date_of_birth,
           gender: response.data.gender,
           nin: value,
-          // verification_id: response.data.verification_id,
         };
-        
+
         setTempVerificationData(verificationData);
         setShowModal(true);
       } else {
-        // FAILURE: Verification failed
+        // FAILURE: Verification failed - store as pending_admin
         setVerificationError(
-          response.message || "Unable to verify NIN. You can continue and an admin will verify your details later."
+          response.message ||
+            "Unable to verify NIN. You can continue and an admin will verify your details later.",
         );
+        // Auto-mark as pending_admin so user can continue
+        onVerificationComplete("pending_admin", { nin: value });
       }
     } catch (error: any) {
       console.error("Verification failed:", error);
-      
-      // Check for specific error types
-      if (error.message?.includes("public key") || error.message?.includes("encryption")) {
-        setVerificationError(
-          "Unable to encrypt NIN. Please check your connection and try again."
-        );
+
+      let errorMessage =
+        "Verification service is unavailable. Please continue and an admin will verify your details.";
+
+      if (
+        error.message?.includes("public key") ||
+        error.message?.includes("encryption")
+      ) {
+        errorMessage =
+          "Unable to encrypt NIN. Please check your connection and try again.";
       } else if (error.message?.includes("timeout")) {
-        setVerificationError(
-          "Verification request timed out. Please check your internet connection and try again."
-        );
-      } else {
-        setVerificationError(
-          error.response?.data?.message || 
-          "Verification service is unavailable. Please continue and an admin will verify your details."
-        );
+        errorMessage =
+          "Verification request timed out. Please check your internet connection and try again.";
       }
+
+      setVerificationError(errorMessage);
+      // Auto-mark as pending_admin so user can continue
+      onVerificationComplete("pending_admin", { nin: value });
     } finally {
       setIsVerifying(false);
     }
@@ -116,10 +117,6 @@ export function NinVerificationStep({
   const handleConfirmVerification = () => {
     onVerificationComplete("verified", tempVerificationData);
     setShowModal(false);
-  };
-
-  const handleSkipVerification = () => {
-    onVerificationComplete("pending_admin", { nin: value });
   };
 
   const getVerificationBadge = () => {
@@ -206,20 +203,12 @@ export function NinVerificationStep({
         </Button>
       </div>
 
-      {/* Error Message with Continue Anyway option */}
+      {/* Error Message without "Continue anyway" button - auto-continue */}
       {verificationError && !isVerificationComplete && (
         <Alert className="bg-yellow-50 border-yellow-200">
           <AlertCircle className="h-4 w-4 text-yellow-600" />
           <AlertDescription className="text-yellow-800">
             {verificationError}
-            <Button
-              variant="link"
-              size="sm"
-              onClick={handleSkipVerification}
-              className="text-yellow-800 underline p-0 h-auto ml-2"
-            >
-              Continue anyway
-            </Button>
           </AlertDescription>
         </Alert>
       )}

@@ -152,6 +152,28 @@ export function usePublicVerifyNIN() {
 }
 
 /**
+ * Verify NIN using encrypted value (for admin verification)
+ */
+export function useVerifyEncryptedNIN() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (encryptedNIN: string) =>
+      VerificationService.verifyEncryptedNIN(encryptedNIN),
+    onSuccess: (response: NINResponse) => {
+      if (response.success) {
+        toast.success("NIN details fetched successfully");
+      } else {
+        toast.error(response.message || "Failed to fetch NIN details");
+      }
+    },
+    onError: (error) => {
+      toast.error("Failed to fetch NIN details");
+    },
+  });
+}
+
+/**
  * Get employee registrations for NIN verification (Admin)
  */
 export function useEmployeeVerifications(filters?: any) {
