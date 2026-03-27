@@ -12,8 +12,9 @@ export function VerificationTabs() {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-      <TabsList className="grid w-full max-w-md grid-cols-3">
+      <TabsList className="grid w-full max-w-xl grid-cols-4">
         <TabsTrigger value="nin">NIN Verifications</TabsTrigger>
+        <TabsTrigger value="cac">CAC Verifications</TabsTrigger>
         <TabsTrigger value="documents">Documents</TabsTrigger>
         <TabsTrigger value="companies">Companies</TabsTrigger>
       </TabsList>

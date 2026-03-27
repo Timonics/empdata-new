@@ -1,3 +1,4 @@
+// components/admin/verifications/verification-modal.tsx (updated)
 "use client";
 
 import { useState, useEffect } from "react";
@@ -18,7 +19,12 @@ import {
   AlertCircle,
   Loader2,
   User,
+  Calendar,
+  MapPin,
   Building2,
+  Hash,
+  Mail,
+  Phone,
   Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -26,7 +32,7 @@ import { cn } from "@/lib/utils";
 interface VerificationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApprove: (reason?: string) => void;
+  onApprove: () => void;
   onReject: (reason: string) => void;
   type: "nin" | "cac";
   verificationData: any;
@@ -53,8 +59,6 @@ export function VerificationModal({
     dobMatch: boolean;
     emailMatch?: boolean;
     phoneMatch?: boolean;
-    companyNameMatch?: boolean;
-    rcNumberMatch?: boolean;
   }>({
     nameMatch: false,
     dobMatch: false,
@@ -77,31 +81,15 @@ export function VerificationModal({
         const phoneMatch = verificationData.phone === userData.phone;
 
         setMatchStatus({ nameMatch, dobMatch, emailMatch, phoneMatch });
-      } else if (type === "cac") {
-        // Compare CAC data with company data
-        const companyNameMatch = verificationData.company_name?.toLowerCase() === userData.company_name?.toLowerCase();
-        const rcNumberMatch = verificationData.rc_number === userData.rc_number;
-        
-        setMatchStatus({ companyNameMatch, rcNumberMatch, nameMatch: false, dobMatch: false });
       }
     }
   }, [verificationData, userData, type]);
 
   const allMatch = type === "nin" 
     ? (matchStatus.nameMatch && matchStatus.dobMatch)
-    : (matchStatus.companyNameMatch && matchStatus.rcNumberMatch);
+    : true;
 
-  const handleApprove = () => {
-    onApprove();
-  };
-
-  const handleReject = () => {
-    if (!rejectionReason.trim()) {
-      alert("Please provide a rejection reason");
-      return;
-    }
-    onReject(rejectionReason);
-  };
+  const hasVerificationData = verificationData !== null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -130,11 +118,34 @@ export function VerificationModal({
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <p className="mt-4 text-sm text-gray-600">Fetching verification data...</p>
+            <p className="mt-4 text-sm text-gray-600">Fetching official NIN records...</p>
+          </div>
+        ) : !hasVerificationData ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <AlertCircle className="h-12 w-12 text-yellow-500 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to Fetch NIN Record</h3>
+            <p className="text-sm text-gray-600 text-center max-w-md">
+              The NIN verification service is currently unavailable. 
+              You can still proceed with manual verification or reject this submission.
+            </p>
+            <div className="flex gap-3 mt-6">
+              <Button variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button onClick={onApprove} className="bg-green-600 hover:bg-green-700">
+                Approve Manually
+              </Button>
+              <Button 
+                onClick={() => setActiveTab("reject")} 
+                variant="destructive"
+              >
+                Reject
+              </Button>
+            </div>
           </div>
         ) : (
           <>
-            {/* Tabs */}
+            {/* Tabs - only show if we have verification data */}
             <div className="flex border-b mb-4">
               <button
                 onClick={() => setActiveTab("compare")}
@@ -160,7 +171,7 @@ export function VerificationModal({
               </button>
             </div>
 
-            {activeTab === "compare" ? (
+            {activeTab === "compare" && (
               <>
                 {/* Verification Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -168,56 +179,27 @@ export function VerificationModal({
                   <div className="bg-gray-50 rounded-lg p-4">
                     <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
                       <Shield className="h-4 w-4 text-blue-600" />
-                      Official Records
+                      Official NIN Records
                     </h4>
                     <div className="space-y-2">
-                      {type === "nin" ? (
-                        <>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Full Name:</span>
-                            <span className="font-medium">
-                              {verificationData?.first_name} {verificationData?.last_name}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Date of Birth:</span>
-                            <span className="font-medium">{verificationData?.date_of_birth}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Gender:</span>
-                            <span className="font-medium">{verificationData?.gender || "N/A"}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">NIN:</span>
-                            <code className="font-mono text-sm">{verificationData?.nin}</code>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Company Name:</span>
-                            <span className="font-medium">{verificationData?.company_name}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">RC Number:</span>
-                            <code className="font-mono text-sm">{verificationData?.rc_number}</code>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Address:</span>
-                            <span className="font-medium">{verificationData?.address}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Registration Date:</span>
-                            <span className="font-medium">{verificationData?.registration_date}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Status:</span>
-                            <Badge className="bg-green-100 text-green-800">
-                              {verificationData?.status}
-                            </Badge>
-                          </div>
-                        </>
-                      )}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Full Name:</span>
+                        <span className="font-medium">
+                          {verificationData?.first_name} {verificationData?.last_name}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Date of Birth:</span>
+                        <span className="font-medium">{verificationData?.date_of_birth}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Gender:</span>
+                        <span className="font-medium">{verificationData?.gender || "N/A"}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">NIN:</span>
+                        <code className="font-mono text-sm">{verificationData?.nin}</code>
+                      </div>
                     </div>
                   </div>
 
@@ -228,51 +210,24 @@ export function VerificationModal({
                       Submitted Information
                     </h4>
                     <div className="space-y-2">
-                      {type === "nin" ? (
-                        <>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Full Name:</span>
-                            <span className="font-medium">
-                              {userData?.first_name} {userData?.last_name}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Date of Birth:</span>
-                            <span className="font-medium">{userData?.date_of_birth}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Email:</span>
-                            <span className="font-medium">{userData?.email}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Phone:</span>
-                            <span className="font-medium">{userData?.phone}</span>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Company Name:</span>
-                            <span className="font-medium">{userData?.company_name}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">RC Number:</span>
-                            <code className="font-mono text-sm">{userData?.rc_number}</code>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Email:</span>
-                            <span className="font-medium">{userData?.email}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Phone:</span>
-                            <span className="font-medium">{userData?.phone}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Address:</span>
-                            <span className="font-medium">{userData?.house_address}</span>
-                          </div>
-                        </>
-                      )}
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Full Name:</span>
+                        <span className="font-medium">
+                          {userData?.first_name} {userData?.last_name}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Date of Birth:</span>
+                        <span className="font-medium">{userData?.date_of_birth}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Email:</span>
+                        <span className="font-medium">{userData?.email}</span>
+                      </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Phone:</span>
+                        <span className="font-medium">{userData?.phone}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -281,97 +236,48 @@ export function VerificationModal({
                 <div className="bg-white border rounded-lg p-4 mb-6">
                   <h4 className="font-medium text-gray-900 mb-3">Verification Match Status</h4>
                   <div className="space-y-3">
-                    {type === "nin" ? (
-                      <>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Name Match:</span>
-                          {matchStatus.nameMatch ? (
-                            <Badge className="bg-green-100 text-green-800">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Matches
-                            </Badge>
-                          ) : (
-                            <Badge variant="destructive" className="bg-red-100 text-red-800">
-                              <XCircle className="h-3 w-3 mr-1" />
-                              Mismatch
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Date of Birth Match:</span>
-                          {matchStatus.dobMatch ? (
-                            <Badge className="bg-green-100 text-green-800">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Matches
-                            </Badge>
-                          ) : (
-                            <Badge variant="destructive" className="bg-red-100 text-red-800">
-                              <XCircle className="h-3 w-3 mr-1" />
-                              Mismatch
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Email Match:</span>
-                          {matchStatus.emailMatch ? (
-                            <Badge className="bg-green-100 text-green-800">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Matches
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-gray-500">
-                              <XCircle className="h-3 w-3 mr-1" />
-                              Not Applicable
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Phone Match:</span>
-                          {matchStatus.phoneMatch ? (
-                            <Badge className="bg-green-100 text-green-800">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Matches
-                            </Badge>
-                          ) : (
-                            <Badge variant="outline" className="text-gray-500">
-                              <XCircle className="h-3 w-3 mr-1" />
-                              Not Applicable
-                            </Badge>
-                          )}
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Company Name Match:</span>
-                          {matchStatus.companyNameMatch ? (
-                            <Badge className="bg-green-100 text-green-800">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Matches
-                            </Badge>
-                          ) : (
-                            <Badge variant="destructive" className="bg-red-100 text-red-800">
-                              <XCircle className="h-3 w-3 mr-1" />
-                              Mismatch
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">RC Number Match:</span>
-                          {matchStatus.rcNumberMatch ? (
-                            <Badge className="bg-green-100 text-green-800">
-                              <CheckCircle2 className="h-3 w-3 mr-1" />
-                              Matches
-                            </Badge>
-                          ) : (
-                            <Badge variant="destructive" className="bg-red-100 text-red-800">
-                              <XCircle className="h-3 w-3 mr-1" />
-                              Mismatch
-                            </Badge>
-                          )}
-                        </div>
-                      </>
-                    )}
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Name Match:</span>
+                      {matchStatus.nameMatch ? (
+                        <Badge className="bg-green-100 text-green-800">
+                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                          Matches
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive" className="bg-red-100 text-red-800">
+                          <XCircle className="h-3 w-3 mr-1" />
+                          Mismatch
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Date of Birth Match:</span>
+                      {matchStatus.dobMatch ? (
+                        <Badge className="bg-green-100 text-green-800">
+                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                          Matches
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive" className="bg-red-100 text-red-800">
+                          <XCircle className="h-3 w-3 mr-1" />
+                          Mismatch
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-gray-600">Email Match:</span>
+                      {matchStatus.emailMatch ? (
+                        <Badge className="bg-green-100 text-green-800">
+                          <CheckCircle2 className="h-3 w-3 mr-1" />
+                          Matches
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="text-gray-500">
+                          <XCircle className="h-3 w-3 mr-1" />
+                          Not Provided
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -380,9 +286,7 @@ export function VerificationModal({
                   <div className="bg-amber-50 rounded-lg p-3 flex items-start gap-2 mb-6">
                     <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" />
                     <p className="text-sm text-amber-800">
-                      {type === "nin"
-                        ? "Some information doesn't match the official NIN records. Please verify with the user or reject if the information is incorrect."
-                        : "Some company information doesn't match CAC records. Please verify with the company or reject if the information is incorrect."}
+                      Some information doesn't match the official NIN records. Please verify with the user or reject if the information is incorrect.
                     </p>
                   </div>
                 )}
@@ -392,14 +296,14 @@ export function VerificationModal({
                     Cancel
                   </Button>
                   <Button
-                    onClick={handleApprove}
+                    onClick={onApprove}
                     disabled={isSubmitting}
                     className="bg-green-600 hover:bg-green-700"
                   >
                     {isSubmitting ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Approving...
+                        Verifying...
                       </>
                     ) : (
                       <>
@@ -410,9 +314,10 @@ export function VerificationModal({
                   </Button>
                 </DialogFooter>
               </>
-            ) : (
+            )}
+
+            {activeTab === "reject" && (
               <>
-                {/* Reject Tab */}
                 <div className="space-y-4 py-4">
                   <div className="bg-red-50 rounded-lg p-4">
                     <div className="flex items-start gap-2">
@@ -439,55 +344,34 @@ export function VerificationModal({
                   <div className="bg-gray-50 rounded-lg p-3">
                     <p className="text-xs text-gray-600 mb-2">Suggested rejection reasons:</p>
                     <div className="flex flex-wrap gap-2">
-                      {type === "nin" ? (
-                        <>
-                          <Badge
-                            variant="outline"
-                            className="cursor-pointer hover:bg-gray-200"
-                            onClick={() => setRejectionReason("NIN number does not match the provided name")}
-                          >
-                            Name mismatch
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="cursor-pointer hover:bg-gray-200"
-                            onClick={() => setRejectionReason("Date of birth does not match NIN records")}
-                          >
-                            DOB mismatch
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="cursor-pointer hover:bg-gray-200"
-                            onClick={() => setRejectionReason("NIN document is unclear or invalid")}
-                          >
-                            Unclear document
-                          </Badge>
-                        </>
-                      ) : (
-                        <>
-                          <Badge
-                            variant="outline"
-                            className="cursor-pointer hover:bg-gray-200"
-                            onClick={() => setRejectionReason("RC Number does not exist in CAC records")}
-                          >
-                            Invalid RC Number
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="cursor-pointer hover:bg-gray-200"
-                            onClick={() => setRejectionReason("Company name does not match CAC records")}
-                          >
-                            Name mismatch
-                          </Badge>
-                          <Badge
-                            variant="outline"
-                            className="cursor-pointer hover:bg-gray-200"
-                            onClick={() => setRejectionReason("CAC document is incomplete or invalid")}
-                          >
-                            Invalid document
-                          </Badge>
-                        </>
-                      )}
+                      <Badge
+                        variant="outline"
+                        className="cursor-pointer hover:bg-gray-200"
+                        onClick={() => setRejectionReason("NIN number does not match the provided name")}
+                      >
+                        Name mismatch
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="cursor-pointer hover:bg-gray-200"
+                        onClick={() => setRejectionReason("Date of birth does not match NIN records")}
+                      >
+                        DOB mismatch
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="cursor-pointer hover:bg-gray-200"
+                        onClick={() => setRejectionReason("NIN document is unclear or invalid")}
+                      >
+                        Unclear document
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className="cursor-pointer hover:bg-gray-200"
+                        onClick={() => setRejectionReason("NIN verification service unavailable - manual review required")}
+                      >
+                        Service unavailable
+                      </Badge>
                     </div>
                   </div>
                 </div>
@@ -501,7 +385,7 @@ export function VerificationModal({
                   </Button>
                   <Button
                     variant="destructive"
-                    onClick={handleReject}
+                    onClick={() => onReject(rejectionReason)}
                     disabled={isSubmitting || !rejectionReason.trim()}
                   >
                     {isSubmitting ? (

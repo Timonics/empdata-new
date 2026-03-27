@@ -31,8 +31,8 @@ import { VerificationDrawer } from "./verification-drawer";
 import { VerificationModal } from "./verification-modal";
 import {
   useEmployeeVerifications,
-  useVerifyNIN,
-  useRejectNIN,
+  useRejectEmployeeRegistration,
+  useVerifyEmployeeRegistration,
 } from "@/hooks/queries/useVerifications";
 import { useCurrentAdmin } from "@/hooks/queries/useAdminRoles";
 import { formatDistanceToNow } from "date-fns";
@@ -76,8 +76,8 @@ export function CACVerifications() {
     status: filter === "all" ? undefined : filter,
   });
 
-  const verifyMutation = useVerifyNIN();
-  const rejectMutation = useRejectNIN();
+  const verifyMutation = useVerifyEmployeeRegistration();
+  const rejectMutation = useRejectEmployeeRegistration();
 
   const verifications = data?.data || [];
   const pagination = data?.pagination;

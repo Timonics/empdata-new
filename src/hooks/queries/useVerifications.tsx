@@ -5,12 +5,111 @@ import { EncryptedNIN, NINResponse } from "@/types/onboarding.types";
 
 export const verificationKeys = {
   all: ["verifications"] as const,
+  allNIN: () => [...verificationKeys.all, "all-nin"] as const,
   companies: () => [...verificationKeys.all, "companies"] as const,
   employees: () => [...verificationKeys.all, "employees"] as const,
+  individuals: () => [...verificationKeys.all, "individuals"] as const,
   public: () => [...verificationKeys.all, "public"] as const,
   documents: (type: string, id: number) =>
     [...verificationKeys.all, "documents", type, id] as const,
 };
+
+/**
+ * Get all NIN verifications across all registration types
+ */
+export function useAllNINVerifications(filters?: {
+  status?: string;
+  from_date?: string;
+  to_date?: string;
+}) {
+  return useQuery({
+    queryKey: [...verificationKeys.allNIN(), { filters }],
+    queryFn: async () => {
+      const response =
+        await VerificationService.getAllNINVerifications(filters);
+      if (!response.success) {
+        throw new Error("Failed to fetch NIN verifications");
+      }
+      return response;
+    },
+  });
+}
+
+/**
+ * Verify NIN for a specific registration type
+ */
+export function useVerifyRegistrationNIN() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      type,
+      id,
+    }: {
+      type: "company" | "employee" | "individual";
+      id: number;
+    }) => VerificationService.verifyRegistrationNIN(type, id),
+    onSuccess: (response) => {
+      if (response.success) {
+        toast.success("NIN verified successfully");
+        queryClient.invalidateQueries({ queryKey: verificationKeys.allNIN() });
+        queryClient.invalidateQueries({
+          queryKey: verificationKeys.companies(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: verificationKeys.employees(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: verificationKeys.individuals(),
+        });
+      } else {
+        toast.error(response.message || "Failed to verify NIN");
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to verify NIN");
+    },
+  });
+}
+
+/**
+ * Reject NIN for a specific registration type
+ */
+export function useRejectRegistrationNIN() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      type,
+      id,
+      reason,
+    }: {
+      type: "company" | "employee" | "individual";
+      id: number;
+      reason: string;
+    }) => VerificationService.rejectRegistrationNIN(type, id, reason),
+    onSuccess: (response) => {
+      if (response.success) {
+        toast.success("NIN rejected successfully");
+        queryClient.invalidateQueries({ queryKey: verificationKeys.allNIN() });
+        queryClient.invalidateQueries({
+          queryKey: verificationKeys.companies(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: verificationKeys.employees(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: verificationKeys.individuals(),
+        });
+      } else {
+        toast.error(response.message || "Failed to reject NIN");
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to reject NIN");
+    },
+  });
+}
 
 /**
  * Get company registrations for verification
@@ -30,7 +129,7 @@ export function useCompanyVerifications(filters?: any) {
 }
 
 /**
- * Verify Public NIN
+ * Verify Public NIN (for onboarding)
  */
 export function usePublicVerifyNIN() {
   const queryClient = useQueryClient();
@@ -47,13 +146,13 @@ export function usePublicVerifyNIN() {
       }
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to verify NIN");
+      toast.error("NIN verification failed");
     },
   });
 }
 
 /**
- * Get employee registrations for NIN verification
+ * Get employee registrations for NIN verification (Admin)
  */
 export function useEmployeeVerifications(filters?: any) {
   return useQuery({
@@ -70,50 +169,57 @@ export function useEmployeeVerifications(filters?: any) {
 }
 
 /**
- * Verify NIN mutation
+ * Verify Employee Registration (Admin)
+ * POST /api/admin/grouplife/employee-registrations/{id}/verify
  */
-export function useVerifyNIN() {
+export function useVerifyEmployeeRegistration() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => VerificationService.verifyNIN(id),
+    mutationFn: (id: number) =>
+      VerificationService.verifyEmployeeRegistration(id),
     onSuccess: (response) => {
       if (response.success) {
-        toast.success("NIN verified successfully");
+        toast.success("Employee registration verified successfully");
         queryClient.invalidateQueries({
           queryKey: verificationKeys.employees(),
         });
       } else {
-        toast.error(response.message || "Failed to verify NIN");
+        toast.error(response.message || "Failed to verify registration");
       }
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to verify NIN");
+      toast.error(
+        error.response?.data?.message || "Failed to verify registration",
+      );
     },
   });
 }
 
 /**
- * Reject NIN mutation
+ * Reject Employee Registration (Admin)
+ * POST /api/admin/grouplife/employee-registrations/{id}/reject
  */
-export function useRejectNIN() {
+export function useRejectEmployeeRegistration() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, reason }: { id: number; reason: string }) =>
-      VerificationService.rejectNIN(id, reason),
+      VerificationService.rejectEmployeeRegistration(id, reason),
     onSuccess: (response) => {
       if (response.success) {
-        toast.success("NIN rejected");
+        toast.success("Employee registration rejected");
         queryClient.invalidateQueries({
           queryKey: verificationKeys.employees(),
         });
       } else {
-        toast.error(response.message || "Failed to reject NIN");
+        toast.error(response.message || "Failed to reject registration");
       }
     },
     onError: (error: any) => {
-      toast.error(error.message || "Failed to reject NIN");
+      toast.error(
+        error.response?.data?.message || "Failed to reject registration",
+      );
     },
   });
 }
