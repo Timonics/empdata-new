@@ -141,7 +141,7 @@ export function CompanyEmployeesHeader({
       <ExportModal
         open={showExportModal}
         onOpenChange={setShowExportModal}
-        entity="employees"
+        entity="portal-employees"
         title="Export Employees"
         description="Export your employees data in various formats"
         filters={filters}
