@@ -70,18 +70,19 @@ export function SetPasswordForm() {
   const [success, setSuccess] = useState(false);
   const [password, setPassword] = useState("");
 
+  console.log(searchParams);
+
   // Get token and email from URL
   const token = searchParams.get("token");
   const email = searchParams.get("email");
-  const type = searchParams.get("type") as 'company' | 'employee' | null;
 
   // Basic validation on mount
   useEffect(() => {
-    if (!token || !email || !type) {
+    if (!token || !email) {
       setError("Invalid invitation link. Missing required parameters.");
     }
     setIsValidating(false);
-  }, [token, email, type]);
+  }, [token, email]);
 
   const {
     register,
@@ -145,7 +146,7 @@ export function SetPasswordForm() {
   };
 
   const onSubmit = async (data: SetPasswordFormValues) => {
-    if (!token || !email || !type) {
+    if (!token || !email) {
       setError("Missing required information");
       return;
     }
@@ -195,7 +196,7 @@ export function SetPasswordForm() {
     );
   }
 
-  if (error && (!token || !email || !type)) {
+  if (error && (!token || !email)) {
     return (
       <Card className="w-full shadow-lg border-0">
         <CardHeader>

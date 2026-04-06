@@ -1,11 +1,9 @@
+// app/api/portal/dashboard/stats/route.ts
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { callBackend } from "@/lib/server-api";
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ company_id: string }> },
-) {
+export async function GET() {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get("token_company_admin")?.value;
@@ -17,39 +15,51 @@ export async function GET(
       );
     }
 
-    const { company_id } = await params;
+    // Get company_id from cookie or session storage (can't access localStorage here)
+    // Option A: Read from a separate cookie set during login
+    const companyIdCookie = cookieStore.get("company_id")?.value;
+    let companyId = companyIdCookie ? parseInt(companyIdCookie, 10) : null;
 
-    if (!company_id) {
-      return NextResponse.json(
-        { success: false, message: "Company ID is required" },
-        { status: 400 },
-      );
+    // Option B: If not available, fetch from /me endpoint
+    if (!companyId) {
+      const meResponse = await callBackend({
+        method: "GET",
+        path: "/portal/auth/me",
+        authType: "company_admin",
+        token,
+      });
+
+      if (meResponse.success && meResponse.data?.company_id) {
+        companyId = meResponse.data.company_id;
+      } else {
+        return NextResponse.json(
+          { success: false, message: "Company not found" },
+          { status: 404 },
+        );
+      }
     }
 
-    console.log(company_id);
-
+    // Fetch full company profile
     const result = await callBackend({
       method: "GET",
-      path: `/portal/companies/${company_id}/full`,
+      path: `/portal/companies/${companyId}/full`,
       authType: "company_admin",
       token,
     });
 
-    console.log(result);
-
-    if (result.success) {
-      return NextResponse.json(result);
+    if (!result.success) {
+      return NextResponse.json(
+        { success: false, message: result.message || "Failed to fetch stats" },
+        { status: result.status || 500 },
+      );
     }
 
-    return NextResponse.json(
-      {
-        success: false,
-        message: result.message || "Failed to fetch company employees",
-      },
-      { status: result.status || 400 },
-    );
+    return NextResponse.json({
+      success: true,
+      data: result,
+    });
   } catch (error) {
-    console.error("Company full employees API error:", error);
+    console.error("Dashboard stats API error:", error);
     return NextResponse.json(
       { success: false, message: "Internal server error" },
       { status: 500 },

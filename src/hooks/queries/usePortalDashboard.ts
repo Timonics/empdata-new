@@ -57,9 +57,6 @@ export function useCompanyEmployeesTotal() {
       const response = await PortalDashboardService.getFullCompanyEmployees(
         company_data.company_id.toString(),
       );
-      if (!response.success) {
-        throw new Error("Failed to fetch dashboard stats");
-      }
       return response.data;
     },
     staleTime: 2 * 60 * 1000, // 2 minutes

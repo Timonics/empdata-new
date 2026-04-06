@@ -8,7 +8,7 @@ import {
   individualPolicyPlans,
   corporatePolicyPlans,
 } from "@/lib/onboarding/policy-plan";
-import type { AccountType } from "@/types/onboarding.types";
+import type { AccountType, EmployeeGroupLifeOnboardingData } from "@/types/onboarding.types";
 
 interface PolicyPlanStepProps {
   accountType: AccountType | null;
@@ -33,6 +33,10 @@ export function PolicyPlanStep({
 
   useEffect(() => {
     if (accountType === "employee-group-life" && !selectedPlan) {
+      setOnBoardingData((prev: EmployeeGroupLifeOnboardingData) => ({
+        ...prev,
+        selected_plan: "Employee Group Life Insurance Plan",
+      }));
       setSelectedPlan("Employee Group Life Insurance Plan");
     }
   }, [accountType, selectedPlan, setSelectedPlan]);

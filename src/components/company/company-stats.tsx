@@ -6,7 +6,6 @@ import { Users, UserPlus, CheckCircle2, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   useCompanyEmployeesTotal,
-  useDashboardStats,
 } from "@/hooks/queries/usePortalDashboard";
 
 const colorClasses = {
@@ -56,6 +55,8 @@ export function CompanyStats() {
       </div>
     );
   }
+
+  console.log(data);
 
   const statCards = [
     {

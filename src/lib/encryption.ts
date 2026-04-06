@@ -1,14 +1,16 @@
+// lib/encryption.ts
 import { BaseService } from "@/services/base.service";
 
-interface EncryptedNinResponse {
-  encrypted_nin: string; // Base64 encrypted NIN (RSA)
+export interface EncryptedData {
+  encrypted_nin?: string;
+  encrypted_bvn?: string;
 }
 
 export class EncryptionService extends BaseService {
   private static readonly BASE_PATH = "/api/public/nin";
 
   /**
-   * Fetch the RSA public key for NIN encryption
+   * Fetch the RSA public key for encryption
    */
   static async getPublicKey(): Promise<string> {
     try {
@@ -28,18 +30,20 @@ export class EncryptionService extends BaseService {
   }
 
   /**
-   * Encrypt NIN using RSA public key
-   * Returns only the encrypted data (RSA doesn't use IV/tag)
+   * Generic encryption method for both NIN and BVN
+   * @param type - "nin" or "bvn"
+   * @param publicKey - RSA public key
+   * @param value - The value to encrypt (NIN or BVN)
+   * @returns Object with encrypted_${type} key
    */
-  static async encryptNin(
+  static async encrypt(
+    type: "nin" | "bvn",
     publicKey: string,
-    nin: string,
-  ): Promise<EncryptedNinResponse> {
+    value: string,
+  ): Promise<EncryptedData> {
     try {
-      const publicKeyPem = publicKey;
-
       // Clean and prepare the PEM public key
-      const pemBody = publicKeyPem
+      const pemBody = publicKey
         .replace("-----BEGIN PUBLIC KEY-----", "")
         .replace("-----END PUBLIC KEY-----", "")
         .replace(/\n/g, "")
@@ -60,8 +64,8 @@ export class EncryptionService extends BaseService {
         ["encrypt"],
       );
 
-      // Encrypt the NIN
-      const encoded = new TextEncoder().encode(nin);
+      // Encrypt the value
+      const encoded = new TextEncoder().encode(value);
       const encrypted = await crypto.subtle.encrypt(
         { name: "RSA-OAEP" },
         cryptoKey,
@@ -73,25 +77,37 @@ export class EncryptionService extends BaseService {
         String.fromCharCode(...new Uint8Array(encrypted)),
       );
 
+      // Return the appropriate key based on type
+      const returnKey = type === "nin" ? "encrypted_nin" : "encrypted_bvn";
+
       return {
-        encrypted_nin: encryptedBase64,
-      };
+        [returnKey]: encryptedBase64,
+      } as EncryptedData;
     } catch (error) {
-      console.error("NIN encryption failed:", error);
-      throw new Error("Failed to encrypt NIN");
+      console.error(`${type.toUpperCase()} encryption failed:`, error);
+      throw new Error(`Failed to encrypt ${type.toUpperCase()}`);
     }
   }
 
   /**
-   * For BVN encryption when implemented
+   * Convenience method for NIN encryption
    */
-  static async encryptBvn(bvn: string): Promise<{
-    bvn_iv: string;
-    bvn_data: string;
-    bvn_tag: string;
-  }> {
-    // Similar implementation for BVN
-    // Will use the same or different public key endpoint
-    throw new Error("BVN encryption not implemented yet");
+  static async encryptNin(
+    publicKey: string,
+    nin: string,
+  ): Promise<{ encrypted_nin: string }> {
+    const result = await this.encrypt("nin", publicKey, nin);
+    return { encrypted_nin: result.encrypted_nin! };
+  }
+
+  /**
+   * Convenience method for BVN encryption
+   */
+  static async encryptBvn(
+    publicKey: string,
+    bvn: string,
+  ): Promise<{ encrypted_bvn: string }> {
+    const result = await this.encrypt("bvn", publicKey, bvn);
+    return { encrypted_bvn: result.encrypted_bvn! };
   }
 }

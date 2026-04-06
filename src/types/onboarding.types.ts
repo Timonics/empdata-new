@@ -105,6 +105,7 @@ export interface CompanyGroupLifeOnboardingData extends BaseOnboardingData {
   nin_number_iv?: string; // For NIN
   nin_number_data?: string; // For NIN
   nin_number_tag?: string; // For NIN
+  director_nin_encrypted?: string;
 
   nin_verification_status?: "pending_admin" | "verified";
   nin_verification_pending?: boolean;

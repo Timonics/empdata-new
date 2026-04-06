@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { LoginCredentials, UserRole, Verify2FAData } from "@/types/auth.types";
 import { toast } from "sonner";
 import { tokenManager } from "@/lib/token-manager";
+import Cookies from "js-cookie";
 
 // Auth keys for React Query cache
 export const authKeys = {
@@ -139,6 +140,10 @@ export function useAuth() {
 
           // Store user data in token manager
           tokenManager.setUserData(data.user);
+
+          if (data.user.company_id) {
+            Cookies.set("company_id", data.user.company_id);
+          }
 
           const role = data.user.role;
           const userName =

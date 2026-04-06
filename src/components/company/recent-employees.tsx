@@ -8,7 +8,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowRight, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useCompanyEmployeesTotal, useRecentEmployees } from "@/hooks/queries/usePortalDashboard";
+import {
+  useCompanyEmployeesTotal,
+  useRecentEmployees,
+} from "@/hooks/queries/usePortalDashboard";
 import { formatDistanceToNow, isValid } from "date-fns";
 
 const statusStyles = {
@@ -71,7 +74,9 @@ export function RecentEmployees() {
   }
 
   // Ensure employees is an array
-  const employeeList = Array.isArray(data) ? data : [];
+  const employeeList = Array.isArray(data.recent_employees)
+    ? data.recent_employees
+    : [];
 
   return (
     <Card>
@@ -94,26 +99,23 @@ export function RecentEmployees() {
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10 border">
                   <AvatarFallback className="bg-blue-100 text-blue-600">
-                    {employee.first_name?.[0] || ""}
-                    {employee.last_name?.[0] || ""}
+                    {employee.name?.[0] || ""}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">
-                    {employee.first_name || ""} {employee.last_name || ""}
-                  </p>
+                  <p className="font-medium">{employee.name || ""}</p>
                   <p className="text-xs text-muted-foreground">
                     {employee.email || ""}
                   </p>
-                  {employee.department && (
+                  {employee.position && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      {employee.department}
+                      {employee.position}
                     </p>
                   )}
                 </div>
               </div>
               <div className="text-right">
-                <Badge
+                {/* <Badge
                   variant="outline"
                   className={cn(
                     "font-medium",
@@ -123,9 +125,9 @@ export function RecentEmployees() {
                   )}
                 >
                   {employee.status || "unknown"}
-                </Badge>
+                </Badge> */}
                 <p className="text-xs text-muted-foreground mt-1">
-                  {formatDateSafely(employee.joined_at)}
+                  {formatDateSafely(employee.joined_at.toString())}
                 </p>
               </div>
             </div>

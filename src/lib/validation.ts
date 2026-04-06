@@ -9,7 +9,10 @@ export function validateOnboardingData(
   }
 
   // Common required fields for all types
-  const commonRequired = ["consent_checkbox", "selected_plan"];
+  const commonRequired = [
+    "consent_checkbox",
+    //  "selected_plan"
+  ];
 
   for (const field of commonRequired) {
     if (!data[field]) {
@@ -64,10 +67,10 @@ export function validateOnboardingData(
         return false;
       }
       // Allow if verified OR pending admin review
-      const isVerificationValid = 
-        data.nin_verification_status === "verified" || 
+      const isVerificationValid =
+        data.nin_verification_status === "verified" ||
         data.nin_verification_status === "pending_admin";
-      
+
       if (!isVerificationValid) {
         console.log("NIN verification required - please verify or skip");
         return false;
@@ -92,9 +95,9 @@ export function validateOnboardingData(
       "state",
       "city",
       "house_address",
-      "director_name",
-      "director_bank_name",
-      "director_bank_acct_number",
+      // "director_name",
+      // "director_bank_name",
+      // "director_bank_acct_number",
       "identity_card_type",
     ];
 
@@ -127,12 +130,14 @@ export function validateOnboardingData(
         return false;
       }
       // Allow if verified OR pending admin review
-      const isVerificationValid = 
-        data.nin_verification_status === "verified" || 
+      const isVerificationValid =
+        data.nin_verification_status === "verified" ||
         data.nin_verification_status === "pending_admin";
-      
+
       if (!isVerificationValid) {
-        console.log("Director NIN verification required - please verify or skip");
+        console.log(
+          "Director NIN verification required - please verify or skip",
+        );
         return false;
       }
     } else {
@@ -148,10 +153,10 @@ export function validateOnboardingData(
       return false;
     }
     // Allow if CAC verified OR pending admin review
-    const isCacValid = 
-      data.cac_verification_status === "verified" || 
+    const isCacValid =
+      data.cac_verification_status === "verified" ||
       data.cac_verification_status === "pending_admin";
-    
+
     if (!isCacValid) {
       console.log("CAC verification required - please verify or skip");
       return false;
@@ -203,12 +208,14 @@ export function validateOnboardingData(
         console.log("Invalid employee NIN format - must be 11 digits");
         return false;
       }
-      const isVerificationValid = 
-        data.nin_verification_status === "verified" || 
+      const isVerificationValid =
+        data.nin_verification_status === "verified" ||
         data.nin_verification_status === "pending_admin";
-      
+
       if (!isVerificationValid) {
-        console.log("Employee NIN verification required - please verify or skip");
+        console.log(
+          "Employee NIN verification required - please verify or skip",
+        );
         return false;
       }
     } else {
@@ -303,13 +310,13 @@ export function validateFiles(accountType: string, data: any): string[] {
       errors.push("Identity card must be PDF, JPG, or PNG");
     }
 
-    if (!data.scanned_signature) {
-      errors.push("Scanned signature is required");
-    } else if (data.scanned_signature.size > maxSize) {
-      errors.push("Scanned signature must be less than 5MB");
-    } else if (!allowedDocTypes.includes(data.scanned_signature.type)) {
-      errors.push("Scanned signature must be PDF, JPG, or PNG");
-    }
+    // if (!data.scanned_signature) {
+    //   errors.push("Scanned signature is required");
+    // } else if (data.scanned_signature.size > maxSize) {
+    //   errors.push("Scanned signature must be less than 5MB");
+    // } else if (!allowedDocTypes.includes(data.scanned_signature.type)) {
+    //   errors.push("Scanned signature must be PDF, JPG, or PNG");
+    // }
 
     if (!data.passport_photograph) {
       errors.push("Passport photograph is required");
@@ -319,12 +326,12 @@ export function validateFiles(accountType: string, data: any): string[] {
       errors.push("Passport photograph must be JPG or PNG");
     }
 
-    if (
-      data.identity_card_type === "National Identity Number" &&
-      !data.nin_document
-    ) {
-      errors.push("NIN document is required");
-    }
+    // if (
+    //   data.identity_card_type === "National Identity Number" &&
+    //   !data.nin_document
+    // ) {
+    //   errors.push("NIN document is required");
+    // }
   }
 
   return errors;

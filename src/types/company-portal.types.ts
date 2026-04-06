@@ -21,7 +21,7 @@ export interface CompanyProfile {
   created_at?: string;
 }
 
-export interface ProtalCompanyFull {
+export interface PortalCompanyFull {
   id: number;
   name: string;
   email: string;
@@ -91,9 +91,19 @@ export interface EmployeeSummary {
 
 export interface InvitationSummary {
   id: number;
-  email: string;
-  role: string;
-  sent_at: string;
-  expires_at: string;
-  status: "pending" | "accepted" | "expired";
+  first_name: string
+  last_name: string
+  full_name: string
+  email: string
+  phone: string | null;
+  employee_number: number | null;
+  department: string | null;
+  position: string | null;
+  employment_status: string
+  has_portal_access: boolean;
+  has_submitted_nin: boolean;
+  is_nin_verified: boolean;
+  is_validated: boolean;
+  hire_date: Date | null;
+  created_at: string | Date
 }

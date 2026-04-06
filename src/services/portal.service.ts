@@ -5,9 +5,8 @@ import type {
   DashboardStats,
   EmployeeSummary,
   InvitationSummary,
-  ProtalCompanyFull,
+  PortalCompanyFull,
 } from "@/types/company-portal.types";
-import { PortalEmployee } from "@/types/employee.types";
 
 export class PortalDashboardService {
   private static readonly BASE_PATH = "/api/portal";
@@ -28,11 +27,13 @@ export class PortalDashboardService {
    * GET /api/portal/company/[id]/full
    */
   static async getFullCompanyEmployees(companyId: string) {
-    const response = await api.get<{
+    const response = await api.get(
+      `${this.BASE_PATH}/companies/${companyId}/full`,
+    );
+    return response.data.data as {
       success: boolean;
-      data: ProtalCompanyFull;
-    }>(`${this.BASE_PATH}/companies/${companyId}/full`);
-    return response.data;
+      data: PortalCompanyFull;
+    };
   }
 
   /**
@@ -63,10 +64,12 @@ export class PortalDashboardService {
    * GET /api/portal/invitations?status=pending&per_page=5
    */
   static async getPendingInvitations() {
-    const response = await api.get<{
+    const response = await api.get(
+      `${this.BASE_PATH}/employees?per_page=5&employment_status=inactive`,
+    );
+    return response.data as {
       success: boolean;
       data: InvitationSummary[];
-    }>(`${this.BASE_PATH}/invitations?status=pending&per_page=5`);
-    return response.data;
+    };
   }
 }

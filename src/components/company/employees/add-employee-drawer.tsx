@@ -39,7 +39,7 @@ import { toast } from "sonner";
 const employeeSchema = z.object({
   first_name: z.string().min(2, "First name is required"),
   last_name: z.string().min(2, "Last name is required"),
-  email: z.string().email("Valid email is required"),
+  email: z.email("Valid email is required"),
   phone: z.string().min(10, "Valid phone number is required").optional(),
   date_of_birth: z.string().min(1, "Date of birth is required"),
   department: z.string().optional(),
@@ -93,7 +93,7 @@ export function AddEmployeeDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
         {/* Header */}
-        <div className="sticky top-0 bg-linear-to-r from-emerald-600 to-emerald-800 text-white p-6 z-10">
+        <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-800 text-white p-6 z-10">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-white text-xl">
               Add New Employee
@@ -108,7 +108,7 @@ export function AddEmployeeDrawer({
               <X className="h-5 w-5" />
             </Button>
           </div>
-          <p className="text-emerald-100 text-sm mt-2">
+          <p className="text-blue-100 text-sm mt-2">
             Fill in the employee details below
           </p>
         </div>
@@ -323,7 +323,7 @@ export function AddEmployeeDrawer({
                 <Button
                   type="submit"
                   disabled={createEmployee.isPending}
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  className="bg-blue-600 hover:bg-blue-700"
                 >
                   {createEmployee.isPending ? (
                     <>
