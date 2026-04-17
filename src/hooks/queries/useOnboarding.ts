@@ -50,7 +50,7 @@ export function useSubmitCompanyRegistration() {
             publicKey,
             data.director_bvn_number,
           );
-          submissionData.director_bvn_encrypted = encrypted.encrypted_bvn;
+          submissionData.encrypted_bvn = encrypted.encrypted_bvn;
           delete submissionData.director_bvn_number;
         } catch (error) {
           toast.error("Failed to encrypt director's BVN");
@@ -71,7 +71,7 @@ export function useSubmitCompanyRegistration() {
           );
 
           // Store the encrypted NIN as 'encrypted_nin'
-          submissionData.director_nin_encrypted = encrypted.encrypted_nin;
+          submissionData.encrypted_nin = encrypted.encrypted_nin;
           delete submissionData.director_national_identification_number;
 
           // Track verification status for admin
