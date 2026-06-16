@@ -21,6 +21,8 @@ import {
   BarChart3,
   LogOut,
   X,
+  FileText,
+  Shield,
 } from "lucide-react";
 import Logo from "@/components/logo";
 import { useSidebar } from "@/contexts/sidebar-context";
@@ -52,6 +54,16 @@ const navigation = [
     name: "Employees",
     link: "/admin/employees",
     icon: Users,
+  },
+  {
+    name: "Policies",
+    link: "/admin/policies",
+    icon: FileText,
+  },
+  {
+    name: "Claims",
+    link: "/admin/claims",
+    icon: Shield,
   },
   {
     name: "Verification Status",
@@ -282,6 +294,25 @@ export function AdminSidebar() {
                 />
               ))}
 
+               {/* INSURANCE */}
+              {navIsOpen ? (
+                <h4 className="mt-6 pl-2 text-sm opacity-50">
+                  INSURANCE
+                </h4>
+              ) : (
+                <hr className="text-center border w-full mt-6 opacity-30" />
+              )}
+
+              {/* Verification, Audit Logs, Reports */}
+              {navigation.slice(4, 6).map((item) => (
+                <NavItem
+                  key={item.link}
+                  item={item}
+                  pathname={pathname}
+                  navIsOpen={navIsOpen}
+                />
+              ))}
+
               {/* REPORTS AND COMPLIANCE Section */}
               {navIsOpen ? (
                 <h4 className="mt-6 pl-2 text-sm opacity-50">
@@ -292,7 +323,7 @@ export function AdminSidebar() {
               )}
 
               {/* Verification, Audit Logs, Reports */}
-              {navigation.slice(4, 7).map((item) => (
+              {navigation.slice(6, 9).map((item) => (
                 <NavItem
                   key={item.link}
                   item={item}
@@ -310,7 +341,7 @@ export function AdminSidebar() {
 
               {/* Settings */}
               <NavItem
-                item={navigation[7]} // Settings
+                item={navigation[9]} // Settings
                 pathname={pathname}
                 navIsOpen={navIsOpen}
               />

@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
-interface Column<T> {
+export interface Column<T> {
   header: string | React.ReactNode;
   accessorKey?: keyof T;
   cell?: (item: T) => React.ReactNode;

@@ -2,7 +2,7 @@
 
 ## Description
 
-LifeData is a frontend application for insurance companies to onboard individuals, corporate clients, and employees under group‑life policies. It provides an admin dashboard for KYC verification, a company portal for employee management, and a secure multi‑step registration wizard.
+LifeData is an application for insurance companies to onboard individuals, corporate clients, and employees under group‑life policies. It provides an admin dashboard for KYC verification, a company portal for employee management, and a secure multi‑step registration wizard.
 
 ## Features
 
