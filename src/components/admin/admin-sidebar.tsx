@@ -85,6 +85,11 @@ const navigation = [
     link: "/admin/settings",
     icon: Settings,
   },
+  {
+    name: "Permissions",
+    link: "/admin/permissions",
+    icon: ShieldCheck,
+  },
 ];
 
 interface NavItemProps {

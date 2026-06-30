@@ -20,23 +20,6 @@ export class AuthService {
    */
   static async adminLogin(credentials: LoginCredentials) {
     const response = await api.post(`${this.ADMIN_BASE}/login`, credentials);
-
-    // console.log("Admin login response:", response.data);
-
-    // // Check if login was successful and has user data
-    // if (response.data?.success) {
-    //   // For 2FA case, user data is at root level
-    //   if (response.data?.user) {
-    //     tokenManager.setUserData(response.data.user);
-    //     tokenManager.setUserRole("super-admin");
-    //   }
-    //   // For normal login case, user might be in data.user
-    //   else if (response.data?.data?.user) {
-    //     tokenManager.setUserData(response.data.data.user);
-    //     tokenManager.setUserRole("super-admin");
-    //   }
-    // }
-
     return response.data;
   }
 
@@ -45,23 +28,6 @@ export class AuthService {
    */
   static async portalLogin(credentials: LoginCredentials) {
     const response = await api.post(`${this.PORTAL_BASE}/login`, credentials);
-
-    // console.log("Portal login response:", response.data);
-
-    // // Check if login was successful and has user data
-    // if (response.data?.success) {
-    //   // For 2FA case, user data is at root level
-    //   if (response.data?.user) {
-    //     tokenManager.setUserData(response.data.user);
-    //     tokenManager.setUserRole(response.data.user.role);
-    //   }
-    //   // For normal login case, user might be in data.user
-    //   else if (response.data?.data?.user) {
-    //     tokenManager.setUserData(response.data.data.user);
-    //     tokenManager.setUserRole(response.data.data.user.role);
-    //   }
-    // }
-
     return response.data;
   }
 
@@ -70,13 +36,6 @@ export class AuthService {
    */
   static async adminVerify2FA(data: Verify2FAData) {
     const response = await api.post(`${this.ADMIN_BASE}/verify-2fa`, data);
-
-    // console.log("Admin verify 2FA response:", response.data);
-
-    // if (response.data?.success && response.data?.user) {
-    //   tokenManager.setUserData(response.data.user);
-    // }
-
     return response.data;
   }
 
@@ -85,13 +44,6 @@ export class AuthService {
    */
   static async portalVerify2FA(data: Verify2FAData) {
     const response = await api.post(`${this.PORTAL_BASE}/verify-2fa`, data);
-
-    // console.log("Portal verify 2FA response:", response.data);
-
-    // if (response.data?.success && response.data?.user) {
-    //   tokenManager.setUserData(response.data.user);
-    // }
-
     return response.data;
   }
 
