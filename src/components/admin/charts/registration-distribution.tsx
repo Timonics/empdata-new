@@ -187,7 +187,7 @@ export function RegistrationDistribution() {
         {/* Total */}
         <div className="mt-4 pt-4 border-t flex items-center justify-between">
           <span className="text-sm font-medium">Total Registrations</span>
-          <span className="text-xl font-bold text-gray-900">{total}</span>
+          <span className="text-xl font-bold text-foreground">{total}</span>
         </div>
       </CardContent>
     </Card>

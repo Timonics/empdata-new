@@ -51,10 +51,10 @@ export function CompanySelectStep({
   return (
     <div className={cn("space-y-8", isOpen && "h-125")}>
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-foreground mb-2">
           Select Your Company
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Choose the company you are registering under for Group Life insurance
         </p>
       </div>
@@ -65,38 +65,38 @@ export function CompanySelectStep({
             onClick={() => !isLoading && setIsOpen(!isOpen)}
             disabled={isLoading}
             className={cn(
-              "w-full p-4 bg-white border-2 rounded-xl flex items-center justify-between transition-all",
+              "w-full p-4 bg-card border-2 rounded-xl flex items-center justify-between transition-all",
               isOpen
                 ? "border-blue-500 ring-4 ring-blue-100"
                 : selectedCompany
                   ? "border-green-500 bg-green-50"
-                  : "border-gray-200 hover:border-gray-300",
+                  : "border-border hover:border-muted-foreground/40",
               isLoading && "opacity-50 cursor-not-allowed",
             )}
           >
             <div className="flex items-center gap-3">
               {isLoading ? (
                 <>
-                  <Loader2 className="w-5 h-5 animate-spin text-gray-400" />
-                  <span className="text-gray-400">Loading companies...</span>
+                  <Loader2 className="w-5 h-5 animate-spin text-muted-foreground/70" />
+                  <span className="text-muted-foreground/70">Loading companies...</span>
                 </>
               ) : selectedCompany ? (
                 <>
                   <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                     <Check className="w-4 h-4 text-green-600" />
                   </div>
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium text-foreground">
                     {selectedCompany.name}
                   </span>
                 </>
               ) : (
-                <span className="text-gray-400">Select your company</span>
+                <span className="text-muted-foreground/70">Select your company</span>
               )}
             </div>
             {!isLoading && (
               <ChevronDown
                 className={cn(
-                  "w-5 h-5 text-gray-400 transition-transform",
+                  "w-5 h-5 text-muted-foreground/70 transition-transform",
                   isOpen && "rotate-180",
                 )}
               />
@@ -111,18 +111,18 @@ export function CompanySelectStep({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden"
+                className="absolute z-50 w-full mt-2 bg-card border border-border rounded-xl shadow-xl overflow-hidden"
               >
                 {/* Search Input */}
-                <div className="p-3 border-b border-gray-200">
+                <div className="p-3 border-b border-border">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
                     <input
                       type="text"
                       placeholder="Search companies..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       autoFocus
                     />
                   </div>
@@ -138,17 +138,17 @@ export function CompanySelectStep({
                         animate={{ opacity: 1 }}
                         transition={{ delay: index * 0.05 }}
                         onClick={() => handleSelect(company.id, company.name)}
-                        className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
+                        className="w-full px-4 py-3 text-left hover:bg-muted/60 transition-colors border-b border-border/70 last:border-0"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
                             <Building2 className="w-4 h-4 text-blue-600" />
                           </div>
                           <div>
-                            <p className="font-medium text-gray-900">
+                            <p className="font-medium text-foreground">
                               {company.name}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-muted-foreground">
                               {company.email}
                             </p>
                           </div>
@@ -157,7 +157,7 @@ export function CompanySelectStep({
                     ))
                   ) : (
                     <div className="p-8 text-center">
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         No companies found
                       </p>
                     </div>
@@ -169,10 +169,10 @@ export function CompanySelectStep({
         </div>
       </div>
       {/* Navigation Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+      <div className="flex items-center justify-between pt-6 border-t border-border">
         <button
           onClick={onBack}
-          className="px-8 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+          className="px-8 py-3 rounded-xl font-medium text-muted-foreground hover:bg-muted transition-colors"
         >
           Back
         </button>
@@ -182,8 +182,8 @@ export function CompanySelectStep({
           className={cn(
             "px-8 py-3 rounded-xl font-medium transition-all",
             onBoardingData?.company_id
-              ? "bg-linear-to-r from-blue-600 to-emerald-600 text-white hover:shadow-lg hover:scale-105"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed",
+              ? "bg-primary text-primary-foreground shadow-sm hover:bg-brand-700"
+              : "bg-muted text-muted-foreground/70 cursor-not-allowed",
           )}
         >
           Continue

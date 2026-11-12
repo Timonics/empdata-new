@@ -61,10 +61,10 @@ export function RegistrationDrawer({
     value: string;
     icon?: any;
   }) => (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
+    <div className="flex items-start gap-3 py-3 border-b border-border/70 last:border-0">
       {Icon && <Icon className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500">{label}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-sm font-medium mt-0.5 wrap-break-word">{value || "—"}</p>
       </div>
     </div>
@@ -77,19 +77,19 @@ export function RegistrationDrawer({
     title: string;
     children: React.ReactNode;
   }) => (
-    <div className="bg-gray-50 rounded-lg p-5">
+    <div className="bg-muted/60 rounded-lg p-5">
       <h3 className="text-sm font-medium text-gray-700 mb-4">{title}</h3>
       <div className="space-y-1">{children}</div>
     </div>
   );
 
   const DocumentCard = ({ name, date }: { name: string; date: string }) => (
-    <div className="flex items-center justify-between p-3 bg-white rounded-lg border">
+    <div className="flex items-center justify-between p-3 bg-card rounded-lg border">
       <div className="flex items-center gap-3">
         <FileText className="h-5 w-5 text-blue-500" />
         <div>
           <p className="text-sm font-medium">{name}</p>
-          <p className="text-xs text-gray-500">Uploaded {date}</p>
+          <p className="text-xs text-muted-foreground">Uploaded {date}</p>
         </div>
       </div>
       <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -102,7 +102,7 @@ export function RegistrationDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none! data-[side=right]:max-w-none!">
         {/* Header */}
-        <div className="bg-linear-to-r from-blue-600 to-blue-800 text-white p-8 sticky top-0 z-20">
+        <div className="bg-navy-900 text-white p-8 sticky top-0 z-20">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center">
@@ -173,7 +173,7 @@ export function RegistrationDrawer({
         </div>
 
         {/* Tabs */}
-        <div className="border-b px-8 sticky top-43 bg-white z-10">
+        <div className="border-b px-8 sticky top-43 bg-card z-10">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
@@ -212,24 +212,24 @@ export function RegistrationDrawer({
                 <div className="bg-blue-50 p-4 rounded-lg text-center">
                   <Users className="h-6 w-6 text-blue-500 mx-auto mb-2" />
                   <p className="text-2xl font-bold">{registration.employees}</p>
-                  <p className="text-xs text-gray-600">Employees</p>
+                  <p className="text-xs text-muted-foreground">Employees</p>
                 </div>
                 <div className="bg-green-50 p-4 rounded-lg text-center">
                   <DollarSign className="h-6 w-6 text-green-500 mx-auto mb-2" />
                   <p className="text-2xl font-bold">{registration.coverage}</p>
-                  <p className="text-xs text-gray-600">Coverage</p>
+                  <p className="text-xs text-muted-foreground">Coverage</p>
                 </div>
                 <div className="bg-purple-50 p-4 rounded-lg text-center">
                   <FileText className="h-6 w-6 text-purple-500 mx-auto mb-2" />
                   <p className="text-2xl font-bold">
                     {registration.documents.length}
                   </p>
-                  <p className="text-xs text-gray-600">Documents</p>
+                  <p className="text-xs text-muted-foreground">Documents</p>
                 </div>
                 <div className="bg-orange-50 p-4 rounded-lg text-center">
                   <Calendar className="h-6 w-6 text-orange-500 mx-auto mb-2" />
                   <p className="text-2xl font-bold">3</p>
-                  <p className="text-xs text-gray-600">Days Pending</p>
+                  <p className="text-xs text-muted-foreground">Days Pending</p>
                 </div>
               </div>
 
@@ -376,7 +376,7 @@ export function RegistrationDrawer({
                     </div>
                     <div className="flex-1 pb-4">
                       <p className="font-medium">Application Submitted</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         {new Date(registration.submittedAt).toLocaleString()}
                       </p>
                     </div>
@@ -389,7 +389,7 @@ export function RegistrationDrawer({
                       </div>
                       <div className="flex-1">
                         <p className="font-medium">Application Approved</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {new Date(registration.approvedAt).toLocaleString()}
                         </p>
                       </div>
@@ -403,7 +403,7 @@ export function RegistrationDrawer({
                       </div>
                       <div className="flex-1">
                         <p className="font-medium">Application Rejected</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           {new Date(registration.rejectedAt).toLocaleString()}
                         </p>
                         <p className="text-sm text-red-600 mt-1">

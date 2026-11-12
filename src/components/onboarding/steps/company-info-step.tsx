@@ -80,10 +80,10 @@ export function CompanyInfoStep({
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-foreground mb-2">
           Company Information
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Tell us about your company. This information will be used for your
           insurance policy.
         </p>
@@ -92,45 +92,45 @@ export function CompanyInfoStep({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-auto">
         {/* Company Name */}
         <div className="space-y-2 md:col-span-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Company Name <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               value={onBoardingData?.company_name || ""}
               onChange={(e) => handleChange("company_name", e.target.value)}
               placeholder="Enter your company name"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* RC Number */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             RC Number <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               value={onBoardingData?.rc_number || ""}
               onChange={(e) => handleChange("rc_number", e.target.value)}
               placeholder="e.g., RC-123456"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* TIN (Optional) */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Tax Identification Number (Optional)
           </label>
           <div className="relative">
-            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               value={onBoardingData?.tax_identification_number || ""}
@@ -138,35 +138,35 @@ export function CompanyInfoStep({
                 handleChange("tax_identification_number", e.target.value)
               }
               placeholder="Enter TIN if available"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Business Email */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Business Email <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="email"
               value={onBoardingData?.email_address || ""}
               onChange={(e) => handleChange("email_address", e.target.value)}
               placeholder="info@company.com"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Confirm Email */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Confirm Email <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="email"
               value={onBoardingData?.confirm_email_address || ""}
@@ -181,7 +181,7 @@ export function CompanyInfoStep({
                   onBoardingData?.email_address !==
                     onBoardingData?.confirm_email_address
                   ? "border-red-300 bg-red-50"
-                  : "border-gray-200",
+                  : "border-border",
               )}
             />
           </div>
@@ -197,28 +197,28 @@ export function CompanyInfoStep({
 
         {/* Phone Number */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Business Phone <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="tel"
               value={onBoardingData?.phone_number || ""}
               onChange={(e) => handleChange("phone_number", e.target.value)}
               placeholder="+234 801 234 5678"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Confirm Phone */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Confirm Phone <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="tel"
               value={onBoardingData?.confirm_phone_number || ""}
@@ -233,7 +233,7 @@ export function CompanyInfoStep({
                   onBoardingData?.phone_number !==
                     onBoardingData?.confirm_phone_number
                   ? "border-red-300 bg-red-50"
-                  : "border-gray-200",
+                  : "border-border",
               )}
             />
           </div>
@@ -249,58 +249,58 @@ export function CompanyInfoStep({
 
         {/* Secondary Phone (Optional) */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Secondary Phone (Optional)
           </label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="tel"
               value={onBoardingData?.secondary_phone || ""}
               onChange={(e) => handleChange("secondary_phone", e.target.value)}
               placeholder="Alternative contact number"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Address */}
         <div className="space-y-2 md:col-span-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Business Address <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               value={onBoardingData?.house_address || ""}
               onChange={(e) => handleChange("house_address", e.target.value)}
               placeholder="Enter your business address"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Previous Address (Optional) */}
         <div className="space-y-2 md:col-span-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Previous Address (Optional)
           </label>
           <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               value={onBoardingData?.previous_address || ""}
               onChange={(e) => handleChange("previous_address", e.target.value)}
               placeholder="Enter previous address if applicable"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* City */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             City <span className="text-red-500">*</span>
           </label>
           <input
@@ -308,36 +308,36 @@ export function CompanyInfoStep({
             value={onBoardingData?.city || ""}
             onChange={(e) => handleChange("city", e.target.value)}
             placeholder="e.g., Lagos"
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
 
         {/* State */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             State <span className="text-red-500">*</span>
           </label>
           <div className="relative">
             <button
               onClick={() => setOpenState(!openState)}
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors"
+              className="w-full px-4 py-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors"
             >
               <span
                 className={
-                  onBoardingData?.state ? "text-gray-900" : "text-gray-400"
+                  onBoardingData?.state ? "text-foreground" : "text-muted-foreground/70"
                 }
               >
                 {onBoardingData?.state || "Select state"}
               </span>
               <ChevronDown
                 className={cn(
-                  "w-4 h-4 text-gray-400",
+                  "w-4 h-4 text-muted-foreground/70",
                   openState && "rotate-180",
                 )}
               />
             </button>
             {openState && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg max-h-48 overflow-y-auto">
                 {states.map((state) => (
                   <button
                     key={state}
@@ -345,7 +345,7 @@ export function CompanyInfoStep({
                       handleChange("state", state);
                       setOpenState(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-4 py-2 text-left hover:bg-muted/60 transition-colors"
                   >
                     {state}
                   </button>
@@ -357,31 +357,31 @@ export function CompanyInfoStep({
 
         {/* Country */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Country <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <button
               onClick={() => setOpenCountry(!openCountry)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors"
+              className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors"
             >
               <span
                 className={
-                  onBoardingData?.country ? "text-gray-900" : "text-gray-400"
+                  onBoardingData?.country ? "text-foreground" : "text-muted-foreground/70"
                 }
               >
                 {onBoardingData?.country || "Select country"}
               </span>
               <ChevronDown
                 className={cn(
-                  "w-4 h-4 text-gray-400",
+                  "w-4 h-4 text-muted-foreground/70",
                   openCountry && "rotate-180",
                 )}
               />
             </button>
             {openCountry && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
                 {countries.map((country) => (
                   <button
                     key={country}
@@ -389,7 +389,7 @@ export function CompanyInfoStep({
                       handleChange("country", country);
                       setOpenCountry(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-4 py-2 text-left hover:bg-muted/60 transition-colors"
                   >
                     {country}
                   </button>
@@ -401,10 +401,10 @@ export function CompanyInfoStep({
       </div>
 
       {/* Navigation Buttons */}
-      {/* <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+      {/* <div className="flex items-center justify-between pt-6 border-t border-border">
         <button
           onClick={onBack}
-          className="px-8 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+          className="px-8 py-3 rounded-xl font-medium text-muted-foreground hover:bg-muted transition-colors"
         >
           Back
         </button>
@@ -414,8 +414,8 @@ export function CompanyInfoStep({
           className={cn(
             "px-8 py-3 rounded-xl font-medium transition-all",
             isFormValid()
-              ? "bg-linear-to-r from-blue-600 to-emerald-600 text-white hover:shadow-lg hover:scale-105"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              ? "bg-primary text-primary-foreground shadow-sm hover:bg-brand-700"
+              : "bg-muted text-muted-foreground/70 cursor-not-allowed"
           )}
         >
           Continue

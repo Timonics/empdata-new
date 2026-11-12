@@ -353,7 +353,7 @@ export function DocumentVerifications() {
         </div>
       </div>
 
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-card">
         <DataTable
           data={filteredData || []}
           columns={columns}

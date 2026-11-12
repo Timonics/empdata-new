@@ -1,8 +1,7 @@
 'use client'
 
 import React from "react";
-import Image from "next/image";
-import logo from "../../../public/logo.png";
+import { Database } from "lucide-react";
 
 interface LogoProps {
   width?: number;
@@ -17,14 +16,12 @@ const Logo: React.FC<LogoProps> = ({
 }) => {
   return (
     <div
-      className={`px-4 py-2 rounded-lg bg-white flex items-center justify-center w-fit outfit shadow-md ${className}`}
+      className={`flex items-center justify-center rounded-lg bg-linear-to-br from-blue-600 to-indigo-600 text-white shadow-md ${className}`}
+      style={{ width, height }}
     >
-      <Image
-        src={logo}
-        alt="Logo"
-        width={width}
-        height={height}
-        priority
+      <Database
+        style={{ width: Math.round(width * 0.55), height: Math.round(height * 0.55) }}
+        strokeWidth={2.2}
       />
     </div>
   );

@@ -17,37 +17,37 @@ const actions = [
   {
     label: 'Add Company',
     icon: Building2,
-    color: 'bg-blue-100 text-blue-600',
+    color: 'bg-blue-50 text-blue-700',
     href: '/admin/companies/add',
   },
   {
     label: 'Add Employee',
     icon: UserPlus,
-    color: 'bg-green-100 text-green-600',
+    color: 'bg-emerald-50 text-emerald-700',
     href: '/admin/employees/add',
   },
   {
     label: 'New Registration',
     icon: FileText,
-    color: 'bg-purple-100 text-purple-600',
+    color: 'bg-violet-50 text-violet-700',
     href: '/admin/registrations/new',
   },
   {
     label: 'Export Data',
     icon: Download,
-    color: 'bg-orange-100 text-orange-600',
+    color: 'bg-amber-50 text-amber-700',
     href: '/admin/export',
   },
   {
     label: 'Send Invites',
     icon: Mail,
-    color: 'bg-pink-100 text-pink-600',
+    color: 'bg-sky-50 text-sky-700',
     href: '/admin/invitations',
   },
   {
     label: 'Verification',
     icon: Shield,
-    color: 'bg-yellow-100 text-yellow-600',
+    color: 'bg-slate-100 text-slate-700',
     href: '/admin/verification',
   },
 ];
@@ -64,7 +64,7 @@ export function QuickActions() {
             <Button
               key={action.label}
               variant="outline"
-              className="h-auto flex-col gap-2 p-4 hover:border-blue-200 hover:bg-blue-50/50 bg-gray-50"
+              className="h-auto flex-col gap-2.5 rounded-lg border-border/70 p-4 bg-card hover:border-border hover:bg-muted/50 hover:shadow-card"
               asChild
             >
               <a href={action.href}>

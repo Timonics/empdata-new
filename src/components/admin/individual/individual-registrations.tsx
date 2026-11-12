@@ -1,5 +1,7 @@
 "use client";
 
+import { useClientPagination } from "@/hooks/useClientPagination";
+
 import { useState, useEffect } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
@@ -77,7 +79,7 @@ const statusStyles = {
 };
 
 const accountStatusStyles = {
-  pending: "bg-gray-100 text-gray-800 border-gray-200",
+  pending: "bg-muted text-foreground border-border",
   invited: "bg-blue-100 text-blue-800 border-blue-200",
   active: "bg-emerald-100 text-emerald-800 border-emerald-200",
 };
@@ -95,6 +97,7 @@ export function IndividualRegistrations() {
     null,
   );
   const [drawerMode, setDrawerMode] = useState<"view" | "edit">("view");
+  const [initialTab, setInitialTab] = useState("details");
 
   // Filter state
   const [filters, setFilters] = useState<IndividualRegistrationFilters>({
@@ -281,6 +284,9 @@ export function IndividualRegistrations() {
     }
   };
 
+  const client = useClientPagination(data?.data || []);
+  const tableRows = data?.pagination ? (data?.data || []) : client.rows;
+
   const columns = [
     {
       header: (
@@ -340,7 +346,7 @@ export function IndividualRegistrations() {
             className={cn(
               "font-medium",
               statusStyles[item.status as keyof typeof statusStyles] ||
-                "bg-gray-100",
+                "bg-muted",
             )}
           >
             {item.status}
@@ -351,7 +357,7 @@ export function IndividualRegistrations() {
               "font-medium ml-1",
               accountStatusStyles[
                 item.account_status as keyof typeof accountStatusStyles
-              ] || "bg-gray-100",
+              ] || "bg-muted",
             )}
           >
             {item.account_status}
@@ -460,12 +466,19 @@ export function IndividualRegistrations() {
                 onClick={() => {
                   setDrawerRegistration(item);
                   setDrawerMode("view");
+                  setInitialTab("details");
                 }}
               >
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setDrawerRegistration(item);
+                  setDrawerMode("view");
+                  setInitialTab("documents");
+                }}
+              >
                 <FileText className="mr-2 h-4 w-4" />
                 View Documents
               </DropdownMenuItem>
@@ -609,9 +622,9 @@ export function IndividualRegistrations() {
       </div>
 
       {/* Data Table with Pagination */}
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-card">
         <DataTable
-          data={data?.data || []}
+          data={tableRows}
           columns={columns}
           isLoading={isLoading}
           pagination={
@@ -622,7 +635,7 @@ export function IndividualRegistrations() {
                   totalItems: data.pagination.total,
                   onPageChange: handlePageChange,
                 }
-              : undefined
+              : client.pagination
           }
           emptyMessage="No individual registrations found"
         />
@@ -653,6 +666,7 @@ export function IndividualRegistrations() {
           onOpenChange={() => setDrawerRegistration(null)}
           mode={drawerMode}
           onModeChange={(mode) => setDrawerMode(mode)}
+          initialTab={initialTab}
         />
       )}
 
@@ -673,7 +687,7 @@ export function IndividualRegistrations() {
                   </span>
                   ?
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   This will mark the registration as approved. You can then send an invitation to the individual to create their account.
                 </p>
               </div>
@@ -778,7 +792,7 @@ export function IndividualRegistrations() {
                   </span>
                   ?
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   This will mark the identity documents as verified.
                 </p>
               </div>
@@ -831,7 +845,7 @@ export function IndividualRegistrations() {
                 placeholder={selectedRegistration?.email_address}
                 value={inviteEmail}
                 onChange={(e) => setInviteEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <p className="text-xs text-muted-foreground">
                 If left blank, the invitation will be sent to {selectedRegistration?.email_address}

@@ -147,7 +147,7 @@ export function VerificationModal({
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <p className="mt-4 text-sm text-gray-600">
+            <p className="mt-4 text-sm text-muted-foreground">
               {type === "nin" 
                 ? "Fetching official NIN records..." 
                 : "Fetching official CAC records..."}
@@ -159,10 +159,10 @@ export function VerificationModal({
         {!isLoading && error && !hasVerificationData && (
           <div className="flex flex-col items-center justify-center py-12">
             <AlertCircle className="h-12 w-12 text-yellow-500 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               Unable to Fetch {type === "nin" ? "NIN" : "CAC"} Record
             </h3>
-            <p className="text-sm text-gray-600 text-center max-w-md">{error}</p>
+            <p className="text-sm text-muted-foreground text-center max-w-md">{error}</p>
             <div className="flex gap-3 mt-6">
               <Button variant="outline" onClick={onClose}>
                 Cancel
@@ -205,7 +205,7 @@ export function VerificationModal({
                   "px-4 py-2 text-sm font-medium transition-colors relative",
                   activeTab === "compare"
                     ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-muted-foreground hover:text-gray-700"
                 )}
               >
                 Compare Details
@@ -216,7 +216,7 @@ export function VerificationModal({
                   "px-4 py-2 text-sm font-medium transition-colors relative",
                   activeTab === "reject"
                     ? "text-red-600 border-b-2 border-red-600"
-                    : "text-gray-500 hover:text-gray-700"
+                    : "text-muted-foreground hover:text-gray-700"
                 )}
               >
                 Reject
@@ -229,8 +229,8 @@ export function VerificationModal({
                 {/* Verification Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   {/* Official Records */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                  <div className="bg-muted/60 rounded-lg p-4">
+                    <h4 className="font-medium text-foreground mb-3 flex items-center gap-2">
                       <Shield className="h-4 w-4 text-blue-600" />
                       {type === "nin" ? "Official NIN Records" : "Official CAC Records"}
                     </h4>
@@ -238,25 +238,25 @@ export function VerificationModal({
                       {type === "nin" ? (
                         <>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Full Name:</span>
+                            <span className="text-muted-foreground">Full Name:</span>
                             <span className="font-medium">
                               {verificationData?.first_name} {verificationData?.last_name}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Date of Birth:</span>
+                            <span className="text-muted-foreground">Date of Birth:</span>
                             <span className="font-medium">
                               {verificationData?.date_of_birth}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Gender:</span>
+                            <span className="text-muted-foreground">Gender:</span>
                             <span className="font-medium">
                               {verificationData?.gender || "N/A"}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">NIN:</span>
+                            <span className="text-muted-foreground">NIN:</span>
                             <code className="font-mono text-sm">
                               {verificationData?.nin}
                             </code>
@@ -265,31 +265,31 @@ export function VerificationModal({
                       ) : (
                         <>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Company Name:</span>
+                            <span className="text-muted-foreground">Company Name:</span>
                             <span className="font-medium">
                               {verificationData?.company_name}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">RC Number:</span>
+                            <span className="text-muted-foreground">RC Number:</span>
                             <code className="font-mono text-sm">
                               {verificationData?.rc_number}
                             </code>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Address:</span>
+                            <span className="text-muted-foreground">Address:</span>
                             <span className="font-medium">
                               {verificationData?.address}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Registration Date:</span>
+                            <span className="text-muted-foreground">Registration Date:</span>
                             <span className="font-medium">
                               {verificationData?.registration_date}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Status:</span>
+                            <span className="text-muted-foreground">Status:</span>
                             <Badge className="bg-green-100 text-green-800">
                               {verificationData?.status}
                             </Badge>
@@ -300,8 +300,8 @@ export function VerificationModal({
                   </div>
 
                   {/* User Submitted Data */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                  <div className="bg-muted/60 rounded-lg p-4">
+                    <h4 className="font-medium text-foreground mb-3 flex items-center gap-2">
                       <User className="h-4 w-4 text-green-600" />
                       Submitted Information
                     </h4>
@@ -309,50 +309,50 @@ export function VerificationModal({
                       {type === "nin" ? (
                         <>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Full Name:</span>
+                            <span className="text-muted-foreground">Full Name:</span>
                             <span className="font-medium">
                               {userData?.first_name} {userData?.last_name}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Date of Birth:</span>
+                            <span className="text-muted-foreground">Date of Birth:</span>
                             <span className="font-medium">
                               {userData?.date_of_birth}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Email:</span>
+                            <span className="text-muted-foreground">Email:</span>
                             <span className="font-medium">{userData?.email}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Phone:</span>
+                            <span className="text-muted-foreground">Phone:</span>
                             <span className="font-medium">{userData?.phone}</span>
                           </div>
                         </>
                       ) : (
                         <>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Company Name:</span>
+                            <span className="text-muted-foreground">Company Name:</span>
                             <span className="font-medium">
                               {userData?.company_name}
                             </span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">RC Number:</span>
+                            <span className="text-muted-foreground">RC Number:</span>
                             <code className="font-mono text-sm">
                               {userData?.rc_number}
                             </code>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Email:</span>
+                            <span className="text-muted-foreground">Email:</span>
                             <span className="font-medium">{userData?.email}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Phone:</span>
+                            <span className="text-muted-foreground">Phone:</span>
                             <span className="font-medium">{userData?.phone}</span>
                           </div>
                           <div className="flex items-center justify-between text-sm">
-                            <span className="text-gray-600">Address:</span>
+                            <span className="text-muted-foreground">Address:</span>
                             <span className="font-medium">
                               {userData?.house_address}
                             </span>
@@ -364,15 +364,15 @@ export function VerificationModal({
                 </div>
 
                 {/* Match Status */}
-                <div className="bg-white border rounded-lg p-4 mb-6">
-                  <h4 className="font-medium text-gray-900 mb-3">
+                <div className="bg-card border rounded-lg p-4 mb-6">
+                  <h4 className="font-medium text-foreground mb-3">
                     Verification Match Status
                   </h4>
                   <div className="space-y-3">
                     {type === "nin" ? (
                       <>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Name Match:</span>
+                          <span className="text-muted-foreground">Name Match:</span>
                           {matchStatus.nameMatch ? (
                             <Badge className="bg-green-100 text-green-800">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -386,7 +386,7 @@ export function VerificationModal({
                           )}
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Date of Birth Match:</span>
+                          <span className="text-muted-foreground">Date of Birth Match:</span>
                           {matchStatus.dobMatch ? (
                             <Badge className="bg-green-100 text-green-800">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -400,14 +400,14 @@ export function VerificationModal({
                           )}
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Email Match:</span>
+                          <span className="text-muted-foreground">Email Match:</span>
                           {matchStatus.emailMatch ? (
                             <Badge className="bg-green-100 text-green-800">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
                               Matches
                             </Badge>
                           ) : (
-                            <Badge variant="outline" className="text-gray-500">
+                            <Badge variant="outline" className="text-muted-foreground">
                               <XCircle className="h-3 w-3 mr-1" />
                               Not Provided
                             </Badge>
@@ -417,7 +417,7 @@ export function VerificationModal({
                     ) : (
                       <>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">Company Name Match:</span>
+                          <span className="text-muted-foreground">Company Name Match:</span>
                           {matchStatus.companyNameMatch ? (
                             <Badge className="bg-green-100 text-green-800">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -431,7 +431,7 @@ export function VerificationModal({
                           )}
                         </div>
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-600">RC Number Match:</span>
+                          <span className="text-muted-foreground">RC Number Match:</span>
                           {matchStatus.rcNumberMatch ? (
                             <Badge className="bg-green-100 text-green-800">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -513,8 +513,8 @@ export function VerificationModal({
                     className="resize-none"
                   />
 
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-600 mb-2">
+                  <div className="bg-muted/60 rounded-lg p-3">
+                    <p className="text-xs text-muted-foreground mb-2">
                       Suggested rejection reasons:
                     </p>
                     <div className="flex flex-wrap gap-2">

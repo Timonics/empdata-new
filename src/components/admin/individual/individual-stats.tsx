@@ -12,7 +12,7 @@ import {
   ShieldCheck,
   ShieldX,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, toFiniteNumber } from "@/lib/utils";
 import { useIndividualStats } from "@/hooks/queries/useIndividualRegistrations";
 
 export function IndividualStats() {
@@ -56,38 +56,38 @@ export function IndividualStats() {
   const statCards = [
     {
       title: "Total Individuals",
-      value: stats.total,
+      value: toFiniteNumber(stats.total),
       icon: Users,
       color: "blue",
-      change: stats.change,
+      change: Number.isFinite(parseFloat(stats.change)) ? stats.change : null,
     },
     {
       title: "Pending",
-      value: stats.pending,
+      value: toFiniteNumber(stats.pending),
       icon: Clock,
       color: "yellow",
     },
     {
       title: "Approved",
-      value: stats.approved,
+      value: toFiniteNumber(stats.approved),
       icon: CheckCircle2,
       color: "green",
     },
     {
       title: "Verified",
-      value: stats.verified,
+      value: toFiniteNumber(stats.verified),
       icon: ShieldCheck,
       color: "purple",
     },
     {
       title: "Not Verified",
-      value: stats.not_verified,
+      value: toFiniteNumber(stats.not_verified),
       icon: ShieldX,
       color: "orange",
     },
     {
       title: "Rejected",
-      value: stats.rejected,
+      value: toFiniteNumber(stats.rejected),
       icon: XCircle,
       color: "red",
     },

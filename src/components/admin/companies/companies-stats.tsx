@@ -1,66 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Building2,
   Users,
-  FileCheck,
   Clock,
-  TrendingUp,
-  AlertCircle,
+  ShieldX,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-interface Stat {
-  title: string;
-  value: string | number;
-  change: string;
-  changeType: "positive" | "negative" | "neutral";
-  icon: React.ElementType;
-  color: string;
-  subtitle?: string;
-}
-
-const stats: Stat[] = [
-  {
-    title: "Total Companies",
-    value: "156",
-    change: "+12",
-    changeType: "positive",
-    icon: Building2,
-    color: "blue",
-    subtitle: "Active corporate clients",
-  },
-  {
-    title: "Total Employees",
-    value: "2,345",
-    change: "+234",
-    changeType: "positive",
-    icon: Users,
-    color: "green",
-    subtitle: "Across all companies",
-  },
-  {
-    title: "Pending Approvals",
-    value: "23",
-    change: "-5",
-    changeType: "positive",
-    icon: Clock,
-    color: "yellow",
-    subtitle: "Awaiting verification",
-  },
-  {
-    title: "This Month",
-    value: "18",
-    change: "+23%",
-    changeType: "positive",
-    icon: TrendingUp,
-    color: "indigo",
-    subtitle: "New registrations",
-  }
-];
+import { cn, toFiniteNumber } from "@/lib/utils";
+import { useCompanies } from "@/hooks/queries/useCompanies";
+import { useRegistrationStatusSummary } from "@/hooks/queries/useAnalytics";
 
 const colorClasses = {
   blue: { bg: "bg-blue-50", text: "text-blue-600", iconBg: "bg-blue-100" },
@@ -84,12 +34,10 @@ const colorClasses = {
 };
 
 export function CompaniesStats() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  // Single fetch; counts are computed from the returned records so we
+  // don't depend on pagination meta that the API may not provide.
+  const { data, isLoading } = useCompanies({ per_page: 100, page: 1 });
+  const { data: summary } = useRegistrationStatusSummary();
 
   if (isLoading) {
     return (
@@ -110,13 +58,66 @@ export function CompaniesStats() {
     );
   }
 
+  const companies: Array<{ status?: string }> = data?.data || [];
+
+  // Prefer server-side total when the API paginates; otherwise count records
+  const totalCompanies = toFiniteNumber(
+    data?.pagination?.total ?? companies.length,
+  );
+  const activeCompanies = companies.filter(
+    (c) => c?.status === "active",
+  ).length;
+  const pendingCompanies = companies.filter(
+    (c) => c?.status === "pending" || c?.status === "pending_approval",
+  ).length;
+  const suspendedCompanies = companies.filter(
+    (c) => c?.status === "suspended",
+  ).length;
+  const totalEmployees = toFiniteNumber(
+    summary?.employee_registrations?.total,
+  );
+
+  const stats = [
+    {
+      title: "Total Companies",
+      value: totalCompanies,
+      icon: Building2,
+      color: "blue" as const,
+      subtitle: "Registered corporate clients",
+    },
+    {
+      title: "Active Companies",
+      value: activeCompanies,
+      icon: Users,
+      color: "green" as const,
+      subtitle: "Currently active",
+    },
+    {
+      title: "Pending Approval",
+      value: pendingCompanies,
+      icon: Clock,
+      color: "yellow" as const,
+      subtitle: "Awaiting activation",
+    },
+    {
+      title: "Suspended",
+      value: suspendedCompanies,
+      icon: ShieldX,
+      color: "red" as const,
+      subtitle: `${totalEmployees.toLocaleString()} employees enrolled`,
+    },
+  ];
+
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {stats.map((stat) => {
-        const colors = colorClasses[stat.color as keyof typeof colorClasses];
+        const colors = colorClasses[stat.color];
 
         return (
-          <Card key={stat.title} className={cn("hover:shadow-lg transition-shadow", colors.bg)}>
+          <Card
+            key={stat.title}
+            className={cn("transition-shadow hover:shadow-lift")}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.title}
@@ -126,18 +127,10 @@ export function CompaniesStats() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-2xl font-bold">
+                {stat.value.toLocaleString()}
+              </div>
               <div className="flex items-center gap-2 mt-1">
-                <span
-                  className={cn(
-                    "text-xs font-medium",
-                    stat.changeType === "positive" && "text-green-600",
-                    stat.changeType === "negative" && "text-red-600",
-                  )}
-                >
-                  {stat.changeType === "positive" && "+"}
-                  {stat.change}
-                </span>
                 <span className="text-xs text-muted-foreground">
                   {stat.subtitle}
                 </span>

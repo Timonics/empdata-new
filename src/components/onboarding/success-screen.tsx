@@ -29,13 +29,6 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
       origin: { y: 0.6 },
       colors: ["#3b82f6", "#10b981", "#8b5cf6", "#f59e0b"],
     });
-
-    // Auto redirect after 5 seconds
-    const timer = setTimeout(() => {
-      router.push("/");
-    }, 5000);
-
-    return () => clearTimeout(timer);
   }, [router]);
 
   const getIcon = () => {
@@ -52,7 +45,7 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
       case "corporate":
         return "Company Registration Submitted!";
       default:
-        return "Individual Registration Submitted!";
+        return "Individual/Retail Registration Submitted!";
     }
   };
 
@@ -107,7 +100,7 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="text-3xl font-bold text-gray-900 mb-4"
+          className="text-3xl font-bold text-foreground mb-4"
         >
           {getTitle()}
         </motion.h2>
@@ -116,7 +109,7 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-gray-600 mb-8"
+          className="text-muted-foreground mb-8"
         >
           {getMessage()}
         </motion.p>
@@ -126,13 +119,13 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-linear-to-r from-blue-600 to-emerald-600 text-white rounded-2xl p-6 mb-8"
+          className="bg-navy-900 text-white rounded-2xl p-6 mb-8"
         >
           <div className="w-16 h-16 rounded-full bg-white/20 mx-auto mb-4 flex items-center justify-center">
             <Icon className="w-8 h-8" />
           </div>
           <p className="text-lg font-semibold mb-2">
-            {accountType === "individual" && "Individual Account"}
+            {accountType === "individual" && "Individual/Retail Account"}
             {accountType === "corporate" && "Corporate Account"}
           </p>
           <p className="text-sm text-white/80">
@@ -145,9 +138,9 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="bg-gray-50 rounded-xl p-6 mb-8"
+          className="bg-muted/60 rounded-xl p-6 mb-8"
         >
-          <h3 className="font-semibold text-gray-900 mb-4">What's Next?</h3>
+          <h3 className="font-semibold text-foreground mb-4">What's Next?</h3>
           <div className="space-y-4">
             {getNextSteps().map((step, index) => (
               <div key={index} className="flex items-start gap-3">
@@ -156,7 +149,7 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
                     {index + 1}
                   </span>
                 </div>
-                <p className="text-sm text-gray-600 text-left">{step}</p>
+                <p className="text-sm text-muted-foreground text-left">{step}</p>
               </div>
             ))}
           </div>
@@ -167,7 +160,7 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="flex items-center justify-center gap-2 text-sm text-gray-500 mb-8"
+          className="flex items-center justify-center gap-2 text-sm text-muted-foreground mb-8"
         >
           <Mail className="w-4 h-4" />
           <span>Check your email for confirmation</span>
@@ -179,15 +172,11 @@ export function SuccessScreen({ accountType }: SuccessScreenProps) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.8 }}
           onClick={() => router.push("/")}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl hover:bg-gray-800 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-navy-900 text-white rounded-xl hover:bg-navy-800 transition-colors"
         >
           Go to Home
           <ArrowRight className="w-4 h-4" />
         </motion.button>
-
-        <p className="text-xs text-gray-400 mt-4">
-          You will be redirected automatically in 5 seconds
-        </p>
       </div>
     </motion.div>
   );

@@ -8,8 +8,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { NinVerificationStep } from "./nin-verification-step";
 import { CacVerificationStep } from "./cac-verification-step";
+import { VerifyIdentityButton } from "./verify-identity-button";
 import type { AccountType } from "@/types/onboarding.types";
 
 interface IdentityInfoStepProps {
@@ -42,37 +42,6 @@ export function IdentityInfoStep({
       ...prev,
       [field]: value,
     }));
-  };
-
-  const handleNinVerificationComplete = (status: "verified" | "pending_admin", data?: any) => {
-    if (status === "verified") {
-      handleChange("nin_verified", true);
-      handleChange("nin_verification_status", "verified");
-      if (data) {
-        handleChange("nin_verification_data", data);
-        // Auto-fill personal info if empty
-        if (!onBoardingData?.first_name && data.first_name) {
-          handleChange("first_name", data.first_name);
-        }
-        if (!onBoardingData?.last_name && data.last_name) {
-          handleChange("last_name", data.last_name);
-        }
-        if (!onBoardingData?.date_of_birth && data.date_of_birth) {
-          handleChange("date_of_birth", data.date_of_birth);
-        }
-      }
-    } else if (status === "pending_admin") {
-      handleChange("nin_verified", false);
-      handleChange("nin_verification_status", "pending_admin");
-      if (data) {
-        handleChange("nin_verification_data", data);
-      }
-    } else {
-      // Reset verification
-      handleChange("nin_verified", false);
-      handleChange("nin_verification_status", null);
-      handleChange("nin_verification_data", null);
-    }
   };
 
   const handleCacVerificationComplete = (status: "verified" | "pending_admin", data?: any) => {
@@ -116,12 +85,12 @@ export function IdentityInfoStep({
   return (
     <div className={cn("space-y-8", openIdentityType && "h-125")}>
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-foreground mb-2">
           {isCorporate
             ? "Director's Identity Information"
             : "Identity Information"}
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Provide your identification details for verification purposes
         </p>
       </div>
@@ -130,12 +99,12 @@ export function IdentityInfoStep({
         {/* Identity Card Type */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground/80">
               Identity Card Type <span className="text-red-500">*</span>
             </label>
             <Tooltip>
               <TooltipTrigger>
-                <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                <HelpCircle className="w-4 h-4 text-muted-foreground/70 cursor-help" />
               </TooltipTrigger>
               <TooltipContent>
                 Select the ID type you want to use for verification
@@ -143,13 +112,13 @@ export function IdentityInfoStep({
             </Tooltip>
           </div>
           <div className="relative">
-            <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+            <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 z-10" />
             <button
               onClick={() => setOpenIdentityType(!openIdentityType)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors"
+              className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors"
             >
               <span
-                className={selectedType ? "text-gray-900" : "text-gray-400"}
+                className={selectedType ? "text-foreground" : "text-muted-foreground/70"}
               >
                 {selectedType
                   ? selectedType.label
@@ -157,21 +126,21 @@ export function IdentityInfoStep({
               </span>
               <ChevronDown
                 className={cn(
-                  "w-4 h-4 text-gray-400",
+                  "w-4 h-4 text-muted-foreground/70",
                   openIdentityType && "rotate-180",
                 )}
               />
             </button>
 
             {openIdentityType && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-                <div className="p-3 border-b border-gray-200">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+                <div className="p-3 border-b border-border">
                   <input
                     type="text"
                     placeholder="Search identity types..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     autoFocus
                   />
                 </div>
@@ -184,11 +153,11 @@ export function IdentityInfoStep({
                         setOpenIdentityType(false);
                         setSearchQuery("");
                       }}
-                      className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-3"
+                      className="w-full px-4 py-3 text-left hover:bg-muted/60 transition-colors flex items-center gap-3"
                     >
                       <span className="text-xl">{type.icon}</span>
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-foreground">
                           {type.label}
                         </p>
                       </div>
@@ -200,45 +169,119 @@ export function IdentityInfoStep({
           </div>
         </div>
 
-        {/* NIN Verification Step */}
+        {/* NIN Field */}
         {isNinSelected && (
           <div className="space-y-2">
-            <NinVerificationStep
-              value={onBoardingData?.national_identification_number || 
-                     onBoardingData?.director_national_identification_number || ""}
-              onChange={(value) => {
-                if (isCorporate) {
-                  handleChange("director_national_identification_number", value);
-                } else {
-                  handleChange("national_identification_number", value);
+            <label className="text-sm font-medium text-foreground/80">
+              {isCorporate
+                ? "Director's NIN (National Identification Number)"
+                : "NIN (National Identification Number)"}{" "}
+              <span className="text-red-500">*</span>
+            </label>
+            <div className="flex gap-3 items-start">
+              <div className="relative flex-1">
+                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
+                <input
+                  type="text"
+                  maxLength={11}
+                  value={
+                    isCorporate
+                      ? onBoardingData?.director_national_identification_number || ""
+                      : onBoardingData?.national_identification_number || ""
+                  }
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    handleChange(
+                      isCorporate
+                        ? "director_national_identification_number"
+                        : "national_identification_number",
+                      value,
+                    );
+                  }}
+                  placeholder="Enter 11-digit NIN"
+                  className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <VerifyIdentityButton
+                type="nin"
+                value={
+                  isCorporate
+                    ? onBoardingData?.director_national_identification_number || ""
+                    : onBoardingData?.national_identification_number || ""
                 }
-              }}
-              onVerificationComplete={handleNinVerificationComplete}
-              userData={{
-                first_name: isCorporate ? onBoardingData?.director_name?.split(" ")[0] : onBoardingData?.first_name,
-                last_name: isCorporate ? onBoardingData?.director_name?.split(" ")[1] : onBoardingData?.last_name,
-                date_of_birth: onBoardingData?.date_of_birth,
-                gender: onBoardingData?.gender,
-              }}
-              verificationStatus={onBoardingData?.nin_verification_status}
-              verificationData={onBoardingData?.nin_verification_data}
-              label={
-                isCorporate
-                  ? "Director's NIN (National Identification Number)"
-                  : "NIN (National Identification Number)"
-              }
-            />
+                onVerified={(data) => {
+                  if (!isCorporate) {
+                    if (!onBoardingData?.first_name && data.first_name) {
+                      handleChange("first_name", data.first_name);
+                    }
+                    if (!onBoardingData?.last_name && data.last_name) {
+                      handleChange("last_name", data.last_name);
+                    }
+                    if (!onBoardingData?.date_of_birth && data.date_of_birth) {
+                      handleChange("date_of_birth", data.date_of_birth);
+                    }
+                    if (!onBoardingData?.gender && data.gender) {
+                      handleChange("gender", data.gender);
+                    }
+                  }
+                  handleChange(
+                    isCorporate ? "director_nin_verified" : "nin_verified",
+                    true,
+                  );
+                }}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Your NIN is encrypted before verification and only ever stored in
+              encrypted form.
+            </p>
+          </div>
+        )}
+
+        {/* Director's BVN - Corporate only */}
+        {isCorporate && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground/80">
+              Director's BVN (Bank Verification Number){" "}
+              <span className="text-red-500">*</span>
+            </label>
+            <div className="flex gap-3 items-start">
+              <div className="relative flex-1">
+                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
+                <input
+                  type="text"
+                  maxLength={11}
+                  value={onBoardingData?.director_bvn_number || ""}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    handleChange("director_bvn_number", value);
+                  }}
+                  placeholder="Enter 11-digit BVN"
+                  className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <VerifyIdentityButton
+                type="bvn"
+                value={onBoardingData?.director_bvn_number || ""}
+                onVerified={() =>
+                  handleChange("director_bvn_verified", true)
+                }
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The BVN will be encrypted before transmission
+            </p>
           </div>
         )}
 
         {/* Other ID Number Field */}
         {selectedType && !isNinSelected && (
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground/80">
               ID Number <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
               <input
                 type="text"
                 value={onBoardingData?.identity_card_number || ""}
@@ -246,7 +289,7 @@ export function IdentityInfoStep({
                   handleChange("identity_card_number", e.target.value)
                 }
                 placeholder={`Enter your ${selectedType?.label || "ID"} number`}
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -255,7 +298,7 @@ export function IdentityInfoStep({
 
       {/* CAC Verification for Corporate */}
       {isCorporate && (
-        <div className="border-t border-gray-200 pt-6 mt-4">
+        <div className="border-t border-border pt-6 mt-4">
           <CacVerificationStep
             rcNumber={onBoardingData?.rc_number || ""}
             // companyName={onBoardingData?.company_name || ""}

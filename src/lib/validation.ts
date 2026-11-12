@@ -66,15 +66,6 @@ export function validateOnboardingData(
         console.log("Invalid NIN format - must be 11 digits");
         return false;
       }
-      // Allow if verified OR pending admin review
-      const isVerificationValid =
-        data.nin_verification_status === "verified" ||
-        data.nin_verification_status === "pending_admin";
-
-      if (!isVerificationValid) {
-        console.log("NIN verification required - please verify or skip");
-        return false;
-      }
     } else {
       if (!data.identity_card_number) {
         console.log("Missing identity card number");
@@ -129,15 +120,13 @@ export function validateOnboardingData(
         console.log("Invalid director NIN format - must be 11 digits");
         return false;
       }
-      // Allow if verified OR pending admin review
-      const isVerificationValid =
-        data.nin_verification_status === "verified" ||
-        data.nin_verification_status === "pending_admin";
-
-      if (!isVerificationValid) {
-        console.log(
-          "Director NIN verification required - please verify or skip",
-        );
+      // Director's BVN is required alongside the NIN
+      if (!data.director_bvn_number) {
+        console.log("Missing director BVN");
+        return false;
+      }
+      if (!/^\d{11}$/.test(data.director_bvn_number)) {
+        console.log("Invalid director BVN format - must be 11 digits");
         return false;
       }
     } else {
@@ -206,16 +195,6 @@ export function validateOnboardingData(
       }
       if (!/^\d{11}$/.test(data.national_identification_number)) {
         console.log("Invalid employee NIN format - must be 11 digits");
-        return false;
-      }
-      const isVerificationValid =
-        data.nin_verification_status === "verified" ||
-        data.nin_verification_status === "pending_admin";
-
-      if (!isVerificationValid) {
-        console.log(
-          "Employee NIN verification required - please verify or skip",
-        );
         return false;
       }
     } else {

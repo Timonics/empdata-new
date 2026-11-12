@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useCompanies } from "@/hooks/queries/useCompanies";
 
 const policySchema = z.object({
   company_id: z.number().min(1),
@@ -44,6 +45,10 @@ export function PolicyForm({ defaultValues, onSubmit, isSubmitting }: any) {
     defaultValues,
   });
 
+  // Real company list for the dropdown
+  const { data: companiesData } = useCompanies({ per_page: 100 });
+  const companies = companiesData?.data || [];
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -54,10 +59,11 @@ export function PolicyForm({ defaultValues, onSubmit, isSubmitting }: any) {
               <SelectValue placeholder="Select company" />
             </SelectTrigger>
             <SelectContent>
-              {/* TODO: Replace with real company list */}
-              <SelectItem value="1">Acme Corp</SelectItem>
-              <SelectItem value="2">TechCorp</SelectItem>
-              <SelectItem value="3">FinServe</SelectItem>
+              {companies.map((company: any) => (
+                <SelectItem key={company.id} value={String(company.id)}>
+                  {company.company_name || company.name}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

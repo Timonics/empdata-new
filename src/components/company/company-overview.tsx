@@ -72,7 +72,7 @@ export function CompanyOverview() {
       <CardContent className="space-y-6">
         {/* Company Header */}
         <div className="flex items-start gap-4">
-          <div className="h-16 w-16 rounded-lg bg-linear-to-br from-blue-600 to-blue-800 flex items-center justify-center text-white text-xl font-bold">
+          <div className="h-16 w-16 rounded-lg bg-navy-900 flex items-center justify-center text-white text-xl font-bold">
             {data.name
               .split(" ")
               .map((n) => n[0])
@@ -114,14 +114,14 @@ export function CompanyOverview() {
           <div className="bg-blue-50 p-3 rounded-lg text-center">
             <Building2 className="h-5 w-5 text-blue-600 mx-auto mb-1" />
             <p className="text-2xl font-bold">{data.employee_stats.total}</p>
-            <p className="text-xs text-gray-600">Total Employees</p>
+            <p className="text-xs text-muted-foreground">Total Employees</p>
           </div>
           <div className="bg-green-50 p-3 rounded-lg text-center">
             <Shield className="h-5 w-5 text-green-600 mx-auto mb-1" />
             <p className="text-2xl font-bold">
               {data.employee_stats.nin_verified}
             </p>
-            <p className="text-xs text-gray-600">Verified</p>
+            <p className="text-xs text-muted-foreground">Verified</p>
           </div>
         </div>
 
@@ -135,7 +135,7 @@ export function CompanyOverview() {
         </div> */}
 
         {/* Insurance Info */}
-        <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="bg-muted/60 p-4 rounded-lg">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium">Insurance Plan</span>
             <Badge
@@ -152,10 +152,10 @@ export function CompanyOverview() {
         </div>
 
         {/* Admin Info */}
-        <div className="bg-gray-50 p-3 rounded-lg">
+        <div className="bg-muted/60 p-3 rounded-lg">
           <p className="text-xs text-muted-foreground">Admin Contact</p>
           <p className="text-sm font-medium mt-1">{data.admins[0].name}</p>
-          <p className="text-xs text-gray-600">{data.admins[0].email}</p>
+          <p className="text-xs text-muted-foreground">{data.admins[0].email}</p>
         </div>
 
         {/* Action Buttons */}

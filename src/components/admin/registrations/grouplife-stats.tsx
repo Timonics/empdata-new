@@ -12,11 +12,15 @@ import {
   ShieldCheck,
   ShieldX,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useRegistrationStatusSummary } from "@/hooks/queries/useAnalytics";
+import { cn, toFiniteNumber, monthOverMonthChange } from "@/lib/utils";
+import {
+  useRegistrationStatusSummary,
+  useMonthlyCompanyRegistrations,
+} from "@/hooks/queries/useAnalytics";
 
 export function GroupLifeStats() {
   const { data, isLoading, error } = useRegistrationStatusSummary();
+  const { data: monthlyCompanies } = useMonthlyCompanyRegistrations();
 
   if (isLoading) {
     return (
@@ -55,18 +59,19 @@ export function GroupLifeStats() {
 
   // Safely extract company registration data with optional chaining
   const companyData = data?.company_registrations;
-  const total = companyData?.total ?? 0;
-  const pending = companyData?.by_status?.pending_approval ?? 0;
-  const approved = companyData?.by_status?.approved ?? 0;
-  const rejected = companyData?.by_status?.rejected ?? 0;
-  const verified = companyData?.by_verification_status?.verified ?? 0;
-  const notVerified = companyData?.by_verification_status?.not_verified ?? 0;
+  const total = toFiniteNumber(companyData?.total);
+  const pending = toFiniteNumber(companyData?.by_status?.pending_approval);
+  const approved = toFiniteNumber(companyData?.by_status?.approved);
+  const rejected = toFiniteNumber(companyData?.by_status?.rejected);
+  const verified = toFiniteNumber(
+    companyData?.by_verification_status?.verified,
+  );
+  const notVerified = toFiniteNumber(
+    companyData?.by_verification_status?.not_verified,
+  );
 
-  // Calculate change safely
-  const employeeTotal = data?.employee_registrations?.total ?? 0;
-  const changeValue = total - employeeTotal;
-  const change = (changeValue / 100).toFixed(1);
-  const changePrefix = Number(change) >= 0 ? "+" : "";
+  // Real month-over-month change from monthly registrations
+  const changeValue = monthOverMonthChange(monthlyCompanies?.data);
 
   const statCards = [
     {
@@ -74,7 +79,10 @@ export function GroupLifeStats() {
       value: total,
       icon: Building2,
       color: "blue",
-      change: total > 0 ? `${changePrefix}${change}%` : "0%",
+      change:
+        changeValue !== null
+          ? `${changeValue >= 0 ? "+" : ""}${changeValue.toFixed(1)}%`
+          : undefined,
     },
     {
       title: "Pending Approval",
@@ -139,7 +147,7 @@ export function GroupLifeStats() {
         const colors = colorClasses[stat.color as keyof typeof colorClasses];
 
         return (
-          <Card key={stat.title} className={cn("hover:shadow-lg transition-shadow", colors.bg)}>
+          <Card key={stat.title} className={cn("transition-shadow hover:shadow-lift")}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium text-muted-foreground">
                 {stat.title}

@@ -13,6 +13,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Loader2 } from "lucide-react";
 import { useMonthlyCompanyRegistrations } from "@/hooks/queries/useAnalytics";
+import { toFiniteNumber } from "@/lib/utils";
 
 export function CompanyGrowth() {
   const { data, isLoading, error } = useMonthlyCompanyRegistrations();
@@ -64,27 +65,35 @@ export function CompanyGrowth() {
   }
 
   // Transform data for the chart
-  const chartData = data.data.map((item) => ({
+  const chartData = (data?.data || []).map((item) => ({
     month: item.month,
     new: item.total, // Total new registrations for the month
-    total: item.total, // You might want cumulative total here
-    approved: item.by_status.approved,
-    pending: item.by_status.pending_approval,
-    rejected: item.by_status.rejected,
+    total: item.total,
+    approved: item.by_status?.approved ?? 0,
+    pending: item.by_status?.pending_approval ?? 0,
+    rejected: item.by_status?.rejected ?? 0,
   }));
 
-  // Calculate total companies (last month's total)
-  const lastMonth = chartData[chartData.length - 1];
-  const totalCompanies = lastMonth?.total || 0;
+  // Use the last month that actually has registrations — the calendar
+  // last month is usually empty and produced 0 totals and NaN rates
+  const monthsWithData = chartData.filter((m) => toFiniteNumber(m.total) > 0);
+  const lastMonth = monthsWithData[monthsWithData.length - 1] ?? null;
+  const previousMonth = monthsWithData[monthsWithData.length - 2] ?? null;
+  const totalCompanies = chartData.reduce(
+    (sum, m) => sum + toFiniteNumber(m.total),
+    0,
+  );
 
-  // Calculate growth rate
-  const previousMonth = chartData[chartData.length - 2];
-  const growthRate = previousMonth
-    ? (
-        ((lastMonth.total - previousMonth.total) / previousMonth.total) *
-        100
-      ).toFixed(1)
-    : 0;
+  // Growth rate vs the previous month that had registrations;
+  // null (rendered as —) when there is no prior month to compare
+  const growthRate =
+    lastMonth && previousMonth && toFiniteNumber(previousMonth.total) > 0
+      ? (
+          ((toFiniteNumber(lastMonth.total) - toFiniteNumber(previousMonth.total)) /
+            toFiniteNumber(previousMonth.total)) *
+          100
+        ).toFixed(1)
+      : null;
 
   return (
     <Card>
@@ -173,8 +182,7 @@ export function CompanyGrowth() {
             <p
               className={`text-2xl font-bold ${Number(growthRate) >= 0 ? "text-green-600" : "text-red-600"}`}
             >
-              {Number(growthRate) >= 0 ? "+" : ""}
-              {growthRate}%
+              {growthRate !== null ? `${Number(growthRate) >= 0 ? "+" : ""}${growthRate}%` : "—"}
             </p>
           </div>
         </div>

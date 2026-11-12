@@ -48,7 +48,7 @@ const actions = [
   {
     label: 'Company Settings',
     icon: Settings,
-    color: 'bg-gray-100 text-gray-600',
+    color: 'bg-muted text-muted-foreground',
     href: '/portal/company/settings',
   },
   {

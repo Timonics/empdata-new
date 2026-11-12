@@ -50,7 +50,7 @@ export function DeleteCompanyModal({ company, open, onOpenChange, onSuccess }: D
             <p className="text-sm text-red-600 bg-red-50 p-3 rounded">
               This action cannot be undone. This will permanently delete:
             </p>
-            <ul className="list-disc list-inside text-sm text-gray-600">
+            <ul className="list-disc list-inside text-sm text-muted-foreground">
               <li>The company profile and all associated data</li>
               <li>All employee records under this company</li>
               <li>All insurance policies and claims</li>

@@ -64,12 +64,7 @@ const validateIdentityInfo = (data: any) => {
     // Check if NIN format is valid (11 digits)
     if (!/^\d{11}$/.test(data.national_identification_number)) return false;
     
-    // CRITICAL: Check if verification has been attempted (either verified OR pending_admin)
-    const hasVerificationAttempt = 
-      data?.nin_verification_status === "verified" || 
-      data?.nin_verification_status === "pending_admin";
-    
-    return hasVerificationAttempt;
+    return true;
   } else {
     return !!data?.identity_card_number;
   }
@@ -113,12 +108,11 @@ const validateDirectorIdentity = (data: any) => {
     // Check if NIN format is valid (11 digits)
     if (!/^\d{11}$/.test(data.director_national_identification_number)) return false;
     
-    // CRITICAL: Check if verification has been attempted (either verified OR pending_admin)
-    const hasVerificationAttempt = 
-      data?.nin_verification_status === "verified" || 
-      data?.nin_verification_status === "pending_admin";
-    
-    return hasVerificationAttempt;
+    // Director's BVN is required alongside the NIN
+    if (!data?.director_bvn_number) return false;
+    if (!/^\d{11}$/.test(data.director_bvn_number)) return false;
+
+    return true;
   } else {
     return !!data?.identity_card_number;
   }
@@ -221,7 +215,7 @@ export function InformationPage({
     if (isValid) {
       return <CheckCircle className="w-5 h-5 text-green-500" />;
     }
-    return <AlertCircle className="w-5 h-5 text-gray-300" />;
+    return <AlertCircle className="w-5 h-5 text-muted-foreground/50" />;
   };
 
   const getHeaderText = () => {
@@ -239,25 +233,25 @@ export function InformationPage({
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold text-foreground mb-2">
           {getHeaderText()}
         </h2>
-        <p className="text-sm text-gray-500">{getHeaderDescription()}</p>
+        <p className="text-sm text-muted-foreground">{getHeaderDescription()}</p>
       </div>
 
       {isCorporate ? (
         <>
-          <motion.div layout className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
-            <button onClick={() => toggleSection("company")} className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+          <motion.div layout className="border border-border rounded-xl overflow-hidden bg-card shadow-sm">
+            <button onClick={() => toggleSection("company")} className="w-full px-6 py-4 flex items-center justify-between hover:bg-muted/60 transition-colors">
               <div className="flex items-center gap-3">
                 <SectionStatus isValid={validation.company} />
-                <h3 className="text-lg font-semibold text-gray-900">Company Information</h3>
+                <h3 className="text-lg font-semibold text-foreground">Company Information</h3>
                 {validation.company && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Completed</span>}
               </div>
-              {expandedSections.company ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
+              {expandedSections.company ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
             </button>
             {expandedSections.company && (
-              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} transition={{ duration: 0.2 }} className="border-t border-gray-200">
+              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} transition={{ duration: 0.2 }} className="border-t border-border">
                 <div className="p-6">
                   <CompanyInfoStep onBoardingData={onBoardingData} setOnBoardingData={setOnBoardingData} />
                 </div>
@@ -265,17 +259,17 @@ export function InformationPage({
             )}
           </motion.div>
 
-          <motion.div layout className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
-            <button onClick={() => toggleSection("directorIdentity")} className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+          <motion.div layout className="border border-border rounded-xl overflow-hidden bg-card shadow-sm">
+            <button onClick={() => toggleSection("directorIdentity")} className="w-full px-6 py-4 flex items-center justify-between hover:bg-muted/60 transition-colors">
               <div className="flex items-center gap-3">
                 <SectionStatus isValid={validation.directorIdentity} />
-                <h3 className="text-lg font-semibold text-gray-900">Director's Identity</h3>
+                <h3 className="text-lg font-semibold text-foreground">Director's Identity</h3>
                 {validation.directorIdentity && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Completed</span>}
               </div>
-              {expandedSections.directorIdentity ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
+              {expandedSections.directorIdentity ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
             </button>
             {expandedSections.directorIdentity && (
-              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} transition={{ duration: 0.2 }} className="border-t border-gray-200">
+              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} transition={{ duration: 0.2 }} className="border-t border-border">
                 <div className="p-6">
                   <IdentityInfoStep accountType={accountType} onBoardingData={onBoardingData} setOnBoardingData={setOnBoardingData} />
                 </div>
@@ -285,17 +279,17 @@ export function InformationPage({
         </>
       ) : (
         <>
-          <motion.div layout className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
-            <button onClick={() => toggleSection("personal")} className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+          <motion.div layout className="border border-border rounded-xl overflow-hidden bg-card shadow-sm">
+            <button onClick={() => toggleSection("personal")} className="w-full px-6 py-4 flex items-center justify-between hover:bg-muted/60 transition-colors">
               <div className="flex items-center gap-3">
                 <SectionStatus isValid={validation.personal} />
-                <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
+                <h3 className="text-lg font-semibold text-foreground">Personal Information</h3>
                 {validation.personal && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Completed</span>}
               </div>
-              {expandedSections.personal ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
+              {expandedSections.personal ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
             </button>
             {expandedSections.personal && (
-              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} transition={{ duration: 0.2 }} className="border-t border-gray-200">
+              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} transition={{ duration: 0.2 }} className="border-t border-border">
                 <div className="p-6">
                   <PersonalInfoSection accountType={accountType} onBoardingData={onBoardingData} setOnBoardingData={setOnBoardingData} />
                 </div>
@@ -304,17 +298,17 @@ export function InformationPage({
           </motion.div>
 
           {isIndividual && (
-            <motion.div layout className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
-              <button onClick={() => toggleSection("bank")} className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+            <motion.div layout className="border border-border rounded-xl overflow-hidden bg-card shadow-sm">
+              <button onClick={() => toggleSection("bank")} className="w-full px-6 py-4 flex items-center justify-between hover:bg-muted/60 transition-colors">
                 <div className="flex items-center gap-3">
                   <SectionStatus isValid={validation.bank} />
-                  <h3 className="text-lg font-semibold text-gray-900">Bank Information</h3>
+                  <h3 className="text-lg font-semibold text-foreground">Bank Information</h3>
                   {validation.bank && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Completed</span>}
                 </div>
-                {expandedSections.bank ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
+                {expandedSections.bank ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
               </button>
               {expandedSections.bank && (
-                <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} transition={{ duration: 0.2 }} className="border-t border-gray-200">
+                <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} transition={{ duration: 0.2 }} className="border-t border-border">
                   <div className="p-6">
                     <BankInfoStep accountType={accountType} onBoardingData={onBoardingData} setOnBoardingData={setOnBoardingData} />
                   </div>
@@ -323,17 +317,17 @@ export function InformationPage({
             </motion.div>
           )}
 
-          <motion.div layout className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
-            <button onClick={() => toggleSection("identity")} className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors">
+          <motion.div layout className="border border-border rounded-xl overflow-hidden bg-card shadow-sm">
+            <button onClick={() => toggleSection("identity")} className="w-full px-6 py-4 flex items-center justify-between hover:bg-muted/60 transition-colors">
               <div className="flex items-center gap-3">
                 <SectionStatus isValid={validation.identity} />
-                <h3 className="text-lg font-semibold text-gray-900">Identity Information</h3>
+                <h3 className="text-lg font-semibold text-foreground">Identity Information</h3>
                 {validation.identity && <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Completed</span>}
               </div>
-              {expandedSections.identity ? <ChevronUp className="w-5 h-5 text-gray-500" /> : <ChevronDown className="w-5 h-5 text-gray-500" />}
+              {expandedSections.identity ? <ChevronUp className="w-5 h-5 text-muted-foreground" /> : <ChevronDown className="w-5 h-5 text-muted-foreground" />}
             </button>
             {expandedSections.identity && (
-              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} transition={{ duration: 0.2 }} className="border-t border-gray-200">
+              <motion.div initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} transition={{ duration: 0.2 }} className="border-t border-border">
                 <div className="p-6">
                   <IdentityInfoStep accountType={accountType} onBoardingData={onBoardingData} setOnBoardingData={setOnBoardingData} />
                 </div>
@@ -343,7 +337,7 @@ export function InformationPage({
         </>
       )}
 
-      <div className="bg-gray-50 p-4 rounded-lg">
+      <div className="bg-muted/60 p-4 rounded-lg">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {allValid ? <CheckCircle className="w-5 h-5 text-green-500" /> : <AlertCircle className="w-5 h-5 text-yellow-500" />}
@@ -356,8 +350,8 @@ export function InformationPage({
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-        <button onClick={onBack} className="px-8 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition-colors">
+      <div className="flex items-center justify-between pt-6 border-t border-border">
+        <button onClick={onBack} className="px-8 py-3 rounded-xl font-medium text-muted-foreground hover:bg-muted transition-colors">
           Back
         </button>
         <button
@@ -367,12 +361,12 @@ export function InformationPage({
             "px-8 py-3 rounded-xl font-medium transition-all flex items-center gap-2",
             allValid
               ? "bg-gradient-to-r from-blue-600 to-emerald-600 text-white hover:shadow-lg hover:scale-105"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed",
+              : "bg-muted text-muted-foreground/70 cursor-not-allowed",
           )}
         >
           Continue
           {!allValid && (
-            <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full ml-2">
+            <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full ml-2">
               {totalCount - completedCount} missing
             </span>
           )}

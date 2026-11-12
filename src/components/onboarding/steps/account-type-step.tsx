@@ -16,7 +16,7 @@ interface AccountTypeStepProps {
 const accountTypes = [
   {
     id: 'individual' as AccountType,
-    title: 'Individual',
+    title: 'Individual/Retail',
     description: 'For individuals seeking personal insurance coverage',
     icon: User,
     color: 'blue',
@@ -63,8 +63,8 @@ export function AccountTypeStep({
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Choose your account type</h3>
-        <p className="text-sm text-gray-500">
+        <h3 className="text-lg font-medium text-foreground mb-2">Choose your account type</h3>
+        <p className="text-sm text-muted-foreground">
           Select the type of account you want to create. This will determine the information we need from you.
         </p>
       </div>
@@ -84,14 +84,14 @@ export function AccountTypeStep({
                 "relative cursor-pointer rounded-2xl border-2 p-6 transition-all",
                 isSelected
                   ? `border-${type.color}-500 bg-${type.color}-50`
-                  : "border-gray-200 hover:border-gray-300 bg-white"
+                  : "border-border hover:border-muted-foreground/40 bg-card"
               )}
             >
               {isSelected && (
                 <motion.div
                   layoutId="selectedIndicator"
                   className={cn(
-                    "absolute inset-0 rounded-2xl bg-linear-to-br opacity-10",
+                    "absolute inset-0 rounded-2xl bg-linear-to-br from-brand-500 to-emerald-500 opacity-10",
                     type.gradient
                   )}
                   initial={false}
@@ -109,11 +109,11 @@ export function AccountTypeStep({
                   <Icon className={cn("w-8 h-8", `text-${type.color}-600`)} />
                 </div>
                 
-                <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                <h4 className="text-lg font-semibold text-foreground mb-2">
                   {type.title}
                 </h4>
                 
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   {type.description}
                 </p>
 
@@ -136,15 +136,15 @@ export function AccountTypeStep({
         })}
       </div>
 
-      <div className="flex justify-end pt-6 border-t border-gray-200">
+      <div className="flex justify-end pt-6 border-t border-border">
         <button
           onClick={handleContinue}
           disabled={!accountType}
           className={cn(
             "px-8 py-3 rounded-xl font-medium transition-all flex items-center gap-2",
             accountType
-              ? "bg-linear-to-r from-blue-600 to-emerald-600 text-white hover:shadow-lg hover:scale-105"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              ? "bg-primary text-primary-foreground shadow-sm hover:bg-brand-700"
+              : "bg-muted text-muted-foreground/70 cursor-not-allowed"
           )}
         >
           Continue

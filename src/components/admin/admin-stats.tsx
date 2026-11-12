@@ -1,63 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Building2,
   Users,
-  StickyNote,
-  ShieldCheck,
-  TrendingUp,
-  AlertCircle,
-  CheckCircle2,
   Clock,
+  ShieldCheck,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-interface Stat {
-  title: string;
-  value: string | number;
-  change: string;
-  changeType: "positive" | "negative" | "neutral";
-  icon: React.ElementType;
-  color: string;
-}
-
-const stats: Stat[] = [
-  {
-    title: "Total Companies",
-    value: "156",
-    change: "+12.5%",
-    changeType: "positive",
-    icon: Building2,
-    color: "blue",
-  },
-  {
-    title: "Total Employees",
-    value: "2,345",
-    change: "+23.1%",
-    changeType: "positive",
-    icon: Users,
-    color: "green",
-  },
-  {
-    title: "Pending Registrations",
-    value: "28",
-    change: "-4.3%",
-    changeType: "negative",
-    icon: Clock,
-    color: "yellow",
-  },
-  {
-    title: "Verifications Today",
-    value: "142",
-    change: "+8.2%",
-    changeType: "positive",
-    icon: ShieldCheck,
-    color: "purple",
-  },
-];
+import { cn, toFiniteNumber } from "@/lib/utils";
+import { useRegistrationStatusSummary } from "@/hooks/queries/useAnalytics";
 
 const colorClasses = {
   blue: {
@@ -83,13 +35,7 @@ const colorClasses = {
 };
 
 export function AdminStats() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  const { data: summary, isLoading } = useRegistrationStatusSummary();
 
   if (isLoading) {
     return (
@@ -110,18 +56,53 @@ export function AdminStats() {
     );
   }
 
+  const company = summary?.company_registrations;
+  const employee = summary?.employee_registrations;
+
+  const pendingTotal =
+    toFiniteNumber(company?.by_status?.pending_approval) +
+    toFiniteNumber(employee?.by_status?.pending_approval);
+
+  const verifiedTotal =
+    toFiniteNumber(company?.by_verification_status?.verified) +
+    toFiniteNumber(employee?.by_verification_status?.verified);
+
+  const stats = [
+    {
+      title: "Total Companies",
+      value: toFiniteNumber(company?.total),
+      icon: Building2,
+      color: "blue" as const,
+    },
+    {
+      title: "Total Employees",
+      value: toFiniteNumber(employee?.total),
+      icon: Users,
+      color: "green" as const,
+    },
+    {
+      title: "Pending Registrations",
+      value: pendingTotal,
+      icon: Clock,
+      color: "yellow" as const,
+    },
+    {
+      title: "Verified",
+      value: verifiedTotal,
+      icon: ShieldCheck,
+      color: "purple" as const,
+    },
+  ];
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => {
-        const colors = colorClasses[stat.color as keyof typeof colorClasses];
+        const colors = colorClasses[stat.color];
 
         return (
-          <Card
-            key={stat.title}
-            className={cn("hover:shadow-lg transition-shadow", colors.bg)}
-          >
+          <Card key={stat.title} className={cn("transition-shadow hover:shadow-lift")}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
+              <CardTitle className="text-[13px] font-medium text-muted-foreground">
                 {stat.title}
               </CardTitle>
               <div className={cn("rounded-lg p-2", colors.iconBg)}>
@@ -129,25 +110,9 @@ export function AdminStats() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground mt-1">
-                <span
-                  className={cn(
-                    "inline-flex items-center font-medium",
-                    stat.changeType === "positive" && "text-green-600",
-                    stat.changeType === "negative" && "text-red-600",
-                  )}
-                >
-                  {stat.changeType === "positive" && (
-                    <TrendingUp className="mr-1 h-3 w-3" />
-                  )}
-                  {stat.changeType === "negative" && (
-                    <TrendingUp className="mr-1 h-3 w-3 rotate-180" />
-                  )}
-                  {stat.change}
-                </span>{" "}
-                from last month
-              </p>
+              <div className="font-display text-[28px] font-semibold leading-none tracking-tight">
+                {stat.value.toLocaleString()}
+              </div>
             </CardContent>
           </Card>
         );

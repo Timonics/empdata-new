@@ -44,7 +44,7 @@ import { EmploymentStatus } from "@/types/employee.types";
 
 const statusStyles = {
   active: "bg-green-100 text-green-800 border-green-200",
-  inactive: "bg-gray-100 text-gray-800 border-gray-200",
+  inactive: "bg-muted text-foreground border-border",
 };
 
 const ninStatusIcons = {
@@ -260,7 +260,7 @@ export function CompanyEmployeesTable({
           className={cn(
             "font-medium",
             statusStyles[item.employment_status as keyof typeof statusStyles] ||
-              "bg-gray-100",
+              "bg-muted",
           )}
         >
           {item.employment_status}
@@ -398,7 +398,7 @@ export function CompanyEmployeesTable({
       </div>
 
       {/* Data Table */}
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-card">
         <DataTable
           data={employees}
           columns={columns}

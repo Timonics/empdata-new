@@ -10,13 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AuthCard } from "./auth-card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, UserCog, ArrowLeft } from "lucide-react";
 
@@ -48,16 +48,16 @@ export function AdminLoginForm() {
   };
 
   return (
-    <Card className="w-full shadow-lg border-0">
+    <AuthCard>
       <CardHeader className="space-y-1">
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl">
-            <h1 className="text-3xl font-semibold tracking-tight bg-linear-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
               Admin Access
             </h1>
           </CardTitle>
-          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-            <UserCog className="h-5 w-5 text-blue-600" />
+          <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-md shadow-brand-600/25">
+            <UserCog className="size-5" />
           </div>
         </div>
         <CardDescription>
@@ -139,9 +139,9 @@ export function AdminLoginForm() {
         </form>
 
         {/* Admin info */}
-        <div className="bg-blue-50/50 p-3 rounded-lg">
+        <div className="bg-brand-50/50 dark:bg-brand-950/50 p-3 rounded-lg">
           <p className="text-xs text-muted-foreground flex items-center gap-2">
-            <UserCog className="h-8 w-20 text-blue-600" />
+            <UserCog className="h-8 w-20 text-brand-600 dark:text-brand-300" />
             Full platform access: manage companies, employees, registrations,
             and system settings.
           </p>
@@ -158,6 +158,6 @@ export function AdminLoginForm() {
           </Link>
         </div>
       </CardFooter>
-    </Card>
+    </AuthCard>
   );
 }

@@ -49,7 +49,7 @@ export function ResendInvitationDialog({ invitation, open, onOpenChange }: Resen
               Are you sure you want to resend the invitation to{' '}
               <span className="font-semibold">{invitation?.email}</span>?
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               A new invitation email will be sent and the previous link will be invalidated.
             </p>
           </AlertDialogDescription>

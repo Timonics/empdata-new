@@ -85,6 +85,7 @@ export interface EmployeeFilters {
   search?: string;
   employment_status?: EmploymentStatus;
   nin_verified?: boolean;
+  company_id?: number;
 }
 
 export interface SubmitNINData {

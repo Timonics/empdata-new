@@ -167,7 +167,7 @@ export function CompanyEmployeesStats() {
                     "text-xs font-medium",
                     stat.changeType === "positive" && "text-green-600",
                     stat.changeType === "negative" && "text-red-600",
-                    stat.changeType === "neutral" && "text-gray-600",
+                    stat.changeType === "neutral" && "text-muted-foreground",
                   )}
                 >
                   {stat.changeType === "positive" && "+"}

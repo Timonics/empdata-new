@@ -117,7 +117,7 @@ export function CACVerifications() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <ShieldAlert className="h-12 w-12 text-red-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900">Access Denied</h3>
+        <h3 className="text-lg font-semibold text-foreground">Access Denied</h3>
         <p className="text-sm text-muted-foreground mt-1">
           You don't have permission to view CAC verifications.
         </p>
@@ -145,7 +145,7 @@ export function CACVerifications() {
     {
       header: "RC Number",
       cell: (item: any) => (
-        <code className="rounded bg-gray-100 px-2 py-1 text-xs font-mono">
+        <code className="rounded bg-muted px-2 py-1 text-xs font-mono">
           {item.rc_number}
         </code>
       ),
@@ -171,7 +171,7 @@ export function CACVerifications() {
                 item.cac_verification_status as keyof typeof statusStyles
               ] ||
                 statusStyles[item.status as keyof typeof statusStyles] ||
-                "bg-gray-100",
+                "bg-muted",
             )}
           >
             {item.cac_verification_status || item.status || "pending"}
@@ -303,7 +303,7 @@ export function CACVerifications() {
         </Button>
       </div>
 
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-card">
         <DataTable
           data={verifications}
           columns={columns}

@@ -9,6 +9,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { VerifyIdentityButton } from "./verify-identity-button";
 import {
   Tooltip,
   TooltipContent,
@@ -129,10 +130,10 @@ export function BankInfoStep({
     return (
       <div className="space-y-8">
         <div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <h3 className="text-lg font-medium text-foreground mb-2">
             Bank Information (Optional)
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-muted-foreground">
             Provide your bank details for premium payments and claims
           </p>
         </div>
@@ -141,74 +142,81 @@ export function BankInfoStep({
           {/* BVN */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-foreground/80">
                 BVN
               </label>
               <Tooltip>
                 <TooltipTrigger>
-                  <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                  <HelpCircle className="w-4 h-4 text-muted-foreground/70 cursor-help" />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>Bank Verification Number (11 digits) - Optional</p>
                 </TooltipContent>
               </Tooltip>
             </div>
-            <div className="relative">
-              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-              <input
-                type="text"
-                maxLength={11}
+            <div className="flex gap-3 items-start">
+              <div className="relative flex-1">
+                <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
+                <input
+                  type="text"
+                  maxLength={11}
+                  value={onBoardingData?.bvn_number || ""}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    handleChange("bvn_number", value);
+                  }}
+                  placeholder="Enter 11-digit BVN (optional)"
+                  className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+              <VerifyIdentityButton
+                type="bvn"
                 value={onBoardingData?.bvn_number || ""}
-                onChange={(e) => {
-                  const value = e.target.value.replace(/\D/g, "");
-                  handleChange("bvn_number", value);
-                }}
-                placeholder="Enter 11-digit BVN (optional)"
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                onVerified={() => handleChange("bvn_verified", true)}
               />
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               Your BVN is encrypted for security
             </p>
           </div>
 
           {/* Bank Name */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground/80">
               Bank Name
             </label>
             <div className="relative">
-              <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+              <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 z-10" />
               <button
                 onClick={() => setOpenBank(!openBank)}
-                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors"
+                className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors"
               >
                 <span
                   className={
                     onBoardingData?.bank_name
-                      ? "text-gray-900"
-                      : "text-gray-400"
+                      ? "text-foreground"
+                      : "text-muted-foreground/70"
                   }
                 >
                   {onBoardingData?.bank_name || "Select your bank (optional)"}
                 </span>
                 <ChevronDown
                   className={cn(
-                    "w-4 h-4 text-gray-400",
+                    "w-4 h-4 text-muted-foreground/70",
                     openBank && "rotate-180",
                   )}
                 />
               </button>
 
               {openBank && (
-                <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-                  <div className="p-3 border-b border-gray-200">
+                <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+                  <div className="p-3 border-b border-border">
                     <input
                       type="text"
                       placeholder="Search banks..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       autoFocus
                     />
                   </div>
@@ -221,7 +229,7 @@ export function BankInfoStep({
                           setOpenBank(false);
                           setSearchQuery("");
                         }}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                        className="w-full px-4 py-2 text-left hover:bg-muted/60 transition-colors"
                       >
                         {bank}
                       </button>
@@ -234,11 +242,11 @@ export function BankInfoStep({
 
           {/* Account Number */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground/80">
               Account Number
             </label>
             <div className="relative">
-              <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
               <input
                 type="text"
                 maxLength={10}
@@ -248,7 +256,7 @@ export function BankInfoStep({
                   handleChange("bank_account_number", value);
                 }}
                 placeholder="Enter 10-digit account number (optional)"
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -279,10 +287,10 @@ export function BankInfoStep({
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-foreground mb-2">
           {isCorporate ? "Director's Bank Information" : "Bank Information"}
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           {isCorporate
             ? "Provide the director's bank details for premium payments and claims"
             : "Provide your bank details for premium payments and claims"}
@@ -293,13 +301,13 @@ export function BankInfoStep({
         {/* BVN */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground/80">
               {isCorporate ? "Director's BVN" : "BVN"}{" "}
               <span className="text-red-500">*</span>
             </label>
             <Tooltip>
               <TooltipTrigger>
-                <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                <HelpCircle className="w-4 h-4 text-muted-foreground/70 cursor-help" />
               </TooltipTrigger>
               <TooltipContent>
                 <p>Bank Verification Number (11 digits)</p>
@@ -307,7 +315,7 @@ export function BankInfoStep({
             </Tooltip>
           </div>
           <div className="relative">
-            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               maxLength={11}
@@ -325,35 +333,35 @@ export function BankInfoStep({
                 }
               }}
               placeholder="Enter 11-digit BVN"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-muted-foreground">
             Your BVN is encrypted for security
           </p>
         </div>
 
         {/* Bank Name */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             {isCorporate ? "Director's Bank" : "Bank Name"}{" "}
             <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+            <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 z-10" />
             <button
               onClick={() => setOpenBank(!openBank)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors"
+              className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors"
             >
               <span
                 className={
                   isIndividual
                     ? onBoardingData?.bank_name
-                      ? "text-gray-900"
-                      : "text-gray-400"
+                      ? "text-foreground"
+                      : "text-muted-foreground/70"
                     : onBoardingData?.director_bank_name
-                      ? "text-gray-900"
-                      : "text-gray-400"
+                      ? "text-foreground"
+                      : "text-muted-foreground/70"
                 }
               >
                 {isIndividual
@@ -363,21 +371,21 @@ export function BankInfoStep({
               </span>
               <ChevronDown
                 className={cn(
-                  "w-4 h-4 text-gray-400",
+                  "w-4 h-4 text-muted-foreground/70",
                   openBank && "rotate-180",
                 )}
               />
             </button>
 
             {openBank && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-                <div className="p-3 border-b border-gray-200">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+                <div className="p-3 border-b border-border">
                   <input
                     type="text"
                     placeholder="Search banks..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     autoFocus
                   />
                 </div>
@@ -394,7 +402,7 @@ export function BankInfoStep({
                         setOpenBank(false);
                         setSearchQuery("");
                       }}
-                      className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                      className="w-full px-4 py-2 text-left hover:bg-muted/60 transition-colors"
                     >
                       {bank}
                     </button>
@@ -407,12 +415,12 @@ export function BankInfoStep({
 
         {/* Account Number */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             {isCorporate ? "Director's Account Number" : "Account Number"}{" "}
             <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               maxLength={10}
@@ -430,7 +438,7 @@ export function BankInfoStep({
                 }
               }}
               placeholder="Enter 10-digit account number"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -439,13 +447,13 @@ export function BankInfoStep({
         {isCorporate && (
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700">
+              <label className="text-sm font-medium text-foreground/80">
                 Tax Identification Number{" "}
                 <span className="text-red-500">*</span>
               </label>
               <Tooltip>
                 <TooltipTrigger>
-                  <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                  <HelpCircle className="w-4 h-4 text-muted-foreground/70 cursor-help" />
                 </TooltipTrigger>
                 <TooltipContent>
                   Tax Identification Number (TIN) or Payer ID
@@ -453,7 +461,7 @@ export function BankInfoStep({
               </Tooltip>
             </div>
             <div className="relative">
-              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
               <input
                 type="text"
                 value={onBoardingData?.director_tax_identification_number || ""}
@@ -464,7 +472,7 @@ export function BankInfoStep({
                   )
                 }
                 placeholder="Enter TIN"
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>

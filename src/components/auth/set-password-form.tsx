@@ -10,13 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AuthCard } from "./auth-card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -183,7 +183,7 @@ export function SetPasswordForm() {
 
   if (isValidating) {
     return (
-      <Card className="w-full shadow-lg border-0">
+      <AuthCard>
         <CardContent className="pt-6">
           <div className="flex flex-col items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-emerald-600 mb-4" />
@@ -192,13 +192,13 @@ export function SetPasswordForm() {
             </p>
           </div>
         </CardContent>
-      </Card>
+      </AuthCard>
     );
   }
 
   if (error && (!token || !email)) {
     return (
-      <Card className="w-full shadow-lg border-0">
+      <AuthCard>
         <CardHeader>
           <CardTitle className="text-red-600">Invalid Link</CardTitle>
           <CardDescription>
@@ -219,13 +219,13 @@ export function SetPasswordForm() {
             Go to home page
           </Link>
         </CardFooter>
-      </Card>
+      </AuthCard>
     );
   }
 
   if (success) {
     return (
-      <Card className="w-full shadow-lg border-0">
+      <AuthCard>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-emerald-600">
             <CheckCircle2 className="h-6 w-6" />
@@ -237,8 +237,8 @@ export function SetPasswordForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="bg-emerald-50 p-4 rounded-lg">
-            <p className="text-sm text-emerald-800">
+          <div className="bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 p-4 rounded-lg">
+            <p className="text-sm text-emerald-800 dark:text-emerald-200">
               You can now log in with your email and new password.
             </p>
           </div>
@@ -251,18 +251,18 @@ export function SetPasswordForm() {
             Go to login now →
           </Link>
         </CardFooter>
-      </Card>
+      </AuthCard>
     );
   }
 
   const isPortal = true; // Always portal for this form
 
   return (
-    <Card className="w-full shadow-lg border-0">
+    <AuthCard>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center">
-            <Lock className="h-5 w-5 text-emerald-600" />
+          <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-white shadow-md shadow-emerald-600/25">
+            <Lock className="size-5" />
           </div>
           <div>
             <CardTitle className="text-xl">Set Your Password</CardTitle>
@@ -285,7 +285,7 @@ export function SetPasswordForm() {
           <div className="space-y-2">
             <Label htmlFor="password">New Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
               <Input
                 id="password"
                 type={showPassword ? "text" : "password"}
@@ -342,8 +342,8 @@ export function SetPasswordForm() {
           )}
 
           {/* Password Requirements */}
-          <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-            <p className="text-sm font-medium text-gray-700">
+          <div className="bg-muted/60 p-4 rounded-lg space-y-2">
+            <p className="text-sm font-medium text-foreground/80">
               Password requirements:
             </p>
             <ul className="space-y-1">
@@ -352,12 +352,12 @@ export function SetPasswordForm() {
                   {req.met ? (
                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                   ) : (
-                    <XCircle className="h-4 w-4 text-gray-300" />
+                    <XCircle className="h-4 w-4 text-muted-foreground/50" />
                   )}
                   <span
                     className={cn(
                       "text-muted-foreground",
-                      req.met && "text-gray-900",
+                      req.met && "text-foreground",
                     )}
                   >
                     {req.label}
@@ -371,7 +371,7 @@ export function SetPasswordForm() {
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
               <Input
                 id="confirmPassword"
                 type={showConfirmPassword ? "text" : "password"}
@@ -436,6 +436,6 @@ export function SetPasswordForm() {
           </Link>
         </div>
       </CardContent>
-    </Card>
+    </AuthCard>
   );
 }

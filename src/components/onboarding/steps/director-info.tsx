@@ -75,12 +75,12 @@ export function IdentityInfoStep({
   return (
     <div className={cn("space-y-8", openIdentityType && "h-125")}>
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-foreground mb-2">
           {isCorporate
             ? "Director's Identity Information"
             : "Identity Information"}
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           {isCorporate
             ? "Provide the director's identification details for verification"
             : "Provide your identification details for verification purposes"}
@@ -91,17 +91,17 @@ export function IdentityInfoStep({
       {isCorporate && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground/80">
               Director's Full Name <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
               <input
                 type="text"
                 value={onBoardingData?.director_name || ""}
                 onChange={(e) => handleChange("director_name", e.target.value)}
                 placeholder="Enter director's full name"
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -112,13 +112,13 @@ export function IdentityInfoStep({
         {/* Identity Card Type */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground/80">
               {isCorporate ? "Director's ID Type" : "Identity Card Type"}{" "}
               <span className="text-red-500">*</span>
             </label>
             <Tooltip>
               <TooltipTrigger>
-                <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                <HelpCircle className="w-4 h-4 text-muted-foreground/70 cursor-help" />
               </TooltipTrigger>
               <TooltipContent>
                 Select the ID type you want to use for verification
@@ -126,13 +126,13 @@ export function IdentityInfoStep({
             </Tooltip>
           </div>
           <div className="relative">
-            <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+            <IdCard className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 z-10" />
             <button
               onClick={() => setOpenIdentityType(!openIdentityType)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors"
+              className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors"
             >
               <span
-                className={selectedType ? "text-gray-900" : "text-gray-400"}
+                className={selectedType ? "text-foreground" : "text-muted-foreground/70"}
               >
                 {selectedType
                   ? selectedType.label
@@ -140,21 +140,21 @@ export function IdentityInfoStep({
               </span>
               <ChevronDown
                 className={cn(
-                  "w-4 h-4 text-gray-400",
+                  "w-4 h-4 text-muted-foreground/70",
                   openIdentityType && "rotate-180",
                 )}
               />
             </button>
 
             {openIdentityType && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
-                <div className="p-3 border-b border-gray-200">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
+                <div className="p-3 border-b border-border">
                   <input
                     type="text"
                     placeholder="Search identity types..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     autoFocus
                   />
                 </div>
@@ -179,11 +179,11 @@ export function IdentityInfoStep({
                         setOpenIdentityType(false);
                         setSearchQuery("");
                       }}
-                      className="w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors flex items-center gap-3"
+                      className="w-full px-4 py-3 text-left hover:bg-muted/60 transition-colors flex items-center gap-3"
                     >
                       <span className="text-xl">{type.icon}</span>
                       <div>
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-foreground">
                           {type.label}
                         </p>
                       </div>
@@ -198,12 +198,12 @@ export function IdentityInfoStep({
         {/* ID Number Field - Conditional based on type */}
         {selectedType?.value === "National Identity Number" ? (
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground/80">
               {isCorporate ? "Director's NIN" : "NIN (National Identification Number)"}{" "}
               <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
               <input
                 type="text"
                 maxLength={11}
@@ -222,21 +222,21 @@ export function IdentityInfoStep({
                   );
                 }}
                 placeholder="Enter 11-digit NIN"
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-muted-foreground">
               The NIN will be encrypted before transmission
             </p>
           </div>
         ) : (
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-foreground/80">
               {isCorporate ? "Director's ID Number" : "ID Number"}{" "}
               <span className="text-red-500">*</span>
             </label>
             <div className="relative">
-              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
               <input
                 type="text"
                 value={onBoardingData?.identity_card_number || ""}
@@ -244,7 +244,7 @@ export function IdentityInfoStep({
                   handleChange("identity_card_number", e.target.value)
                 }
                 placeholder={`Enter your ${selectedType?.label || "ID"} number`}
-                className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>

@@ -1,66 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Users,
   UserCheck,
   UserX,
-  Clock,
-  TrendingUp,
-  Building2,
+  ShieldCheck,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-
-interface Stat {
-  title: string;
-  value: string | number;
-  change: string;
-  changeType: "positive" | "negative" | "neutral";
-  icon: React.ElementType;
-  color: string;
-  subtitle?: string;
-}
-
-const stats: Stat[] = [
-  {
-    title: "Total Employees",
-    value: "2,345",
-    change: "+156",
-    changeType: "positive",
-    icon: Users,
-    color: "blue",
-    subtitle: "Across all companies",
-  },
-  {
-    title: "Verified NIN",
-    value: "1,892",
-    change: "+89",
-    changeType: "positive",
-    icon: UserCheck,
-    color: "green",
-    subtitle: "80.6% verification rate",
-  },
-  {
-    title: "Pending Verification",
-    value: "342",
-    change: "-23",
-    changeType: "positive",
-    icon: Clock,
-    color: "yellow",
-    subtitle: "Awaiting NIN submission",
-  },
-  {
-    title: "Inactive",
-    value: "111",
-    change: "+12",
-    changeType: "negative",
-    icon: UserX,
-    color: "red",
-    subtitle: "No portal access",
-  },
-];
+import { cn, toFiniteNumber } from "@/lib/utils";
+import { useAdminEmployees } from "@/hooks/queries/useEmployees";
 
 const colorClasses = {
   blue: { bg: "bg-blue-50", text: "text-blue-600", iconBg: "bg-blue-100" },
@@ -71,25 +20,15 @@ const colorClasses = {
     iconBg: "bg-yellow-100",
   },
   red: { bg: "bg-red-50", text: "text-red-600", iconBg: "bg-red-100" },
-  purple: {
-    bg: "bg-purple-50",
-    text: "text-purple-600",
-    iconBg: "bg-purple-100",
-  },
-  indigo: {
-    bg: "bg-indigo-50",
-    text: "text-indigo-600",
-    iconBg: "bg-indigo-100",
-  },
 };
 
 export function EmployeesStats() {
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  // Single fetch; counts computed from returned records so the cards
+  // work whether or not the API provides pagination meta.
+  const { data: allData, isLoading } = useAdminEmployees({
+    per_page: 100,
+    page: 1,
+  });
 
   if (isLoading) {
     return (
@@ -110,13 +49,70 @@ export function EmployeesStats() {
     );
   }
 
+  interface EmployeeRecord {
+    employment_status?: string;
+    nin_verification?: { is_nin_verified?: boolean };
+  }
+  const employees: EmployeeRecord[] = allData?.data || [];
+
+  const total = toFiniteNumber(
+    allData?.pagination?.total ?? employees.length,
+  );
+  const verified = employees.filter(
+    (e) => e?.nin_verification?.is_nin_verified,
+  ).length;
+  const inactive = employees.filter(
+    (e) => e?.employment_status === "inactive",
+  ).length;
+  const active = employees.filter(
+    (e) => e?.employment_status === "active",
+  ).length;
+  const pending = Math.max(0, total - verified);
+
+  const stats = [
+    {
+      title: "Total Employees",
+      value: total,
+      icon: Users,
+      color: "blue" as const,
+      subtitle: "Across all companies",
+    },
+    {
+      title: "Verified NIN",
+      value: verified,
+      icon: UserCheck,
+      color: "green" as const,
+      subtitle:
+        total > 0
+          ? `${((verified / total) * 100).toFixed(1)}% verification rate`
+          : "No employees yet",
+    },
+    {
+      title: "Pending Verification",
+      value: pending,
+      icon: ShieldCheck,
+      color: "yellow" as const,
+      subtitle: "Awaiting NIN verification",
+    },
+    {
+      title: "Inactive",
+      value: inactive,
+      icon: UserX,
+      color: "red" as const,
+      subtitle: `${active.toLocaleString()} active employees`,
+    },
+  ];
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => {
-        const colors = colorClasses[stat.color as keyof typeof colorClasses];
+        const colors = colorClasses[stat.color];
 
         return (
-          <Card key={stat.title} className={cn("hover:shadow-lg transition-shadow", colors.bg)}>
+          <Card
+            key={stat.title}
+            className={cn("transition-shadow hover:shadow-lift")}
+          >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.title}
@@ -126,18 +122,10 @@ export function EmployeesStats() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-2xl font-bold">
+                {stat.value.toLocaleString()}
+              </div>
               <div className="flex items-center gap-2 mt-1">
-                <span
-                  className={cn(
-                    "text-xs font-medium",
-                    stat.changeType === "positive" && "text-green-600",
-                    stat.changeType === "negative" && "text-red-600",
-                  )}
-                >
-                  {stat.changeType === "positive" && "+"}
-                  {stat.change}
-                </span>
                 <span className="text-xs text-muted-foreground">
                   {stat.subtitle}
                 </span>

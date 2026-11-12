@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { CompaniesHeader } from "@/components/admin/companies/companies-header";
 import { CompaniesStats } from "@/components/admin/companies/companies-stats";
 import { CompaniesTable } from "@/components/admin/companies/companies-table";
@@ -16,23 +16,26 @@ export default function CompaniesPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [filteredCount, setFilteredCount] = useState(0);
 
-  const handleSearch = (query: string) => {
-    setFilters(prev => ({ ...prev, search: query }));
-  };
+  const handleSearch = useCallback((query: string) => {
+    setFilters((prev) => ({ ...prev, search: query }));
+  }, []);
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value === "all" ? undefined : value }));
-  };
+  const handleFilterChange = useCallback((key: string, value: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value === "all" ? undefined : value,
+    }));
+  }, []);
 
-  // These will be updated by the table component
-  const updateSelection = (rows: number[]) => {
+  // Stable identities so child effects don't loop
+  const updateSelection = useCallback((rows: number[]) => {
     setSelectedRows(rows);
-  };
+  }, []);
 
-  const updateCounts = (total: number, filtered: number) => {
-    setTotalCount(total);
-    setFilteredCount(filtered);
-  };
+  const updateCounts = useCallback((total: number, filtered: number) => {
+    setTotalCount((prev) => (prev === total ? prev : total));
+    setFilteredCount((prev) => (prev === filtered ? prev : filtered));
+  }, []);
 
   return (
     <div className="space-y-6">

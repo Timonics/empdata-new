@@ -93,7 +93,7 @@ export function AddEmployeeDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
         {/* Header */}
-        <div className="sticky top-0 bg-linear-to-r from-blue-600 to-blue-800 text-white p-6 z-10">
+        <div className="sticky top-0 bg-navy-900 text-white p-6 z-10">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-white text-xl">
               Add New Employee
@@ -311,7 +311,7 @@ export function AddEmployeeDrawer({
               </div>
 
               {/* Form Actions */}
-              <div className="sticky bottom-0 bg-white py-4 border-t flex items-center justify-end gap-3">
+              <div className="sticky bottom-0 bg-card py-4 border-t flex items-center justify-end gap-3">
                 <Button
                   type="button"
                   variant="outline"

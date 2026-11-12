@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { callBackend } from "@/lib/server-api";
+import { requirePermission } from "@/lib/server-api";
 
 export async function GET(request: Request) {
   try {
@@ -46,6 +47,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const guard = await requirePermission(request, ["create_companies"]);
+    if (guard) return guard;
     const cookieStore = await cookies();
     const token = cookieStore.get("token_super-admin")?.value;
 

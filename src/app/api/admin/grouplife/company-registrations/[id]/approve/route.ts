@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { callBackend } from "@/lib/server-api";
+import { callBackend, requirePermission } from "@/lib/server-api";
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
+    const guard = await requirePermission(request, ["approve_company_registrations"]);
+    if (guard) return guard;
     const { id } = await params;
     
     const cookieStore = await cookies();

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PortalEmployeeService } from '@/services/employee.service';
+import { AdminEmployeeService } from '@/services/admin-employee.service';
 import { toast } from 'sonner';
 import type { 
   EmployeeFilters, 
@@ -230,5 +231,69 @@ export function useEmployeeStats() {
       return stats;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+/**
+ * Get all employees across companies (admin, super-admin token)
+ */
+export function useAdminEmployees(filters?: EmployeeFilters) {
+  return useQuery({
+    queryKey: [...employeeKeys.all, 'admin-list', { filters }] as const,
+    queryFn: async () => {
+      const response = await AdminEmployeeService.getEmployees(filters);
+      if (!response.success) {
+        throw new Error('Failed to fetch employees');
+      }
+      return response;
+    },
+  });
+}
+
+/**
+ * Get single employee detail (admin, super-admin token)
+ */
+export function useAdminEmployee(id: number) {
+  return useQuery({
+    queryKey: [...employeeKeys.all, 'admin-detail', id] as const,
+    queryFn: async () => {
+      const response = await AdminEmployeeService.getEmployee(id);
+      if (!response.success) {
+        throw new Error('Failed to fetch employee');
+      }
+      return response.data;
+    },
+    enabled: !!id,
+  });
+}
+
+/**
+ * Create an employee under a company (admin)
+ */
+export function useAdminCreateEmployee() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      company_id: number;
+      first_name: string;
+      last_name: string;
+      email: string;
+      date_of_birth: string;
+      phone?: string;
+      department?: string;
+      position?: string;
+    }) => AdminEmployeeService.createEmployee(data),
+    onSuccess: (response) => {
+      if (response.success) {
+        toast.success('Employee created successfully');
+        queryClient.invalidateQueries({ queryKey: employeeKeys.all });
+      } else {
+        toast.error(response.message || 'Failed to create employee');
+      }
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Failed to create employee');
+    },
   });
 }

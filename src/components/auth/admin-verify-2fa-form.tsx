@@ -8,13 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { AuthCard } from "./auth-card";
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   InputOTP,
@@ -151,7 +151,7 @@ export function AdminVerify2FAForm() {
 
   if (!email || !sessionToken) {
     return (
-      <Card className="w-full shadow-lg border-0">
+      <AuthCard>
         <CardContent className="pt-6">
           <div className="flex flex-col items-center justify-center py-12">
             <AlertCircle className="h-8 w-8 text-red-500 mb-4" />
@@ -164,16 +164,16 @@ export function AdminVerify2FAForm() {
             </Button>
           </div>
         </CardContent>
-      </Card>
+      </AuthCard>
     );
   }
 
   return (
-    <Card className="w-full shadow-lg border-0">
+    <AuthCard>
       <CardHeader>
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-            <Shield className="h-6 w-6 text-blue-600" />
+          <div className="flex size-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-md shadow-brand-600/25">
+            <Shield className="size-6" />
           </div>
           <div>
             <CardTitle className="text-xl">Admin Verification</CardTitle>
@@ -222,10 +222,10 @@ export function AdminVerify2FAForm() {
           </div>
 
           {/* Timer and Resend */}
-          <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg">
+          <div className="flex items-center justify-between bg-muted/60 p-3 rounded-lg">
             <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-gray-500" />
-              <span className="text-sm text-gray-600">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">
                 {canResend ? (
                   'Code expired'
                 ) : (
@@ -255,12 +255,12 @@ export function AdminVerify2FAForm() {
           </div>
 
           {/* Security Notice */}
-          <div className="bg-blue-50 p-4 rounded-lg space-y-2">
-            <p className="text-sm font-medium text-blue-800 flex items-center gap-2">
+          <div className="bg-brand-50 dark:bg-brand-950 border border-brand-200 dark:border-brand-800 p-4 rounded-lg space-y-2">
+            <p className="text-sm font-medium text-brand-800 dark:text-brand-200 flex items-center gap-2">
               <Shield className="h-4 w-4" />
               Security Information
             </p>
-            <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
+            <ul className="text-xs text-brand-700 dark:text-brand-300 space-y-1 list-disc list-inside">
               <li>Code expires in 10 minutes</li>
               <li>You have 5 attempts before temporary lockout</li>
               <li>2FA is mandatory for admin accounts</li>
@@ -294,6 +294,6 @@ export function AdminVerify2FAForm() {
           ← Back to login
         </Button>
       </CardFooter>
-    </Card>
+    </AuthCard>
   );
 }

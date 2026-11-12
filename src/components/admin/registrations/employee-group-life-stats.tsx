@@ -13,11 +13,15 @@ import {
   ShieldX,
   Building2,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useRegistrationStatusSummary } from "@/hooks/queries/useAnalytics";
+import { cn, toFiniteNumber, monthOverMonthChange } from "@/lib/utils";
+import {
+  useRegistrationStatusSummary,
+  useMonthlyEmployeeRegistrations,
+} from "@/hooks/queries/useAnalytics";
 
 export function EmployeeGroupLifeStats() {
   const { data, isLoading, error } = useRegistrationStatusSummary();
+  const { data: monthlyEmployees } = useMonthlyEmployeeRegistrations();
 
   if (isLoading) {
     return (
@@ -56,18 +60,19 @@ export function EmployeeGroupLifeStats() {
 
   // Safely extract employee registration data with optional chaining
   const employeeData = data?.employee_registrations;
-  const total = employeeData?.total ?? 0;
-  const pending = employeeData?.by_status?.pending_approval ?? 0;
-  const approved = employeeData?.by_status?.approved ?? 0;
-  const rejected = employeeData?.by_status?.rejected ?? 0;
-  const verified = employeeData?.by_verification_status?.verified ?? 0;
-  const notVerified = employeeData?.by_verification_status?.not_verified ?? 0;
+  const total = toFiniteNumber(employeeData?.total);
+  const pending = toFiniteNumber(employeeData?.by_status?.pending_approval);
+  const approved = toFiniteNumber(employeeData?.by_status?.approved);
+  const rejected = toFiniteNumber(employeeData?.by_status?.rejected);
+  const verified = toFiniteNumber(
+    employeeData?.by_verification_status?.verified,
+  );
+  const notVerified = toFiniteNumber(
+    employeeData?.by_verification_status?.not_verified,
+  );
 
-  // Calculate change safely
-  const companyTotal = data?.company_registrations?.total ?? 0;
-  const changeValue = total - companyTotal;
-  const change = (changeValue / 100).toFixed(1);
-  const changePrefix = Number(change) >= 0 ? "+" : "";
+  // Real month-over-month change from monthly registrations
+  const changeValue = monthOverMonthChange(monthlyEmployees?.data);
 
   const statCards = [
     {
@@ -75,7 +80,10 @@ export function EmployeeGroupLifeStats() {
       value: total,
       icon: Users,
       color: "emerald",
-      change: total > 0 ? `${changePrefix}${change}%` : "0%",
+      change:
+        changeValue !== null
+          ? `${changeValue >= 0 ? "+" : ""}${changeValue.toFixed(1)}%`
+          : undefined,
     },
     {
       title: "Pending Approval",
@@ -146,7 +154,7 @@ export function EmployeeGroupLifeStats() {
         return (
           <Card
             key={stat.title}
-            className={cn("hover:shadow-lg transition-shadow", colors.bg)}
+            className={cn("transition-shadow hover:shadow-lift")}
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-xs font-medium text-muted-foreground">

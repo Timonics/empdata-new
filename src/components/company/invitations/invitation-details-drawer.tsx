@@ -69,17 +69,17 @@ export function InvitationDetailsDrawer({ invitation, open, onOpenChange }: Invi
   };
 
   const InfoRow = ({ label, value, icon: Icon }: { label: string; value: string; icon?: any }) => (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
+    <div className="flex items-start gap-3 py-3 border-b border-border/70 last:border-0">
       {Icon && <Icon className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500">{label}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-sm font-medium mt-0.5 wrap-break-word">{value || '—'}</p>
       </div>
     </div>
   );
 
   const SectionCard = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <div className="bg-gray-50 rounded-lg p-5">
+    <div className="bg-muted/60 rounded-lg p-5">
       <h3 className="text-sm font-medium text-gray-700 mb-4">{title}</h3>
       <div className="space-y-1">{children}</div>
     </div>
@@ -89,7 +89,7 @@ export function InvitationDetailsDrawer({ invitation, open, onOpenChange }: Invi
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
         {/* Header */}
-        <div className="bg-linear-to-r from-emerald-600 to-emerald-800 text-white p-6 sticky top-0 z-10">
+        <div className="bg-emerald-700 text-white p-6 sticky top-0 z-10">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16 border-2 border-white">
@@ -175,7 +175,7 @@ export function InvitationDetailsDrawer({ invitation, open, onOpenChange }: Invi
           <SectionCard title="Invitation Link">
             <div className="space-y-3">
               <div className="flex gap-2">
-                <code className="flex-1 p-3 bg-white rounded border text-sm break-all">
+                <code className="flex-1 p-3 bg-card rounded border text-sm break-all">
                   {invitation.inviteLink}
                 </code>
                 <Button variant="outline" onClick={copyToClipboard}>
@@ -195,7 +195,7 @@ export function InvitationDetailsDrawer({ invitation, open, onOpenChange }: Invi
 
         {/* Footer with actions */}
         {invitation.status === 'pending' && (
-          <div className="border-t p-6 bg-gray-50 sticky bottom-0">
+          <div className="border-t p-6 bg-muted/60 sticky bottom-0">
             <div className="flex items-center gap-3">
               <Button className="flex-1" variant="outline">
                 <RefreshCw className="h-4 w-4 mr-2" />

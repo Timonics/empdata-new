@@ -14,26 +14,22 @@ export default function CompanyLayout({
   const { isCollapsed } = useSidebar();
 
   return (
-    <div className="w-full h-screen overflow-hidden bg-white">
-      <div className="flex h-full bg-white/90 relative">
-        <CompanySidebar />
+    <div className="flex h-screen overflow-hidden bg-muted/40">
+      <CompanySidebar />
 
-        <div
-          className={cn(
-            "w-full transition-all duration-300 ease-in-out flex flex-col bg-sky-50/50",
-            isCollapsed ? "md:ml-24" : "md:ml-55",
-          )}
-        >
-          <CompanyHeader />
+      <div
+        className={cn(
+          "flex min-w-0 flex-1 flex-col transition-[margin] duration-300 ease-in-out",
+          isCollapsed ? "md:ml-16" : "md:ml-64",
+        )}
+      >
+        <CompanyHeader />
 
-          <div className="overflow-auto scrollbar">
-            <div
-              className={`p-6 lg:p-8 ${isCollapsed ? "md:w-[calc(100vw-96px)]" : "md:w-[calc(100vw-220px)]"}`}
-            >
-              {children}
-            </div>
+        <main className="flex-1 overflow-y-auto scrollbar">
+          <div className="mx-auto w-full max-w-[1440px] p-4 md:p-6 lg:p-8">
+            {children}
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );

@@ -35,13 +35,13 @@ interface EmployeeDetailsDrawerProps {
 
 const statusStyles = {
   active: "bg-green-100 text-green-800 border-green-200",
-  inactive: "bg-gray-100 text-gray-800 border-gray-200",
+  inactive: "bg-muted text-foreground border-border",
 };
 
 const ninStatusStyles = {
   verified: "bg-green-100 text-green-800 border-green-200",
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  not_submitted: "bg-gray-100 text-gray-800 border-gray-200",
+  not_submitted: "bg-muted text-foreground border-border",
 };
 
 export function EmployeeDetailsDrawer({
@@ -60,10 +60,10 @@ export function EmployeeDetailsDrawer({
     value: string | number | null | undefined;
     icon?: any;
   }) => (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
+    <div className="flex items-start gap-3 py-3 border-b border-border/70 last:border-0">
       {Icon && <Icon className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500">{label}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-sm font-medium mt-0.5 wrap-break-word">
           {value?.toString() || "—"}
         </p>
@@ -78,7 +78,7 @@ export function EmployeeDetailsDrawer({
     title: string;
     children: React.ReactNode;
   }) => (
-    <div className="bg-gray-50 rounded-lg p-5">
+    <div className="bg-muted/60 rounded-lg p-5">
       <h3 className="text-sm font-medium text-gray-700 mb-4">{title}</h3>
       <div className="space-y-1">{children}</div>
     </div>
@@ -113,7 +113,7 @@ export function EmployeeDetailsDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
         {/* Header */}
-        <div className="bg-linear-to-r from-emerald-600 to-emerald-800 text-white p-6 sticky top-0 z-10">
+        <div className="bg-emerald-700 text-white p-6 sticky top-0 z-10">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <Avatar className="h-16 w-16 border-2 border-white">
@@ -351,16 +351,16 @@ export function EmployeeDetailsDrawer({
                       (beneficiary: any, index: number) => (
                         <div
                           key={beneficiary.id || index}
-                          className="bg-white p-4 rounded-lg border"
+                          className="bg-card p-4 rounded-lg border"
                         >
                           <p className="font-medium">
                             {beneficiary.first_name} {beneficiary.last_name}
                           </p>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm text-muted-foreground mt-1">
                             {beneficiary.relationship}
                           </p>
                           <div className="flex items-center justify-between mt-2">
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm text-muted-foreground">
                               Allocation: {beneficiary.percentage_allocation}%
                             </span>
                             {beneficiary.identification_url && (
@@ -390,7 +390,7 @@ export function EmployeeDetailsDrawer({
                 ) : (
                   <div className="text-center py-8">
                     <Heart className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-                    <p className="text-gray-500">No beneficiaries added yet</p>
+                    <p className="text-muted-foreground">No beneficiaries added yet</p>
                   </div>
                 )}
               </SectionCard>
@@ -400,7 +400,7 @@ export function EmployeeDetailsDrawer({
               <SectionCard title="Documents">
                 <div className="text-center py-8">
                   <FileText className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-                  <p className="text-gray-500">No documents uploaded yet</p>
+                  <p className="text-muted-foreground">No documents uploaded yet</p>
                   <Button variant="outline" className="mt-4">
                     Upload Documents
                   </Button>
@@ -411,9 +411,9 @@ export function EmployeeDetailsDrawer({
         </div>
 
         {/* Footer */}
-        <div className="border-t p-6 bg-gray-50 sticky bottom-0">
+        <div className="border-t p-6 bg-muted/60 sticky bottom-0">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-muted-foreground">
               Last updated:{" "}
               {formatDate(employee.updated_at || employee.created_at)}
             </div>

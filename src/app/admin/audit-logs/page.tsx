@@ -205,7 +205,7 @@ export default function AuditLogsPage() {
     if (action.includes("NIN")) {
       return <FileText className="h-4 w-4 text-purple-500" />;
     }
-    return <FileText className="h-4 w-4 text-gray-500" />;
+    return <FileText className="h-4 w-4 text-muted-foreground" />;
   };
 
   const getStatusBadge = (status: string) => (
@@ -214,7 +214,7 @@ export default function AuditLogsPage() {
       className={cn(
         "font-medium",
         statusColors[status as keyof typeof statusColors] ||
-          "bg-gray-100 text-gray-800",
+          "bg-muted text-foreground",
       )}
     >
       {status}
@@ -433,7 +433,7 @@ export default function AuditLogsPage() {
         <Card className="border-0 shadow-lg border-red-200">
           <CardContent className="flex flex-col items-center py-12">
             <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
-            <p className="text-lg font-medium text-gray-900">
+            <p className="text-lg font-medium text-foreground">
               Failed to load audit logs
             </p>
             <p className="text-sm text-muted-foreground">{error.message}</p>
@@ -448,7 +448,7 @@ export default function AuditLogsPage() {
         <Card className="border-0 shadow-lg">
           <CardContent className="flex flex-col items-center py-12">
             <History className="h-12 w-12 text-gray-400 mb-4" />
-            <p className="text-lg font-medium text-gray-900">
+            <p className="text-lg font-medium text-foreground">
               No audit logs found
             </p>
             <p className="text-sm text-muted-foreground">
@@ -477,7 +477,7 @@ export default function AuditLogsPage() {
               </TableHeader>
               <TableBody>
                 {logs.map((log) => (
-                  <TableRow key={log.id} className="hover:bg-gray-50">
+                  <TableRow key={log.id} className="hover:bg-muted/60">
                     <TableCell className="font-mono text-xs">
                       {log.id}
                     </TableCell>
@@ -515,7 +515,7 @@ export default function AuditLogsPage() {
                     </TableCell>
                     <TableCell>
                       {log.record_type ? (
-                        <Badge variant="outline" className="bg-gray-100">
+                        <Badge variant="outline" className="bg-muted">
                           {log.record_type}
                         </Badge>
                       ) : (

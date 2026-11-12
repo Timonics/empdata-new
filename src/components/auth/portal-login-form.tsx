@@ -10,13 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AuthCard } from "./auth-card";
 import {
   Select,
   SelectContent,
@@ -81,16 +81,16 @@ export function PortalLoginForm() {
   };
 
   return (
-    <Card className="w-full shadow-lg border-0">
+    <AuthCard>
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl">
-            <h1 className="text-3xl font-semibold tracking-tight bg-linear-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
               Portal Login
             </h1>
           </CardTitle>
-          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-            <RoleIcon className="h-5 w-5 text-blue-600" />
+          <div className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-md shadow-brand-600/25">
+            <RoleIcon className="size-5" />
           </div>
         </div>
         <CardDescription>Sign in to your portal account</CardDescription>
@@ -202,15 +202,15 @@ export function PortalLoginForm() {
         </form>
 
         {/* Role-specific info */}
-        <div className="bg-blue-50 p-4 rounded-lg mt-4">
-          <p className="text-xs text-blue-800 flex items-start gap-2">
+        <div className="bg-brand-50 dark:bg-brand-950 border border-brand-200 dark:border-brand-800 p-4 rounded-lg mt-4">
+          <p className="text-xs text-brand-800 dark:text-brand-200 flex items-start gap-2">
             <Building2 className="h-4 w-4 mt-0.5 shrink-0" />
             <span>
               <strong>Company admins:</strong> Manage your employees, send
               invitations, and view reports
             </span>
           </p>
-          <p className="text-xs text-blue-800 flex items-start gap-2 mt-2">
+          <p className="text-xs text-brand-800 dark:text-brand-200 flex items-start gap-2 mt-2">
             <Briefcase className="h-4 w-4 mt-0.5 shrink-0" />
             <span>
               <strong>Employees:</strong> View your profile, manage
@@ -239,6 +239,6 @@ export function PortalLoginForm() {
           </div>
         </div>
       </CardFooter>
-    </Card>
+    </AuthCard>
   );
 }

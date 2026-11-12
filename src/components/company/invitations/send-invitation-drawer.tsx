@@ -98,7 +98,7 @@ export function SendInvitationDrawer({ open, onOpenChange }: SendInvitationDrawe
   return (
     <Sheet open={open} onOpenChange={handleClose}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
-        <div className="sticky top-0 bg-linear-to-r from-emerald-600 to-emerald-800 text-white p-6 z-10">
+        <div className="sticky top-0 bg-emerald-700 text-white p-6 z-10">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-white text-xl">Send Invitation</SheetTitle>
             <Button
@@ -233,7 +233,7 @@ export function SendInvitationDrawer({ open, onOpenChange }: SendInvitationDrawe
                   </p>
                 </div>
 
-                <div className="sticky bottom-0 bg-white py-4 border-t flex items-center justify-end gap-3">
+                <div className="sticky bottom-0 bg-card py-4 border-t flex items-center justify-end gap-3">
                   <Button
                     type="button"
                     variant="outline"
@@ -272,7 +272,7 @@ export function SendInvitationDrawer({ open, onOpenChange }: SendInvitationDrawe
               <div className="space-y-3">
                 <label className="text-sm font-medium">Invite Link (Manual)</label>
                 <div className="flex gap-2">
-                  <Input value={inviteLink} readOnly className="bg-gray-50" />
+                  <Input value={inviteLink} readOnly className="bg-muted/60" />
                   <Button variant="outline" onClick={copyToClipboard}>
                     {copied ? (
                       <CheckCheck className="h-4 w-4 text-green-600" />

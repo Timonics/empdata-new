@@ -342,7 +342,7 @@ export function MonthlyTrends() {
                 "flex items-center gap-1 px-3 py-1 rounded-full text-sm transition-colors",
                 selectedMetrics.includes(metric.key)
                   ? "bg-blue-100 text-blue-700"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                  : "bg-muted text-muted-foreground hover:bg-gray-200",
               )}
             >
               <metric.icon className="h-3 w-3" />

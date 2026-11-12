@@ -48,20 +48,25 @@ export class AuthService {
   }
 
   /**
-   * Forgot password (Admin only)
+   * Forgot password (admin or portal)
    */
-  static async forgotPassword(email: string) {
-    const response = await api.post(`${this.ADMIN_BASE}/forgot-password`, {
+  static async forgotPassword(email: string, role: "admin" | "portal" = "admin") {
+    const base = role === "admin" ? this.ADMIN_BASE : this.PORTAL_BASE;
+    const response = await api.post(`${base}/forgot-password`, {
       email,
     });
     return response.data;
   }
 
   /**
-   * Reset password (Admin only)
+   * Reset password (admin or portal)
    */
-  static async resetPassword(data: ResetPasswordData) {
-    const response = await api.post(`${this.ADMIN_BASE}/reset-password`, data);
+  static async resetPassword(
+    data: ResetPasswordData,
+    role: "admin" | "portal" = "admin"
+  ) {
+    const base = role === "admin" ? this.ADMIN_BASE : this.PORTAL_BASE;
+    const response = await api.post(`${base}/reset-password`, data);
     return response.data;
   }
 

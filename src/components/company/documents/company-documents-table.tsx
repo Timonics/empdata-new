@@ -202,13 +202,13 @@ export function CompanyDocumentsTable() {
               "h-10 w-10 rounded-lg flex items-center justify-center",
               item.type === 'pdf' ? "bg-red-50" :
               item.type.includes('sheet') ? "bg-green-50" :
-              item.type.includes('image') ? "bg-blue-50" : "bg-gray-50"
+              item.type.includes('image') ? "bg-blue-50" : "bg-muted/60"
             )}>
               <FileIcon className={cn(
                 "h-5 w-5",
                 item.type === 'pdf' ? "text-red-600" :
                 item.type.includes('sheet') ? "text-green-600" :
-                item.type.includes('image') ? "text-blue-600" : "text-gray-600"
+                item.type.includes('image') ? "text-blue-600" : "text-muted-foreground"
               )} />
             </div>
             <div>
@@ -344,7 +344,7 @@ export function CompanyDocumentsTable() {
 
   return (
     <>
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-card">
         <DataTable
           data={documents}
           columns={columns}

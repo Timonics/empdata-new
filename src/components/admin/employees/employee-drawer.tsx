@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -42,7 +42,9 @@ import {
   Heart,
   FileText,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDateSafe, getYearSafe, joinAddress } from "@/lib/utils";
+import { useAdminEmployee } from "@/hooks/queries/useEmployees";
+import { DrawerLoading } from "../registrations/drawer-loading";
 
 // Validation schema for employee form
 const employeeSchema = z.object({
@@ -76,7 +78,7 @@ interface EmployeeDrawerProps {
 const statusStyles = {
   verified: "bg-green-100 text-green-800 border-green-200",
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  inactive: "bg-gray-100 text-gray-800 border-gray-200",
+  inactive: "bg-muted text-foreground border-border",
   suspended: "bg-red-100 text-red-800 border-red-200",
 };
 
@@ -87,6 +89,42 @@ const statusOptions = [
   { value: "suspended", label: "Suspended", color: "red" },
 ];
 
+// Normalize an employee record from the API (snake_case) into the
+// camelCase shape this drawer consumes, tolerating either convention.
+function resolveEmployee(e: any) {
+  if (!e) return null;
+  const nin = e.nin_verification;
+  const ninData = nin?.nin_data;
+  return {
+    ...e,
+    firstName: e.first_name ?? e.firstName ?? "",
+    lastName: e.last_name ?? e.lastName ?? "",
+    email: e.email ?? "",
+    phone: e.phone ?? "",
+    employeeId: e.employee_number ?? e.employeeId ?? "",
+    department: e.department ?? "",
+    position: e.position ?? "",
+    dateOfBirth: e.date_of_birth ?? e.dateOfBirth ?? null,
+    gender: ninData?.gender ?? e.gender ?? "",
+    address:
+      e.address ?? e.house_address ?? ninData?.residence_info?.address ?? "",
+    city: e.city ?? ninData?.residence_info?.town ?? "",
+    state: e.state ?? ninData?.residence_info?.state ?? "",
+    country: e.country ?? "",
+    status: e.employment_status ?? e.status ?? "",
+    dateJoined: e.created_at ?? e.dateJoined ?? null,
+    company: e.company_name ?? e.company ?? "",
+    companyId: e.company_id ?? e.companyId ?? null,
+    beneficiaries: e.beneficiaries_count ?? e.beneficiaries ?? 0,
+    policies: e.policies_count ?? e.policies ?? 0,
+    ninVerified: nin?.is_nin_verified ?? e.ninVerified ?? false,
+    ninSubmitted: nin?.has_submitted_nin ?? e.ninSubmitted ?? false,
+    ninVerifiedAt: nin?.nin_verified_at ?? null,
+    createdAt: e.created_at ?? e.createdAt ?? null,
+    updatedAt: e.updated_at ?? e.updatedAt ?? null,
+  };
+}
+
 const genderOptions = [
   { value: "Male", label: "Male" },
   { value: "Female", label: "Female" },
@@ -94,7 +132,7 @@ const genderOptions = [
 ];
 
 export function EmployeeDrawer({
-  employee,
+  employee: initialEmployee,
   open,
   onOpenChange,
   mode,
@@ -103,6 +141,24 @@ export function EmployeeDrawer({
 }: EmployeeDrawerProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const [isSaving, setIsSaving] = useState(false);
+
+  // Fetch the full employee record when the drawer opens
+  const { data: detail, isLoading: isDetailLoading } = useAdminEmployee(
+    open && initialEmployee?.id ? initialEmployee.id : 0,
+  );
+
+  // Memoized so the form-reset effect doesn't fire on every render
+  const initialResolved = useMemo(
+    () => resolveEmployee(initialEmployee),
+    [initialEmployee],
+  );
+  const employee = useMemo(
+    () =>
+      detail
+        ? { ...initialResolved, ...resolveEmployee(detail) }
+        : initialResolved,
+    [detail, initialResolved],
+  );
 
   const form = useForm<EmployeeFormValues>({
     resolver: zodResolver(employeeSchema),
@@ -169,10 +225,10 @@ export function EmployeeDrawer({
     value: string;
     icon?: any;
   }) => (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
+    <div className="flex items-start gap-3 py-3 border-b border-border/70 last:border-0">
       {Icon && <Icon className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500">{label}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-sm font-medium mt-0.5 wrap-break-word">
           {value || "—"}
         </p>
@@ -187,7 +243,7 @@ export function EmployeeDrawer({
     title: string;
     children: React.ReactNode;
   }) => (
-    <div className="bg-gray-50 rounded-lg p-5">
+    <div className="bg-muted/60 rounded-lg p-5">
       <h3 className="text-sm font-medium text-gray-700 mb-4">{title}</h3>
       <div className="space-y-1">{children}</div>
     </div>
@@ -205,7 +261,7 @@ export function EmployeeDrawer({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs text-gray-500">{label}</FormLabel>
+          <FormLabel className="text-xs text-muted-foreground">{label}</FormLabel>
           <FormControl>
             <div className="relative">
               {Icon && (
@@ -231,7 +287,7 @@ export function EmployeeDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none! data-[side=right]:max-w-none!">
         {/* Header with gradient background */}
-        <div className="bg-linear-to-r from-blue-600 to-blue-800 text-white p-8 sticky top-0 z-20">
+        <div className="bg-navy-900 text-white p-8 sticky top-0 z-20">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center">
@@ -242,8 +298,9 @@ export function EmployeeDrawer({
                   {employee.firstName} {employee.lastName}
                 </SheetTitle>
                 <p className="text-blue-100 text-sm mt-1">
-                  {employee.employeeId} • {employee.position} • Joined{" "}
-                  {new Date(employee.dateJoined).getFullYear()}
+                  {employee.employeeId || "—"} • {employee.position || "—"}
+                  {getYearSafe(employee.dateJoined) !== null &&
+                    " • Joined " + getYearSafe(employee.dateJoined)}
                 </p>
               </div>
             </div>
@@ -308,7 +365,7 @@ export function EmployeeDrawer({
         </div>
 
         {/* Tabs navigation */}
-        <div className="border-b px-8 sticky top-39 bg-white z-10">
+        <div className="border-b px-8 sticky top-39 bg-card z-10">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
@@ -345,6 +402,9 @@ export function EmployeeDrawer({
 
         {/* Tab content */}
         <div className="p-8">
+          {isDetailLoading ? (
+            <DrawerLoading />
+          ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             {/* Overview Tab */}
             <TabsContent value="overview" className="mt-0">
@@ -497,7 +557,7 @@ export function EmployeeDrawer({
                     </SectionCard>
 
                     {/* Form Actions */}
-                    <div className="flex items-center justify-end gap-3 sticky bottom-0 bg-white py-4 border-t">
+                    <div className="flex items-center justify-end gap-3 sticky bottom-0 bg-card py-4 border-t">
                       <Button
                         type="button"
                         variant="outline"
@@ -529,7 +589,7 @@ export function EmployeeDrawer({
                     <div className="bg-blue-50 p-4 rounded-lg text-center">
                       <Building2 className="h-6 w-6 text-blue-500 mx-auto mb-2" />
                       <p className="text-sm font-medium">{employee.company}</p>
-                      <p className="text-xs text-gray-500">Company</p>
+                      <p className="text-xs text-muted-foreground">Company</p>
                     </div>
                     <div className="bg-green-50 p-4 rounded-lg text-center">
                       <Shield className="h-6 w-6 text-green-500 mx-auto mb-2" />
@@ -540,19 +600,19 @@ export function EmployeeDrawer({
                             ? "Pending"
                             : "Not Submitted"}
                       </p>
-                      <p className="text-xs text-gray-500">NIN Status</p>
+                      <p className="text-xs text-muted-foreground">NIN Status</p>
                     </div>
                     <div className="bg-purple-50 p-4 rounded-lg text-center">
                       <Heart className="h-6 w-6 text-purple-500 mx-auto mb-2" />
                       <p className="text-2xl font-bold">
                         {employee.beneficiaries}
                       </p>
-                      <p className="text-xs text-gray-500">Beneficiaries</p>
+                      <p className="text-xs text-muted-foreground">Beneficiaries</p>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-lg text-center">
                       <FileText className="h-6 w-6 text-orange-500 mx-auto mb-2" />
                       <p className="text-2xl font-bold">{employee.policies}</p>
-                      <p className="text-xs text-gray-500">Policies</p>
+                      <p className="text-xs text-muted-foreground">Policies</p>
                     </div>
                   </div>
 
@@ -567,9 +627,7 @@ export function EmployeeDrawer({
                         />
                         <InfoRow
                           label="Date of Birth"
-                          value={new Date(
-                            employee.dateOfBirth,
-                          ).toLocaleDateString()}
+                          value={formatDateSafe(employee.dateOfBirth)}
                           icon={Calendar}
                         />
                         <InfoRow
@@ -602,9 +660,7 @@ export function EmployeeDrawer({
                         />
                         <InfoRow
                           label="Date Joined"
-                          value={new Date(
-                            employee.dateJoined,
-                          ).toLocaleDateString()}
+                          value={formatDateSafe(employee.dateJoined)}
                           icon={Calendar}
                         />
                       </SectionCard>
@@ -625,7 +681,12 @@ export function EmployeeDrawer({
                         />
                         <InfoRow
                           label="Address"
-                          value={`${employee.address}, ${employee.city}, ${employee.state}, ${employee.country}`}
+                          value={joinAddress([
+                            employee.address,
+                            employee.city,
+                            employee.state,
+                            employee.country,
+                          ])}
                           icon={MapPin}
                         />
                       </SectionCard>
@@ -645,7 +706,7 @@ export function EmployeeDrawer({
                         {employee.ninVerified && (
                           <InfoRow
                             label="Verified Date"
-                            value="2024-03-15"
+                            value={formatDateSafe(employee.ninVerifiedAt)}
                             icon={Calendar}
                           />
                         )}
@@ -658,10 +719,10 @@ export function EmployeeDrawer({
 
             {/* Beneficiaries Tab */}
             <TabsContent value="beneficiaries" className="mt-0">
-              <div className="text-center py-16 bg-gray-50 rounded-lg">
+              <div className="text-center py-16 bg-muted/60 rounded-lg">
                 <Heart className="h-16 w-16 mx-auto text-gray-300 mb-4" />
                 <h3 className="text-lg font-medium mb-2">Beneficiaries</h3>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-muted-foreground mb-6">
                   This employee has {employee.beneficiaries} registered
                   beneficiaries
                 </p>
@@ -671,10 +732,10 @@ export function EmployeeDrawer({
 
             {/* Policies Tab */}
             <TabsContent value="policies" className="mt-0">
-              <div className="text-center py-16 bg-gray-50 rounded-lg">
+              <div className="text-center py-16 bg-muted/60 rounded-lg">
                 <Shield className="h-16 w-16 mx-auto text-gray-300 mb-4" />
                 <h3 className="text-lg font-medium mb-2">Insurance Policies</h3>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-muted-foreground mb-6">
                   This employee has {employee.policies} active policies
                 </p>
                 <Button>View Policies</Button>
@@ -683,24 +744,30 @@ export function EmployeeDrawer({
 
             {/* Documents Tab */}
             <TabsContent value="documents" className="mt-0">
-              <div className="text-center py-16 bg-gray-50 rounded-lg">
+              <div className="text-center py-16 bg-muted/60 rounded-lg">
                 <FileText className="h-16 w-16 mx-auto text-gray-300 mb-4" />
                 <h3 className="text-lg font-medium mb-2">Employee Documents</h3>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-muted-foreground mb-6">
                   NIN slip, passport photographs, and other documents
                 </p>
                 <Button variant="outline">View Documents</Button>
               </div>
             </TabsContent>
           </Tabs>
+          )}
         </div>
 
         {/* Footer with actions */}
         {mode === "view" && (
-          <div className="border-t p-6 bg-gray-50 sticky bottom-0">
+          <div className="border-t p-6 bg-muted/60 sticky bottom-0">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-500">
-                <span className="font-medium">Last updated:</span> 2 days ago
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium">Last updated:</span>{" "}
+                {formatDateSafe(employee.updatedAt, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
               </div>
               <div className="flex items-center gap-2">
                 <Button

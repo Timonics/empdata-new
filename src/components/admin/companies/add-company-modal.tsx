@@ -120,7 +120,7 @@ export function AddCompanyModal({ open, onOpenChange }: AddCompanyModalProps) {
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            <h1 className="text-3xl font-semibold tracking-tight bg-linear-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">
               Add New Company
             </h1>
           </DialogTitle>

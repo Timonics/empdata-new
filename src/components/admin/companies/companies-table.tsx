@@ -1,5 +1,7 @@
 "use client";
 
+import { useClientPagination } from "@/hooks/useClientPagination";
+
 import { useState, useEffect } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
@@ -32,10 +34,14 @@ import {
   Loader2,
   RefreshCw,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, toFiniteNumber } from "@/lib/utils";
 import { CompanyDrawer } from "./company-drawer";
 import { DeleteCompanyModal } from "./delete-company-modal";
-import { useCompanies, useDeleteCompany } from "@/hooks/queries/useCompanies";
+import {
+  useCompanies,
+  useDeleteCompany,
+  useUpdateCompany,
+} from "@/hooks/queries/useCompanies";
 import { format } from "date-fns";
 import { CompanyStatus } from "@/types/company.types";
 
@@ -51,7 +57,7 @@ interface CompaniesTableProps {
 
 const statusStyles = {
   active: "bg-green-100 text-green-800 border-green-200",
-  inactive: "bg-gray-100 text-gray-800 border-gray-200",
+  inactive: "bg-muted text-foreground border-border",
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
   suspended: "bg-red-100 text-red-800 border-red-200",
 };
@@ -99,21 +105,29 @@ export function CompaniesTable({
   });
 
   const deleteMutation = useDeleteCompany();
+  const updateMutation = useUpdateCompany();
 
   const companies = data?.data || [];
   const pagination = data?.pagination;
 
-  // Notify parent of counts
+
+
+  // Client-side pager fallback when the API returns no pagination meta
+  const client = useClientPagination(companies, pageSize, !pagination);
+
+  // Notify parent of counts (guarded against value-only changes)
   useEffect(() => {
     if (pagination) {
       onCountsChange?.(pagination.total, companies.length);
     }
-  }, [pagination, companies.length, onCountsChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination?.total, companies.length]);
 
   // Notify parent of selection changes
   useEffect(() => {
     onSelectionChange?.(selectedRows);
-  }, [selectedRows, onSelectionChange]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRows]);
 
   // Handle row selection
   const toggleAllRows = () => {
@@ -161,7 +175,8 @@ export function CompaniesTable({
   };
 
   const handleSaveCompany = async (data: any) => {
-    console.log("Saving company:", data);
+    if (!drawerCompany?.id) return;
+    await updateMutation.mutateAsync({ id: drawerCompany.id, data });
   };
 
   const handlePageChange = (page: number) => {
@@ -207,17 +222,19 @@ export function CompaniesTable({
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 border">
             <AvatarFallback className="bg-blue-100 text-blue-600">
-              {item.name
-                ?.split(" ")
+              {(item.company_name || item.name || "CO")
+                .split(" ")
                 .map((n: string) => n[0])
                 .join("")
                 .slice(0, 2)
-                .toUpperCase() || "CO"}
+                .toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-medium">{item.name}</p>
-            <p className="text-xs text-muted-foreground">{item.admin_name}</p>
+            <p className="font-medium">{item.company_name || item.name}</p>
+            <p className="text-xs text-muted-foreground">
+              {item.admin_name || "—"}
+            </p>
           </div>
         </div>
       ),
@@ -225,7 +242,7 @@ export function CompaniesTable({
     {
       header: "RC Number",
       cell: (item: any) => (
-        <code className="rounded bg-gray-100 px-2 py-1 text-xs">
+        <code className="rounded bg-muted px-2 py-1 text-xs">
           {item.rc_number}
         </code>
       ),
@@ -248,7 +265,7 @@ export function CompaniesTable({
           className={cn(
             "font-medium",
             statusStyles[item.status as keyof typeof statusStyles] ||
-              "bg-gray-100",
+              "bg-muted",
           )}
         >
           {item.status}
@@ -258,11 +275,16 @@ export function CompaniesTable({
     {
       header: "Employees",
       sortable: true,
-      cell: (item: any) => (
-        <span className="font-medium text-center block">
-          {item.employees_count?.toLocaleString() || 0}
-        </span>
-      ),
+      cell: (item: any) => {
+        const count =
+          item.employees_count ??
+          (Array.isArray(item.employees) ? item.employees.length : undefined);
+        return (
+          <span className="font-medium text-center block">
+            {count !== undefined ? toFiniteNumber(count).toLocaleString() : "—"}
+          </span>
+        );
+      },
       className: "text-center",
     },
     {
@@ -270,8 +292,8 @@ export function CompaniesTable({
       sortable: true,
       cell: (item: any) => (
         <span className="text-sm text-muted-foreground">
-          {item.joined_date
-            ? format(new Date(item.joined_date), "MMM d, yyyy")
+          {item.joined_date || item.created_at
+            ? format(new Date(item.joined_date || item.created_at), "MMM d, yyyy")
             : "N/A"}
         </span>
       ),
@@ -372,7 +394,7 @@ export function CompaniesTable({
 
       {/* Data Table */}
       <DataTable
-        data={companies}
+        data={client.rows}
         columns={columns}
         isLoading={isLoading}
         onSearch={handleSearch}
@@ -385,7 +407,7 @@ export function CompaniesTable({
                 totalItems: pagination.total,
                 onPageChange: handlePageChange,
               }
-            : undefined
+            : client.pagination
         }
         emptyMessage="No companies found"
         // onRowClick={(item) => handleView(item)}

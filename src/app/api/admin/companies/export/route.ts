@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { callBackend } from "@/lib/server-api";
+import axios from "axios";
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL;
+
+/**
+ * Export companies to CSV.
+ * Proxies the file stream from the backend with the admin token.
+ */
 export async function GET(request: Request) {
   try {
     const cookieStore = await cookies();
@@ -14,38 +20,43 @@ export async function GET(request: Request) {
       );
     }
 
+    if (!BACKEND_URL) {
+      return NextResponse.json(
+        { success: false, message: "Backend URL is not configured" },
+        { status: 500 },
+      );
+    }
+
     const url = new URL(request.url);
     const queryString = url.searchParams.toString();
 
-    const result = await callBackend({
-      method: "GET",
-      path: `/admin/companies/export${queryString ? `?${queryString}` : ""}`,
-      authType: "super-admin",
-      token,
-    });
-
-    if (result.success) {
-      // Return CSV file
-      return new NextResponse(result.data, {
-        headers: {
-          "Content-Type": "text/csv",
-          "Content-Disposition": `attachment; filename="companies-${new Date().toISOString().split("T")[0]}.csv"`,
-        },
-      });
-    }
-
-    return NextResponse.json(
+    const response = await axios.get(
+      `${BACKEND_URL}/admin/companies/export${queryString ? `?${queryString}` : ""}`,
       {
-        success: false,
-        message: result.message || "Failed to export companies",
+        responseType: "arraybuffer",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "x-auth-type": "super-admin",
+        },
+        timeout: 120000,
       },
-      { status: result.status || 400 },
     );
+
+    return new NextResponse(Buffer.from(response.data), {
+      status: 200,
+      headers: {
+        "Content-Type": "text/csv",
+        "Content-Disposition": `attachment; filename="companies-${new Date().toISOString().split("T")[0]}.csv"`,
+      },
+    });
   } catch (error) {
-    console.error("Export companies API error:", error);
+    const status = axios.isAxiosError(error)
+      ? error.response?.status
+      : undefined;
+    console.error("Export companies API error:", status || error);
     return NextResponse.json(
-      { success: false, message: "Internal server error" },
-      { status: 500 },
+      { success: false, message: "Failed to export companies" },
+      { status: status || 500 },
     );
   }
 }

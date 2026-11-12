@@ -132,15 +132,15 @@ export function DocumentUploadStep({
     if (existingFile) {
       return (
         <div className="relative">
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
+          <div className="flex items-center gap-3 p-3 bg-muted/60 rounded-lg border">
             {existingFile.preview ? (
               <img src={existingFile.preview} alt="Preview" className="w-12 h-12 rounded object-cover" />
             ) : (
               <FileText className="w-12 h-12 text-blue-600 p-2 bg-blue-50 rounded" />
             )}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{existingFile.file.name}</p>
-              <p className="text-xs text-gray-500">
+              <p className="text-sm font-medium text-foreground truncate">{existingFile.file.name}</p>
+              <p className="text-xs text-muted-foreground">
                 {(existingFile.file.size / 1024 / 1024).toFixed(2)} MB
               </p>
               <div className="flex items-center gap-1 text-xs text-green-600 mt-1">
@@ -150,9 +150,9 @@ export function DocumentUploadStep({
             </div>
             <button
               onClick={() => removeFile(existingFile)}
-              className="p-1 hover:bg-gray-200 rounded-full transition-colors"
+              className="p-1 hover:bg-muted rounded-full transition-colors"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-4 h-4 text-muted-foreground" />
             </button>
           </div>
         </div>
@@ -166,15 +166,15 @@ export function DocumentUploadStep({
           "border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all",
           isDragActive
             ? "border-blue-500 bg-blue-50"
-            : "border-gray-300 hover:border-blue-400 hover:bg-gray-50"
+            : "border-gray-300 hover:border-blue-400 hover:bg-muted/60"
         )}
       >
         <input {...getInputProps()} />
-        <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-        <p className="text-sm font-medium text-gray-700">
+        <Upload className="w-8 h-8 mx-auto text-muted-foreground/70 mb-2" />
+        <p className="text-sm font-medium text-foreground/80">
           {isDragActive ? 'Drop your file here' : `Upload ${label}`}
         </p>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-muted-foreground mt-1">
           PDF, PNG, JPG up to 5MB
         </p>
       </div>
@@ -201,16 +201,16 @@ export function DocumentUploadStep({
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Document Upload</h3>
-        <p className="text-sm text-gray-500">
+        <h3 className="text-lg font-medium text-foreground mb-2">Document Upload</h3>
+        <p className="text-sm text-muted-foreground">
           Upload the required documents for verification. All documents must be clear and legible.
         </p>
       </div>
 
       <div className="space-y-6">
         {/* Identity Card */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-card rounded-xl border border-border p-6">
+          <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 text-xs flex items-center justify-center font-bold">
               1
             </span>
@@ -230,8 +230,8 @@ export function DocumentUploadStep({
 
         {/* CAC Document (for corporate) */}
         {isCorporate && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 text-xs flex items-center justify-center font-bold">
                 2
               </span>
@@ -251,8 +251,8 @@ export function DocumentUploadStep({
         )}
 
         {/* Passport Photograph */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-card rounded-xl border border-border p-6">
+          <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 text-xs flex items-center justify-center font-bold">
               {isCorporate ? '3' : '2'}
             </span>
@@ -271,8 +271,8 @@ export function DocumentUploadStep({
 
         {/* Scanned Signature (for individuals) */}
         {(isIndividual) && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
               <span className="w-6 h-6 rounded-full bg-orange-100 text-orange-600 text-xs flex items-center justify-center font-bold">
                 3
               </span>
@@ -293,9 +293,9 @@ export function DocumentUploadStep({
 
         {/* NIN Document (if applicable) */}
         {requiresNIN && (isIndividual) && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h4 className="font-medium text-gray-900 mb-4 flex items-center gap-2">
-              <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 text-xs flex items-center justify-center font-bold">
+          <div className="bg-card rounded-xl border border-border p-6">
+            <h4 className="font-medium text-foreground mb-4 flex items-center gap-2">
+              <span className="w-6 h-6 rounded-full bg-brand-100 text-brand-700 text-xs flex items-center justify-center font-bold">
                 4
               </span>
               NIN Document
@@ -315,9 +315,9 @@ export function DocumentUploadStep({
       </div>
 
       {/* Upload Guidelines */}
-      <div className="bg-gray-50 rounded-xl p-4">
-        <h5 className="text-sm font-medium text-gray-700 mb-2">Upload Guidelines</h5>
-        <ul className="text-xs text-gray-500 space-y-1 list-disc list-inside">
+      <div className="bg-muted/60 rounded-xl p-4">
+        <h5 className="text-sm font-medium text-foreground/80 mb-2">Upload Guidelines</h5>
+        <ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
           <li>Files must be in PDF, PNG, or JPG format</li>
           <li>Maximum file size: 5MB per file</li>
           <li>Documents must be clear and fully visible</li>
@@ -327,10 +327,10 @@ export function DocumentUploadStep({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+      <div className="flex items-center justify-between pt-6 border-t border-border">
         <button
           onClick={onBack}
-          className="px-8 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+          className="px-8 py-3 rounded-xl font-medium text-muted-foreground hover:bg-muted transition-colors"
         >
           Back
         </button>
@@ -340,8 +340,8 @@ export function DocumentUploadStep({
           className={cn(
             "px-8 py-3 rounded-xl font-medium transition-all",
             isFormValid()
-              ? "bg-linear-to-r from-blue-600 to-emerald-600 text-white hover:shadow-lg hover:scale-105"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              ? "bg-primary text-primary-foreground shadow-sm hover:bg-brand-700"
+              : "bg-muted text-muted-foreground/70 cursor-not-allowed"
           )}
         >
           Continue

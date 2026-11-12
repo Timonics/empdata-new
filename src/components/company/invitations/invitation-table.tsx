@@ -276,7 +276,7 @@ export function InvitationsTable() {
 
   return (
     <>
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-card">
         <DataTable
           data={invitations}
           columns={columns}

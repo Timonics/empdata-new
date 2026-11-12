@@ -119,7 +119,7 @@ export function DocumentCategories() {
                 "p-3 rounded-lg cursor-pointer transition-all",
                 selectedCategory === category.id
                   ? "bg-emerald-50 border border-emerald-200"
-                  : "hover:bg-gray-50 border border-transparent"
+                  : "hover:bg-muted/60 border border-transparent"
               )}
               onClick={() => setSelectedCategory(category.id)}
             >
@@ -152,7 +152,7 @@ export function DocumentCategories() {
                   <p className="text-xs font-medium text-emerald-700 mb-2">Required Documents:</p>
                   <ul className="space-y-1">
                     {category.documents.map((doc, index) => (
-                      <li key={index} className="flex items-center gap-2 text-xs text-gray-600">
+                      <li key={index} className="flex items-center gap-2 text-xs text-muted-foreground">
                         <FileCheck className="h-3 w-3 text-emerald-500" />
                         {doc}
                       </li>

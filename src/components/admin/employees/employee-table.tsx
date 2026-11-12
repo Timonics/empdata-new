@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useClientPagination } from "@/hooks/useClientPagination";
+
+import { useState, useEffect } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,190 +17,85 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   MoreHorizontal,
   Eye,
-  Edit,
-  Trash2,
   Mail,
-  Phone,
   Building2,
-  Shield,
   ShieldCheck,
   ShieldX,
   Clock,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EmployeeDrawer } from "./employee-drawer";
+import { useAdminEmployees } from "@/hooks/queries/useEmployees";
+import { formatDistanceToNow } from "date-fns";
+import type { PortalEmployee } from "@/types/employee.types";
 
-// Mock data - replace with actual data from API
-const employees = [
-  {
-    id: 1,
-    firstName: "John",
-    lastName: "Adeleke",
-    email: "john.adeleke@techcorp.com",
-    phone: "+234 801 234 5678",
-    employeeId: "EMP-001",
-    company: "TechCorp Solutions Ltd",
-    companyId: 1,
-    department: "Engineering",
-    position: "Senior Developer",
-    status: "verified",
-    ninVerified: true,
-    ninSubmitted: true,
-    dateJoined: "2024-01-15",
-    dateOfBirth: "1990-05-12",
-    gender: "Male",
-    address: "12 Lekki Phase 1",
-    city: "Lagos",
-    state: "Lagos State",
-    country: "Nigeria",
-    beneficiaries: 3,
-    policies: 2,
-  },
-  {
-    id: 2,
-    firstName: "Sarah",
-    lastName: "Okafor",
-    email: "sarah.okafor@globalindustries.ng",
-    phone: "+234 802 345 6789",
-    employeeId: "EMP-002",
-    company: "Global Industries Nigeria",
-    companyId: 2,
-    department: "Finance",
-    position: "Financial Controller",
-    status: "verified",
-    ninVerified: true,
-    ninSubmitted: true,
-    dateJoined: "2023-11-20",
-    dateOfBirth: "1985-08-23",
-    gender: "Female",
-    address: "23 Trans-Amadi",
-    city: "Port Harcourt",
-    state: "Rivers State",
-    country: "Nigeria",
-    beneficiaries: 2,
-    policies: 3,
-  },
-  {
-    id: 3,
-    firstName: "Michael",
-    lastName: "Okonkwo",
-    email: "michael.okonkwo@afrihealth.ng",
-    phone: "+234 803 456 7890",
-    employeeId: "EMP-003",
-    company: "AfriHealth Medical Services",
-    companyId: 3,
-    department: "Medical",
-    position: "Chief Medical Officer",
-    status: "pending",
-    ninVerified: false,
-    ninSubmitted: true,
-    dateJoined: "2024-03-01",
-    dateOfBirth: "1978-11-30",
-    gender: "Male",
-    address: "45 Wuse Zone 5",
-    city: "Abuja",
-    state: "FCT",
-    country: "Nigeria",
-    beneficiaries: 4,
-    policies: 1,
-  },
-  {
-    id: 4,
-    firstName: "Grace",
-    lastName: "Ogunleye",
-    email: "grace.ogunleye@edufirst.edu.ng",
-    phone: "+234 804 567 8901",
-    employeeId: "EMP-004",
-    company: "EduFirst Schools",
-    companyId: 4,
-    department: "Administration",
-    position: "School Administrator",
-    status: "verified",
-    ninVerified: true,
-    ninSubmitted: true,
-    dateJoined: "2023-08-10",
-    dateOfBirth: "1982-03-17",
-    gender: "Female",
-    address: "78 Ring Road",
-    city: "Ibadan",
-    state: "Oyo State",
-    country: "Nigeria",
-    beneficiaries: 2,
-    policies: 4,
-  },
-  {
-    id: 5,
-    firstName: "Chidi",
-    lastName: "Nnamdi",
-    email: "chidi.nnamdi@greenenergy.ng",
-    phone: "+234 805 678 9012",
-    employeeId: "EMP-005",
-    company: "Green Energy Solutions",
-    companyId: 5,
-    department: "Operations",
-    position: "Operations Manager",
-    status: "inactive",
-    ninVerified: false,
-    ninSubmitted: false,
-    dateJoined: "2024-02-15",
-    dateOfBirth: "1988-07-09",
-    gender: "Male",
-    address: "34 Mary Slessor Avenue",
-    city: "Calabar",
-    state: "Cross River State",
-    country: "Nigeria",
-    beneficiaries: 0,
-    policies: 0,
-  },
-  {
-    id: 6,
-    firstName: "Amara",
-    lastName: "Eze",
-    email: "amara.eze@techcorp.com",
-    phone: "+234 806 789 0123",
-    employeeId: "EMP-006",
-    company: "TechCorp Solutions Ltd",
-    companyId: 1,
-    department: "HR",
-    position: "HR Manager",
-    status: "verified",
-    ninVerified: true,
-    ninSubmitted: true,
-    dateJoined: "2024-01-20",
-    dateOfBirth: "1987-12-03",
-    gender: "Female",
-    address: "45 Victoria Island",
-    city: "Lagos",
-    state: "Lagos State",
-    country: "Nigeria",
-    beneficiaries: 2,
-    policies: 2,
-  },
-];
-
-const statusStyles = {
+const ninStatusStyles = {
   verified: "bg-green-100 text-green-800 border-green-200",
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  inactive: "bg-gray-100 text-gray-800 border-gray-200",
-  suspended: "bg-red-100 text-red-800 border-red-200",
+  not_submitted: "bg-muted text-foreground border-border",
 };
 
-const ninStatusIcons = {
-  verified: ShieldCheck,
-  pending: Clock,
-  not_submitted: ShieldX,
-};
+function getNINStatus(employee: PortalEmployee): keyof typeof ninStatusStyles {
+  const v = employee.nin_verification;
+  if (v?.is_nin_verified) return "verified";
+  if (v?.has_submitted_nin) return "pending";
+  return "not_submitted";
+}
 
-export function EmployeesTable() {
+export function EmployeesTable({
+  companyId,
+}: {
+  companyId?: number;
+}) {
+  // Pagination and filter state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(15);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [searchInput, setSearchInput] = useState("");
+
+  // Selection state
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
-  const [drawerEmployee, setDrawerEmployee] = useState<
-    (typeof employees)[0] | null
-  >(null);
+
+  // Drawer state
+  const [drawerEmployee, setDrawerEmployee] = useState<PortalEmployee | null>(
+    null,
+  );
   const [drawerMode, setDrawerMode] = useState<"view" | "edit">("view");
 
-  // Handle row selection
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCurrentPage(1);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
+  const { data, isLoading, refetch, isFetching } = useAdminEmployees({
+    page: currentPage,
+    per_page: pageSize,
+    search: searchInput || undefined,
+    employment_status:
+      statusFilter === "all" ? undefined : (statusFilter as "active" | "inactive"),
+    company_id: companyId,
+  });
+
+
+  const employees = data?.data || [];
+  const pagination = data?.pagination;
+
+  // Client-side pager fallback when the API returns no pagination meta
+  const client = useClientPagination(employees, pageSize, !pagination);
+
   const toggleAllRows = () => {
     if (selectedRows.length === employees.length) {
       setSelectedRows([]);
@@ -215,39 +112,28 @@ export function EmployeesTable() {
     }
   };
 
-  const handleView = (employee: (typeof employees)[0]) => {
-    setDrawerEmployee(employee);
-    setDrawerMode("view");
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSelectedRows([]);
   };
 
-  const handleEdit = (employee: (typeof employees)[0]) => {
-    setDrawerEmployee(employee);
-    setDrawerMode("edit");
+  const handlePageSizeChange = (size: string) => {
+    setPageSize(Number(size));
+    setCurrentPage(1);
+    setSelectedRows([]);
   };
 
-  const getNINStatusIcon = (employee: (typeof employees)[0]) => {
-    if (employee.ninVerified) return ShieldCheck;
-    if (employee.ninSubmitted) return Clock;
-    return ShieldX;
-  };
-
-  const getNINStatusColor = (employee: (typeof employees)[0]) => {
-    if (employee.ninVerified) return "text-green-600";
-    if (employee.ninSubmitted) return "text-yellow-600";
-    return "text-red-600";
-  };
-
-  // Define columns for the DataTable
   const columns = [
     {
       header: (
         <Checkbox
-          checked={selectedRows.length === employees.length}
+          checked={
+            employees.length > 0 && selectedRows.length === employees.length
+          }
           onCheckedChange={toggleAllRows}
         />
       ),
-      accessorKey: "id" as keyof (typeof employees)[0],
-      cell: (item: (typeof employees)[0]) => (
+      cell: (item: PortalEmployee) => (
         <Checkbox
           checked={selectedRows.includes(item.id)}
           onCheckedChange={() => toggleRow(item.id)}
@@ -257,95 +143,98 @@ export function EmployeesTable() {
     },
     {
       header: "Employee",
-      cell: (item: (typeof employees)[0]) => (
+      cell: (item: PortalEmployee) => (
         <div className="flex items-center gap-3">
           <Avatar className="h-9 w-9 border">
             <AvatarFallback className="bg-blue-100 text-blue-600">
-              {item.firstName[0]}
-              {item.lastName[0]}
+              {`${item.first_name?.[0] || ""}${item.last_name?.[0] || ""}`.toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
             <p className="font-medium">
-              {item.firstName} {item.lastName}
+              {item.first_name} {item.last_name}
             </p>
-            <p className="text-xs text-muted-foreground">{item.employeeId}</p>
+            <p className="text-xs text-muted-foreground">
+              {item.employee_number || "—"}
+            </p>
           </div>
         </div>
       ),
     },
     {
       header: "Company",
-      accessorKey: "company" as keyof (typeof employees)[0],
-      cell: (item: (typeof employees)[0]) => (
+      cell: (item: PortalEmployee) => (
         <div className="flex items-center gap-2">
-          <Building2 className="h-4 w-4 text-gray-400" />
-          <span className="text-sm">{item.company}</span>
+          <Building2 className="h-4 w-4 text-gray-400 shrink-0" />
+          <span className="text-sm">{item.company_name || "—"}</span>
         </div>
       ),
     },
     {
       header: "Contact",
-      cell: (item: (typeof employees)[0]) => (
+      cell: (item: PortalEmployee) => (
         <div>
           <p className="text-sm">{item.email}</p>
-          <p className="text-xs text-muted-foreground">{item.phone}</p>
+          <p className="text-xs text-muted-foreground">{item.phone || "—"}</p>
         </div>
       ),
     },
-    // {
-    //   header: "Department",
-    //   accessorKey: "department" as keyof (typeof employees)[0],
-    //   cell: (item: (typeof employees)[0]) => (
-    //     <span className="text-sm">{item.department}</span>
-    //   ),
-    // },
     {
-      header: "Status",
-      accessorKey: "status" as keyof (typeof employees)[0],
-      cell: (item: (typeof employees)[0]) => (
-        <Badge
-          variant="outline"
-          className={cn(
-            "font-medium",
-            statusStyles[item.status as keyof typeof statusStyles],
-          )}
-        >
-          {item.status}
-        </Badge>
-      ),
-    },
-    {
-      header: "NIN",
-      cell: (item: (typeof employees)[0]) => {
-        const Icon = getNINStatusIcon(item);
+      header: "NIN Status",
+      cell: (item: PortalEmployee) => {
+        const status = getNINStatus(item);
+        const Icon =
+          status === "verified"
+            ? ShieldCheck
+            : status === "pending"
+              ? Clock
+              : ShieldX;
         return (
-          <div className="flex items-center gap-2">
-            <Icon className={cn("h-4 w-4", getNINStatusColor(item))} />
-            <span className="text-sm">
-              {item.ninVerified
-                ? "Verified"
-                : item.ninSubmitted
-                  ? "Pending"
-                  : "Not Submitted"}
-            </span>
-          </div>
+          <Badge
+            variant="outline"
+            className={cn("font-medium", ninStatusStyles[status])}
+          >
+            <Icon className="mr-1 h-3 w-3" />
+            {status === "not_submitted"
+              ? "Not Submitted"
+              : status.charAt(0).toUpperCase() + status.slice(1)}
+          </Badge>
         );
       },
     },
     {
-      header: "Beneficiaries",
-      accessorKey: "beneficiaries" as keyof (typeof employees)[0],
-      cell: (item: (typeof employees)[0]) => (
-        <span className="font-medium text-center block">
-          {item.beneficiaries}
-        </span>
+      header: "Department",
+      cell: (item: PortalEmployee) => (
+        <div>
+          <p className="text-sm">{item.department || "—"}</p>
+          <p className="text-xs text-muted-foreground">
+            {item.position || ""}
+          </p>
+        </div>
       ),
-      className: "text-center",
+    },
+    {
+      header: "Joined",
+      cell: (item: PortalEmployee) => (
+        <div>
+          <span className="text-sm">
+            {item.created_at
+              ? new Date(item.created_at).toLocaleDateString()
+              : "—"}
+          </span>
+          {item.created_at && (
+            <p className="text-xs text-muted-foreground">
+              {formatDistanceToNow(new Date(item.created_at), {
+                addSuffix: true,
+              })}
+            </p>
+          )}
+        </div>
+      ),
     },
     {
       header: "",
-      cell: (item: (typeof employees)[0]) => (
+      cell: (item: PortalEmployee) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
@@ -355,26 +244,23 @@ export function EmployeesTable() {
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => handleView(item)}>
+            <DropdownMenuItem
+              onClick={() => {
+                setDrawerEmployee(item);
+                setDrawerMode("view");
+              }}
+            >
               <Eye className="mr-2 h-4 w-4" />
               View Details
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => handleEdit(item)}>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Employee
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                setDrawerEmployee(item);
+                setDrawerMode("edit");
+              }}
+            >
               <Mail className="mr-2 h-4 w-4" />
-              Send Email
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Phone className="mr-2 h-4 w-4" />
-              Call
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-red-600">
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
+              Edit Employee
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -383,25 +269,82 @@ export function EmployeesTable() {
     },
   ];
 
-  // Pagination state (mock)
-  const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = 10;
-
   return (
-    <>
+    <div className="space-y-4">
+      {/* Controls */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Select value={pageSize.toString()} onValueChange={handlePageSizeChange}>
+            <SelectTrigger className="w-24">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10 / page</SelectItem>
+              <SelectItem value="15">15 / page</SelectItem>
+              <SelectItem value="25">25 / page</SelectItem>
+              <SelectItem value="50">50 / page</SelectItem>
+              <SelectItem value="100">100 / page</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            title="Refresh"
+          >
+            <RefreshCw className={cn("h-4 w-4", isFetching && "animate-spin")} />
+          </Button>
+        </div>
+
+        {selectedRows.length > 0 && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">
+              {selectedRows.length} selected
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedRows([])}
+              className="h-8"
+            >
+              Clear
+            </Button>
+          </div>
+        )}
+      </div>
+
       <DataTable
-        data={employees}
+        data={client.rows}
         columns={columns}
-        isLoading={false}
-        pagination={{
-          currentPage,
-          totalPages,
-          onPageChange: setCurrentPage,
-        }}
+        isLoading={isLoading}
+        onSearch={setSearchInput}
+        searchPlaceholder="Search employees by name, email, or employee number..."
+        pagination={
+          pagination
+            ? {
+                currentPage: pagination.current_page,
+                totalPages: pagination.last_page,
+                totalItems: pagination.total,
+                onPageChange: handlePageChange,
+              }
+            : client.pagination
+        }
         emptyMessage="No employees found"
       />
 
-      {/* Employee Drawer for View/Edit */}
       {drawerEmployee && (
         <EmployeeDrawer
           employee={drawerEmployee}
@@ -411,10 +354,9 @@ export function EmployeesTable() {
           onModeChange={(mode) => setDrawerMode(mode)}
           onSave={async (data) => {
             console.log("Saving employee:", data);
-            // Implement save logic here
           }}
         />
       )}
-    </>
+    </div>
   );
 }

@@ -231,11 +231,11 @@ export function OnboardingWizard() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-white/10 bg-card text-card-foreground shadow-[0_40px_80px_-24px_rgba(0,0,0,0.55)]">
       {/* Progress Bar */}
-      <div className="h-2 bg-gray-100">
+      <div className="h-1.5 bg-muted">
         <motion.div
-          className="h-full bg-linear-to-r from-blue-600 to-emerald-600"
+          className="h-full bg-primary"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.3 }}

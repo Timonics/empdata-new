@@ -161,7 +161,7 @@ export function UploadDocumentDrawer({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
-        <div className="sticky top-0 bg-linear-to-r from-emerald-600 to-emerald-800 text-white p-6 z-10">
+        <div className="sticky top-0 bg-emerald-700 text-white p-6 z-10">
           <div className="flex items-center justify-between">
             <SheetTitle className="text-white text-xl">
               Upload Documents
@@ -188,7 +188,7 @@ export function UploadDocumentDrawer({
               "border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors",
               isDragActive
                 ? "border-emerald-500 bg-emerald-50"
-                : "border-gray-300 hover:border-emerald-400 hover:bg-gray-50",
+                : "border-gray-300 hover:border-emerald-400 hover:bg-muted/60",
             )}
           >
             <input {...getInputProps()} />
@@ -221,10 +221,10 @@ export function UploadDocumentDrawer({
                   return (
                     <div
                       key={index}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                      className="flex items-center gap-3 p-3 bg-muted/60 rounded-lg"
                     >
-                      <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center">
-                        <FileIcon className="h-4 w-4 text-gray-600" />
+                      <div className="h-8 w-8 rounded-lg bg-card flex items-center justify-center">
+                        <FileIcon className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">
@@ -314,7 +314,7 @@ export function UploadDocumentDrawer({
 
           {/* Actions */}
           {files.length > 0 && (
-            <div className="sticky bottom-0 bg-white py-4 border-t flex items-center justify-end gap-3">
+            <div className="sticky bottom-0 bg-card py-4 border-t flex items-center justify-end gap-3">
               <Button
                 type="button"
                 variant="outline"

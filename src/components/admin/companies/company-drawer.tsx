@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -51,7 +51,10 @@ import {
   Hash,
   AlertCircle,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDateSafe, getYearSafe, joinAddress } from "@/lib/utils";
+import { useCompany } from "@/hooks/queries/useCompanies";
+import { DrawerLoading } from "../registrations/drawer-loading";
+import { AddEmployeeModal } from "./add-employee-modal";
 
 // Validation schema for company form
 const companySchema = z.object({
@@ -88,12 +91,12 @@ interface CompanyDrawerProps {
   onOpenChange: (open: boolean) => void;
   mode: "view" | "edit";
   onModeChange?: (mode: "view" | "edit") => void;
-  onSave?: (data: CompanyFormValues) => Promise<void>;
+  onSave?: (data: any) => Promise<void>;
 }
 
 const statusStyles = {
   active: "bg-green-100 text-green-800 border-green-200",
-  inactive: "bg-gray-100 text-gray-800 border-gray-200",
+  inactive: "bg-muted text-foreground border-border",
   pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
   suspended: "bg-red-100 text-red-800 border-red-200",
 };
@@ -104,6 +107,35 @@ const statusOptions = [
   { value: "pending", label: "Pending", color: "yellow" },
   { value: "suspended", label: "Suspended", color: "red" },
 ];
+
+// Normalize a company record from the API (snake_case) into the camelCase
+// shape this drawer consumes, tolerating either naming convention.
+function resolveCompany(c: any) {
+  if (!c) return null;
+  return {
+    ...c,
+    name: c.company_name ?? c.name ?? "",
+    rcNumber: c.rc_number ?? c.rcNumber ?? "",
+    taxId: c.tax_id ?? c.taxId ?? "",
+    website: c.website ?? "",
+    email: c.email ?? "",
+    phone: c.phone ?? "",
+    address: c.address ?? c.house_address ?? "",
+    city: c.city ?? "",
+    state: c.state ?? "",
+    country: c.country ?? "",
+    insuranceType: c.insurance_type ?? c.insuranceType ?? "",
+    adminName: c.admin_name ?? c.adminName ?? "",
+    adminEmail: c.admin_email ?? c.adminEmail ?? "",
+    adminPhone: c.admin_phone ?? c.adminPhone ?? "",
+    adminPosition: c.admin_position ?? c.adminPosition ?? "",
+    joinedDate: c.joined_date ?? c.joinedDate ?? c.created_at ?? null,
+    employees: c.employees_count ?? c.employees ?? 0,
+    policies: c.policies_count ?? c.policies ?? 0,
+    createdAt: c.created_at ?? c.createdAt ?? null,
+    updatedAt: c.updated_at ?? c.updatedAt ?? null,
+  };
+}
 
 const insuranceOptions = [
   { value: "Group Life", label: "Group Life" },
@@ -116,7 +148,7 @@ const insuranceOptions = [
 ];
 
 export function CompanyDrawer({
-  company,
+  company: initialCompany,
   open,
   onOpenChange,
   mode,
@@ -125,6 +157,22 @@ export function CompanyDrawer({
 }: CompanyDrawerProps) {
   const [activeTab, setActiveTab] = useState("overview");
   const [isSaving, setIsSaving] = useState(false);
+  const [showAddEmployee, setShowAddEmployee] = useState(false);
+
+  // Fetch the full company record when the drawer opens
+  const { data: detail, isLoading: isDetailLoading } = useCompany(
+    open && initialCompany?.id ? initialCompany.id : 0,
+  );
+
+  // Memoized so the form-reset effect doesn't fire on every render
+  const initialResolved = useMemo(() => resolveCompany(initialCompany), [initialCompany]);
+  const company = useMemo(
+    () =>
+      detail
+        ? { ...initialResolved, ...resolveCompany(detail) }
+        : initialResolved,
+    [detail, initialResolved],
+  );
 
   const form = useForm<CompanyFormValues>({
     resolver: zodResolver(companySchema),
@@ -176,10 +224,25 @@ export function CompanyDrawer({
     setIsSaving(true);
     try {
       if (onSave) {
-        await onSave(data);
+        await onSave({
+          company_name: data.name,
+          rc_number: data.rcNumber,
+          tax_id: data.taxId,
+          website: data.website,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          country: data.country,
+          insurance_type: data.insuranceType,
+          status: data.status,
+          admin_name: data.adminName,
+          admin_email: data.adminEmail,
+          admin_phone: data.adminPhone,
+          admin_position: data.adminPosition,
+        });
       }
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       onModeChange?.("view");
     } catch (error) {
       console.error("Error saving company:", error);
@@ -197,10 +260,10 @@ export function CompanyDrawer({
     value: string;
     icon?: any;
   }) => (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
+    <div className="flex items-start gap-3 py-3 border-b border-border/70 last:border-0">
       {Icon && <Icon className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500">{label}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-sm font-medium mt-0.5 wrap-break-word">
           {value || "—"}
         </p>
@@ -215,7 +278,7 @@ export function CompanyDrawer({
     title: string;
     children: React.ReactNode;
   }) => (
-    <div className="bg-gray-50 rounded-lg p-5">
+    <div className="bg-muted/60 rounded-lg p-5">
       <h3 className="text-sm font-medium text-gray-700 mb-4">{title}</h3>
       <div className="space-y-1">{children}</div>
     </div>
@@ -233,7 +296,7 @@ export function CompanyDrawer({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel className="text-xs text-gray-500">{label}</FormLabel>
+          <FormLabel className="text-xs text-muted-foreground">{label}</FormLabel>
           <FormControl>
             <div className="relative">
               {Icon && (
@@ -258,7 +321,7 @@ export function CompanyDrawer({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
-        <div className="bg-linear-to-r from-blue-600 to-blue-800 text-white p-8 sticky top-0 z-20">
+        <div className="bg-navy-900 text-white p-8 sticky top-0 z-20">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center">
@@ -269,8 +332,9 @@ export function CompanyDrawer({
                   {company.name}
                 </SheetTitle>
                 <p className="text-blue-100 text-sm mt-1">
-                  RC: {company.rcNumber} • Since{" "}
-                  {new Date(company.joinedDate).getFullYear()}
+                  RC: {company.rcNumber || "—"}
+                  {getYearSafe(company.joinedDate) !== null &&
+                    " • Since " + getYearSafe(company.joinedDate)}
                 </p>
               </div>
             </div>
@@ -334,7 +398,7 @@ export function CompanyDrawer({
           </div>
         </div>
         {/* Tabs navigation - sticky */}
-        <div className="border-b px-8 sticky top-35 bg-white z-10">
+        <div className="border-b px-8 sticky top-35 bg-card z-10">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
@@ -370,6 +434,9 @@ export function CompanyDrawer({
         </div>
         {/* Tab content */}
         <div className="p-8">
+          {isDetailLoading ? (
+            <DrawerLoading />
+          ) : (
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             {/* Overview Tab */}
             <TabsContent value="overview" className="mt-0">
@@ -541,7 +608,7 @@ export function CompanyDrawer({
                     </SectionCard>
 
                     {/* Form Actions */}
-                    <div className="flex items-center justify-end gap-3 sticky bottom-0 bg-white py-4 border-t">
+                    <div className="flex items-center justify-end gap-3 sticky bottom-0 bg-card py-4 border-t">
                       <Button
                         type="button"
                         variant="outline"
@@ -573,25 +640,32 @@ export function CompanyDrawer({
                     <div className="bg-blue-50 p-4 rounded-lg text-center">
                       <Users className="h-6 w-6 text-blue-500 mx-auto mb-2" />
                       <p className="text-2xl font-bold">{company.employees}</p>
-                      <p className="text-xs text-gray-600">Employees</p>
+                      <p className="text-xs text-muted-foreground">Employees</p>
                     </div>
                     <div className="bg-green-50 p-4 rounded-lg text-center">
                       <Shield className="h-6 w-6 text-green-500 mx-auto mb-2" />
                       <p className="text-2xl font-bold">{company.policies}</p>
-                      <p className="text-xs text-gray-600">Policies</p>
+                      <p className="text-xs text-muted-foreground">Policies</p>
                     </div>
                     <div className="bg-purple-50 p-4 rounded-lg text-center">
                       <Calendar className="h-6 w-6 text-purple-500 mx-auto mb-2" />
                       <p className="text-2xl font-bold">
-                        {new Date().getFullYear() -
-                          new Date(company.joinedDate).getFullYear()}
+                        {getYearSafe(company.joinedDate) !== null
+                          ? Math.max(
+                              0,
+                              new Date().getFullYear() -
+                                (getYearSafe(company.joinedDate) || 0),
+                            )
+                          : "—"}
                       </p>
-                      <p className="text-xs text-gray-600">Years Active</p>
+                      <p className="text-xs text-muted-foreground">Years Active</p>
                     </div>
                     <div className="bg-orange-50 p-4 rounded-lg text-center">
                       <AlertCircle className="h-6 w-6 text-orange-500 mx-auto mb-2" />
-                      <p className="text-2xl font-bold">98%</p>
-                      <p className="text-xs text-gray-600">Compliance</p>
+                      <p className="text-2xl font-bold text-base wrap-break-word">
+                        {company.insuranceType || "—"}
+                      </p>
+                      <p className="text-xs text-muted-foreground">Plan Type</p>
                     </div>
                   </div>
 
@@ -634,7 +708,12 @@ export function CompanyDrawer({
                         />
                         <InfoRow
                           label="Address"
-                          value={`${company.address}, ${company.city}, ${company.state}, ${company.country}`}
+                          value={joinAddress([
+                            company.address,
+                            company.city,
+                            company.state,
+                            company.country,
+                          ])}
                           icon={MapPin}
                         />
                       </SectionCard>
@@ -668,23 +747,12 @@ export function CompanyDrawer({
                       <SectionCard title="Activity">
                         <InfoRow
                           label="Joined Date"
-                          value={new Date(
-                            company.joinedDate,
-                          ).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                          icon={Calendar}
-                        />
-                        <InfoRow
-                          label="Last Login"
-                          value="Today, 09:30 AM"
+                          value={formatDateSafe(company.joinedDate)}
                           icon={Calendar}
                         />
                         <InfoRow
                           label="Last Updated"
-                          value="2 days ago"
+                          value={formatDateSafe(company.updatedAt)}
                           icon={Calendar}
                         />
                       </SectionCard>
@@ -696,28 +764,35 @@ export function CompanyDrawer({
 
             {/* Employees Tab */}
             <TabsContent value="employees" className="mt-0">
-              <div className="text-center py-16 bg-gray-50 rounded-lg">
+              <div className="text-center py-16 bg-muted/60 rounded-lg">
                 <Users className="h-16 w-16 mx-auto text-gray-300 mb-4" />
                 <h3 className="text-lg font-medium mb-2">
                   Employee Management
                 </h3>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-muted-foreground mb-6">
                   This company has {company.employees} employees across various
                   departments
                 </p>
                 <div className="flex items-center justify-center gap-3">
-                  <Button>View All Employees</Button>
-                  <Button variant="outline">Add Employee</Button>
+                  <Button asChild>
+                    <a href="/admin/employees">View All Employees</a>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowAddEmployee(true)}
+                  >
+                    Add Employee
+                  </Button>
                 </div>
               </div>
             </TabsContent>
 
             {/* Policies Tab */}
             <TabsContent value="policies" className="mt-0">
-              <div className="text-center py-16 bg-gray-50 rounded-lg">
+              <div className="text-center py-16 bg-muted/60 rounded-lg">
                 <Shield className="h-16 w-16 mx-auto text-gray-300 mb-4" />
                 <h3 className="text-lg font-medium mb-2">Insurance Policies</h3>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-muted-foreground mb-6">
                   This company has {company.policies} active insurance policies
                 </p>
                 <Button>View All Policies</Button>
@@ -726,10 +801,10 @@ export function CompanyDrawer({
 
             {/* Documents Tab */}
             <TabsContent value="documents" className="mt-0">
-              <div className="text-center py-16 bg-gray-50 rounded-lg">
+              <div className="text-center py-16 bg-muted/60 rounded-lg">
                 <FileText className="h-16 w-16 mx-auto text-gray-300 mb-4" />
                 <h3 className="text-lg font-medium mb-2">Company Documents</h3>
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm text-muted-foreground mb-6">
                   CAC registration, tax certificates, and other official
                   documents
                 </p>
@@ -746,14 +821,29 @@ export function CompanyDrawer({
               </div>
             </TabsContent>
           </Tabs>
+          )}
         </div>
+        {/* Add Employee Modal */}
+        {company.id && (
+          <AddEmployeeModal
+            companyId={company.id}
+            companyName={company.name}
+            open={showAddEmployee}
+            onOpenChange={setShowAddEmployee}
+          />
+        )}
+
         {/* Footer with actions - sticky */}
         {mode === "view" && (
-          <div className="border-t p-6 bg-gray-50 sticky bottom-0">
+          <div className="border-t p-6 bg-muted/60 sticky bottom-0">
             <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-500">
-                <span className="font-medium">Last updated:</span> 2 days ago by
-                Admin
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium">Last updated:</span>{" "}
+                {formatDateSafe(company.updatedAt, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
               </div>
               <div className="flex items-center gap-2">
                 <Button

@@ -10,13 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AuthCard } from "./auth-card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, CheckCircle2, ArrowLeft } from "lucide-react";
 import { AuthService } from "@/services/auth.service";
@@ -64,11 +64,11 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
   const getLoginLink = () => {
     switch (role) {
       case "admin":
-        return "/admin/auth/login";
+        return "/admin/login";
       case "company":
         return "/portal/auth";
       case "employee":
-        return "/portal/auth/employee";
+        return "/portal/auth";
     }
   };
 
@@ -90,12 +90,15 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
     setError(null);
 
     try {
-      const response = await AuthService.resetPassword({
-        token,
-        email,
-        password: data.password,
-        password_confirmation: data.confirmPassword,
-      });
+      const response = await AuthService.resetPassword(
+        {
+          token,
+          email,
+          password: data.password,
+          password_confirmation: data.confirmPassword,
+        },
+        role === "admin" ? "admin" : "portal"
+      );
 
       if (response.success) {
         setSuccess(true);
@@ -116,7 +119,7 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
 
   if (!token || !email) {
     return (
-      <Card>
+      <AuthCard>
         <CardHeader>
           <CardTitle>Invalid reset link</CardTitle>
           <CardDescription>
@@ -127,7 +130,7 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
           <Link
             href={
               role === "admin"
-                ? "/admin/auth/forgot-password"
+                ? "/admin/forgot-password"
                 : role === "company"
                   ? "/portal/auth/forgot-password"
                   : "/portal/auth/employee/forgot-password"
@@ -137,13 +140,13 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
             Request a new reset link
           </Link>
         </CardFooter>
-      </Card>
+      </AuthCard>
     );
   }
 
   if (success) {
     return (
-      <Card>
+      <AuthCard>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-6 w-6 text-green-500" />
@@ -169,12 +172,12 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
             Go to login
           </Link>
         </CardFooter>
-      </Card>
+      </AuthCard>
     );
   }
 
   return (
-    <Card>
+    <AuthCard>
       <CardHeader>
         <CardTitle>Reset your password</CardTitle>
         <CardDescription>Enter your new password below</CardDescription>
@@ -215,11 +218,11 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
             )}
           </div>
 
-          <div className="rounded-md bg-blue-50 p-4">
-            <p className="text-sm text-blue-800 font-medium">
+          <div className="rounded-md bg-brand-50 dark:bg-brand-950 border border-brand-200 dark:border-brand-800 p-4">
+            <p className="text-sm text-brand-800 dark:text-brand-200 font-medium">
               Password requirements:
             </p>
-            <ul className="mt-2 text-sm text-blue-700 list-disc list-inside">
+            <ul className="mt-2 text-sm text-brand-700 dark:text-brand-300 list-disc list-inside">
               <li>At least 8 characters long</li>
               <li>At least one uppercase letter</li>
               <li>At least one lowercase letter</li>
@@ -248,6 +251,6 @@ export function ResetPasswordForm({ role }: ResetPasswordFormProps) {
           Back to login
         </Link>
       </CardFooter>
-    </Card>
+    </AuthCard>
   );
 }

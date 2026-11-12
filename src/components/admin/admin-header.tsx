@@ -1,53 +1,108 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-import { useSidebar } from "@/contexts/sidebar-context";
-import { useAuth } from "@/hooks/useAuth";
-import { Button } from "@/components/ui/button";
+import { useRouter, usePathname } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 import {
   Bell,
-  PanelRight,
-  User,
-  Settings,
-  LogOut,
-  HelpCircle,
   ChevronDown,
+  LogOut,
+  User as UserIcon,
+  Settings as SettingsIcon,
+  Building2,
+  Users,
+  UserCheck,
+  FileCheck,
 } from "lucide-react";
 import { ProfileModal } from "./profile-modal";
 import { LogoutDialog } from "./logout-dialog";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import {
+  useRegistrationStatusSummary,
+  useRecentRegistrations,
+} from "@/hooks/queries/useAnalytics";
+import { formatDistanceToNow } from "date-fns";
+import type { RecentRegistration } from "@/types/analytics.types";
 
 export function AdminHeader() {
   const router = useRouter();
-  const pathname = usePathname();
-  const { toggleSidebar } = useSidebar();
   const { user, logout, isLoggingOut } = useAuth();
 
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
-  // Generate page title in your original style
+  const pathname = usePathname();
   const getPageTitle = () => {
-    if (pathname === "/admin") {
-      return "Dashboard";
-    }
-
+    if (pathname === "/admin") return "Dashboard";
     const pathSegment = pathname.split("/").pop() || "";
     return (
       pathSegment.charAt(0).toUpperCase() +
       pathSegment.slice(1).replace(/-/g, " ")
     );
   };
+
+  // Real notification sources: pending review workload + recent submissions
+  const { data: summary } = useRegistrationStatusSummary();
+  const { data: recent } = useRecentRegistrations(24);
+
+  const pendingCompanies =
+    summary?.company_registrations?.by_status?.pending_approval ?? 0;
+  const pendingEmployees =
+    summary?.employee_registrations?.by_status?.pending_approval ?? 0;
+  const pendingTotal = pendingCompanies + pendingEmployees;
+
+  const recentItems: RecentRegistration[] = recent?.data ?? [];
+
+  interface NotificationItem {
+    key: string;
+    title: string;
+    description: string;
+    time: string;
+    icon: typeof FileCheck;
+    href: string;
+  }
+
+  const notifications: NotificationItem[] = [];
+
+  if (pendingTotal > 0) {
+    notifications.push({
+      key: "pending-review",
+      title: `${pendingTotal} registration${pendingTotal === 1 ? "" : "s"} pending review`,
+      description: `${pendingCompanies} company / director, ${pendingEmployees} employee submission${
+        pendingEmployees === 1 ? "" : "s"
+      } awaiting approval`,
+      time: "Workload",
+      icon: FileCheck,
+      href: "/admin/registrations/group-life",
+    });
+  }
+
+  for (const item of recentItems.slice(0, 5)) {
+    notifications.push({
+      key: `${item.type}-${item.id}`,
+      title: `New ${item.type} registration`,
+      description: `${item.name} · ${item.email}`,
+      time: item.submitted_at
+        ? formatDistanceToNow(new Date(item.submitted_at), { addSuffix: true })
+        : "",
+      icon: item.type === "company" ? Building2 : Users,
+      href:
+        item.type === "company"
+          ? "/admin/registrations/group-life"
+          : "/admin/registrations/employee-group-life",
+    });
+  }
 
   const handleLogout = async () => {
     try {
@@ -73,113 +128,125 @@ export function AdminHeader() {
 
   return (
     <>
-      <header className="border-b-2 border-black/5 bg-white/95 backdrop-blur supports-backdrop-filter:bg-white/60">
-        <div className="flex h-16 items-center justify-between px-4 md:px-6">
-          {/* Left section - Toggle and Title */}
-          <div className="flex items-center gap-6">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleSidebar}
-              className="hidden md:inline-flex"
-            >
-              <PanelRight className="h-5 w-5" />
-            </Button>
+      <header className="z-10 flex h-16 shrink-0 items-center justify-between border-b border-border/70 bg-card/80 px-4 backdrop-blur-md md:px-6">
+        {/* Left — page title */}
+        <div className="flex min-w-0 items-center gap-3">
+          <h1 className="truncate font-display text-lg font-semibold tracking-tight">
+            {getPageTitle()}
+          </h1>
+        </div>
 
-            <h2 className="text-2xl md:text-3xl font-medium">
-              {getPageTitle()}
-            </h2>
-          </div>
+        {/* Right — actions */}
+        <div className="flex items-center gap-1.5">
+          <ThemeToggle />
 
-          {/* Right section - Actions */}
-          <div className="flex items-center gap-4">
-            {/* Notifications */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute -right-0.5 -top-0.5 h-4 w-4 rounded-full bg-red-500 text-[10px] font-medium text-white flex items-center justify-center">
-                    3
+          {/* Notifications — fed by real pending counts and recent registrations */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="relative">
+                <Bell className="size-4.5" />
+                {pendingTotal > 0 && (
+                  <span className="absolute right-1.5 top-1.5 flex size-4 items-center justify-center rounded-full bg-brand-600 text-[10px] font-semibold text-white">
+                    {pendingTotal > 9 ? "9+" : pendingTotal}
                   </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {[1, 2, 3].map((i) => (
-                  <DropdownMenuItem key={i} className="cursor-pointer">
-                    <div className="flex flex-col gap-1">
-                      <p className="text-sm font-medium">
-                        New registration pending
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-80 p-0">
+              <div className="flex items-center justify-between px-4 py-3">
+                <p className="text-sm font-semibold">Notifications</p>
+                {pendingTotal > 0 && (
+                  <span className="rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-700">
+                    {pendingTotal} pending
+                  </span>
+                )}
+              </div>
+              <DropdownMenuSeparator className="m-0" />
+              {notifications.length === 0 ? (
+                <div className="px-4 py-8 text-center">
+                  <UserCheck className="mx-auto mb-2 h-8 w-8 text-muted-foreground/40" />
+                  <p className="text-sm font-medium">You&apos;re all caught up</p>
+                  <p className="text-xs text-muted-foreground">
+                    New registrations and pending reviews will appear here.
+                  </p>
+                </div>
+              ) : (
+                notifications.map((item) => (
+                  <DropdownMenuItem
+                    key={item.key}
+                    className="cursor-pointer items-start gap-3 px-4 py-3 focus:bg-muted/60"
+                    onSelect={() => router.push(item.href)}
+                  >
+                    <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-brand-50 text-brand-600">
+                      <item.icon className="size-4" />
+                    </span>
+                    <div className="min-w-0 space-y-0.5">
+                      <p className="truncate text-sm font-medium">{item.title}</p>
+                      <p className="line-clamp-2 text-xs text-muted-foreground">
+                        {item.description}
                       </p>
-                      <p className="text-xs text-gray-500">
-                        A new company has registered for Group Life insurance
-                      </p>
-                      <p className="text-xs text-gray-400">5 minutes ago</p>
+                      {item.time && (
+                        <p className="text-[11px] text-muted-foreground/70">
+                          {item.time}
+                        </p>
+                      )}
                     </div>
                   </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                ))
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            {/* User Menu */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="flex items-center gap-2 px-2"
-                >
-                  <Avatar className="h-8 w-8 border-2 border-blue-100">
-                    <AvatarImage src="/avatars/admin.png" alt="Admin" />
-                    <AvatarFallback className="bg-blue-100 text-blue-600">
-                      {getUserInitials()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="hidden text-left lg:block">
-                    <p className="text-sm font-medium">
-                      {user?.name || "Admin User"}
-                    </p>
-                    <p className="text-xs text-gray-500">Administrator</p>
-                  </div>
-                  <ChevronDown className="hidden h-4 w-4 text-gray-500 lg:block" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => setShowProfileModal(true)}>
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <HelpCircle className="mr-2 h-4 w-4" />
-                  Help
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => setShowLogoutDialog(true)}
-                  className="text-red-600 focus:text-red-600"
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          <Separator orientation="vertical" className="mx-1.5 h-6" />
+
+          {/* User Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2.5 px-2 hover:bg-muted"
+              >
+                <Avatar className="size-8">
+                  <AvatarImage src="/avatars/admin.png" alt="Admin" />
+                  <AvatarFallback className="bg-brand-100 text-xs font-semibold text-brand-700">
+                    {getUserInitials()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden text-left md:block">
+                  <p className="text-sm font-medium leading-none">{user?.name}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">Super Admin</p>
+                </div>
+                <ChevronDown className="size-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onSelect={() => setShowProfileModal(true)}>
+                <UserIcon className="mr-2 size-4" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => router.push("/admin/settings")}>
+                <SettingsIcon className="mr-2 size-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onSelect={() => setShowLogoutDialog(true)}
+                className="text-red-600 focus:text-red-600"
+              >
+                <LogOut className="mr-2 size-4" />
+                {isLoggingOut ? "Logging out..." : "Log out"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
       {/* Profile Modal */}
-      <ProfileModal
-        open={showProfileModal}
-        onOpenChange={setShowProfileModal}
-      />
+      {showProfileModal && (
+        <ProfileModal open={showProfileModal} onOpenChange={setShowProfileModal} />
+      )}
 
-      {/* Logout Confirmation Dialog */}
+      {/* Logout Dialog */}
       <LogoutDialog
         open={showLogoutDialog}
         onOpenChange={setShowLogoutDialog}

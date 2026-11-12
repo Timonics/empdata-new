@@ -1,7 +1,7 @@
 // components/admin/verifications/nin-verifications.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
@@ -34,7 +34,10 @@ import { VerificationModal } from "./verification-modal";
 import {
   useAllNINVerifications,
   useVerifyEncryptedNIN,
+  useVerifyRegistrationNIN,
+  useRejectRegistrationNIN,
 } from "@/hooks/queries/useVerifications";
+import { VerificationService } from "@/services/verification.service";
 import { useCurrentAdmin } from "@/hooks/queries/useAdminRoles";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
@@ -79,6 +82,8 @@ export function NINVerifications() {
     "all" | "company" | "employee" | "individual"
   >("all");
   const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [page, setPage] = useState(1);
+  const pageSize = 15;
   const [selectedVerification, setSelectedVerification] = useState<any | null>(
     null,
   );
@@ -104,14 +109,26 @@ export function NINVerifications() {
     status: filter === "all" ? undefined : filter,
   });
 
+  useEffect(() => {
+    setPage(1);
+  }, [filter, typeFilter]);
+
   // Verify encrypted NIN mutation
   const verifyEncryptedNIN = useVerifyEncryptedNIN();
+  const verifyRegistration = useVerifyRegistrationNIN();
+  const rejectRegistration = useRejectRegistrationNIN();
 
   // Filter by type
   const verifications = (data?.data || []).filter((item: any) => {
     if (typeFilter === "all") return true;
     return item.type === typeFilter;
   });
+
+  const totalPages = Math.max(1, Math.ceil(verifications.length / pageSize));
+  const pagedVerifications = verifications.slice(
+    (page - 1) * pageSize,
+    page * pageSize,
+  );
 
   const getVerificationState = (id: number): VerificationState => {
     return (
@@ -143,14 +160,37 @@ export function NINVerifications() {
     const verificationId = verification.registration_id || verification.id;
     const currentState = getVerificationState(verificationId);
 
-    // Get the encrypted NIN - now stored as 'encrypted_nin'
-    const encryptedNIN = verification.encrypted_nin;
-
-    console.log("Encrypted NIN found:", encryptedNIN ? "Yes" : "No");
-
+    // The list payload may omit the encrypted NIN — pull the full record
+    let encryptedNIN = verification.encrypted_nin;
     if (!encryptedNIN) {
-      toast.error("No encrypted NIN found for this verification");
-      return;
+      setVerificationState(verificationId, {
+        isLoading: true,
+        data: null,
+        error: null,
+      });
+      try {
+        const detail = await VerificationService.getRegistrationDetail(
+          verification.type,
+          verificationId,
+        );
+        encryptedNIN = detail?.data?.encrypted_nin ?? detail?.encrypted_nin;
+        if (detail?.data) {
+          Object.assign(verification, detail.data);
+        }
+      } catch {
+        // handled below
+      }
+      if (!encryptedNIN) {
+        setVerificationState(verificationId, {
+          isLoading: false,
+          data: null,
+          error: "No encrypted NIN on file for this registration.",
+        });
+        toast.error("No encrypted NIN found for this verification");
+        setSelectedVerification(verification);
+        setShowVerificationModal(true);
+        return;
+      }
     }
 
     // Only fetch if not already loaded and not currently loading
@@ -207,10 +247,23 @@ export function NINVerifications() {
     const verificationId =
       selectedVerification.registration_id || selectedVerification.id;
 
-    // TODO: Call your admin approval endpoint here
-    // await approveVerification(selectedVerification.type, verificationId);
+    if (selectedVerification.type === "company") {
+      // The company-registrations API has no /verify endpoint (docs):
+      // company document verification happens via the registration
+      // detail/update flow, so there is nothing to mark here.
+      toast.info(
+        "Company registrations are verified from the company detail view.",
+      );
+      setShowVerificationModal(false);
+      setSelectedVerification(null);
+      return;
+    }
 
-    toast.success("NIN verified successfully");
+    await verifyRegistration.mutateAsync({
+      type: selectedVerification.type,
+      id: verificationId,
+    });
+
     setShowVerificationModal(false);
     setSelectedVerification(null);
     setVerificationState(verificationId, {
@@ -227,10 +280,12 @@ export function NINVerifications() {
     const verificationId =
       selectedVerification.registration_id || selectedVerification.id;
 
-    // TODO: Call your admin reject endpoint here
-    // await rejectVerification(selectedVerification.type, verificationId, reason);
+    await rejectRegistration.mutateAsync({
+      type: selectedVerification.type,
+      id: verificationId,
+      reason,
+    });
 
-    toast.success("NIN rejected");
     setShowVerificationModal(false);
     setSelectedVerification(null);
     setVerificationState(verificationId, {
@@ -246,7 +301,7 @@ export function NINVerifications() {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
         <ShieldAlert className="h-12 w-12 text-red-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900">Access Denied</h3>
+        <h3 className="text-lg font-semibold text-foreground">Access Denied</h3>
         <p className="text-sm text-muted-foreground mt-1">
           You don't have permission to view NIN verifications.
         </p>
@@ -261,7 +316,7 @@ export function NINVerifications() {
         const Icon = typeIcons[item.type as keyof typeof typeIcons];
         return (
           <div className="flex items-center gap-2">
-            <Icon className="h-4 w-4 text-gray-500" />
+            <Icon className="h-4 w-4 text-muted-foreground" />
             <Badge variant="outline" className="text-xs">
               {typeLabels[item.type as keyof typeof typeLabels]}
             </Badge>
@@ -306,7 +361,7 @@ export function NINVerifications() {
     {
       header: "NIN",
       cell: (item: any) => (
-        <code className="rounded bg-gray-100 px-2 py-1 text-xs font-mono">
+        <code className="rounded bg-muted px-2 py-1 text-xs font-mono">
           {item.encrypted_nin ? "•••••••••••" : "Not provided"}
         </code>
       ),
@@ -321,7 +376,7 @@ export function NINVerifications() {
               "font-medium",
               statusStyles[
                 item.nin_verification_status as keyof typeof statusStyles
-              ] || "bg-gray-100",
+              ] || "bg-muted",
             )}
           >
             {item.nin_verification_status || item.status || "pending"}
@@ -463,11 +518,17 @@ export function NINVerifications() {
         </Button>
       </div>
 
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-card">
         <DataTable
-          data={verifications}
+          data={pagedVerifications}
           columns={columns}
           isLoading={isLoading}
+          pagination={{
+            currentPage: page,
+            totalPages,
+            totalItems: verifications.length,
+            onPageChange: setPage,
+          }}
           emptyMessage={
             filter === "pending_admin"
               ? "No pending admin verifications. All NINs have been processed."

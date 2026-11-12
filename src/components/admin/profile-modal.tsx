@@ -267,7 +267,7 @@ export function ProfileModal({ open, onOpenChange }: ProfileModalProps) {
                     className={
                       user?.two_factor_enabled
                         ? "text-green-600"
-                        : "text-gray-600"
+                        : "text-muted-foreground"
                     }
                   >
                     {user?.two_factor_enabled ? "Enabled" : "Disabled"}

@@ -19,13 +19,43 @@ import {
   Download,
   X,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatDateSafe } from "@/lib/utils";
 
 interface VerificationDrawerProps {
   verification: any;
   type: "nin" | "document" | "company" | "cac";
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+// Normalize a verification record from the API (snake_case) into the
+// camelCase shape this drawer consumes, tolerating either convention.
+function resolveVerification(v: any) {
+  if (!v) return null;
+  const status = v.nin_verification_status || v.verification_status || v.status;
+  return {
+    ...v,
+    firstName: v.first_name ?? v.firstName ?? "",
+    lastName: v.last_name ?? v.lastName ?? "",
+    name: v.name ?? [v.first_name, v.last_name].filter(Boolean).join(" ") ?? "",
+    // NIN is encrypted at rest; never render the ciphertext
+    nin: v.nin ?? (v.encrypted_nin || v.nin_number_data ? "•••••••••••" : ""),
+    bvn:
+      v.bvn ??
+      (v.director_bvn_number
+        ? "••••••" + String(v.director_bvn_number).slice(-4)
+        : ""),
+    dateOfBirth: v.date_of_birth ?? v.dateOfBirth ?? "",
+    company: v.company_name ?? v.company ?? "",
+    email: v.email_address ?? v.email ?? "",
+    phone: v.phone_number ?? v.phone ?? "",
+    ninSubmitted: v.submitted_at ?? v.ninSubmitted ?? null,
+    verifiedAt: v.verified_at ?? v.nin_verified_at ?? v.verifiedAt ?? null,
+    failureReason: v.rejection_reason ?? v.failure_reason ?? v.failureReason ?? "",
+    attempts: v.attempts ?? v.verification_attempts ?? null,
+    verificationStatus: status,
+    status,
+  };
 }
 
 const statusStyles = {
@@ -42,7 +72,9 @@ export function VerificationDrawer({
   open,
   onOpenChange,
 }: VerificationDrawerProps) {
-  if (!verification) return null;
+  const resolved = resolveVerification(verification);
+  if (!resolved) return null;
+  verification = resolved;
 
   const InfoRow = ({
     label,
@@ -53,10 +85,10 @@ export function VerificationDrawer({
     value: string;
     icon?: any;
   }) => (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
+    <div className="flex items-start gap-3 py-3 border-b border-border/70 last:border-0">
       {Icon && <Icon className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500">{label}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-sm font-medium mt-0.5 wrap-break-word">
           {value || "—"}
         </p>
@@ -71,7 +103,7 @@ export function VerificationDrawer({
     title: string;
     children: React.ReactNode;
   }) => (
-    <div className="bg-gray-50 rounded-lg p-5">
+    <div className="bg-muted/60 rounded-lg p-5">
       <h3 className="text-sm font-medium text-gray-700 mb-4">{title}</h3>
       <div className="space-y-1">{children}</div>
     </div>
@@ -81,7 +113,7 @@ export function VerificationDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none! data-[side=right]:max-w-none!">
         {/* Header */}
-        <div className="bg-linear-to-r from-blue-600 to-blue-800 text-white p-6 sticky top-0 z-20">
+        <div className="bg-navy-900 text-white p-6 sticky top-0 z-20">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <div className="h-14 w-14 rounded-full bg-white/20 flex items-center justify-center">
@@ -196,13 +228,25 @@ export function VerificationDrawer({
                 <InfoRow label="BVN" value={verification.bvn} icon={Shield} />
                 <InfoRow
                   label="Submitted On"
-                  value={new Date(verification.ninSubmitted).toLocaleString()}
+                  value={formatDateSafe(verification.ninSubmitted, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                   icon={Clock}
                 />
                 {verification.verifiedAt && (
                   <InfoRow
                     label="Verified On"
-                    value={new Date(verification.verifiedAt).toLocaleString()}
+                    value={formatDateSafe(verification.verifiedAt, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                     icon={CheckCircle}
                   />
                 )}

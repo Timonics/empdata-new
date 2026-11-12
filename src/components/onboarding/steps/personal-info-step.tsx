@@ -277,8 +277,8 @@ export function PersonalInfoSection({
       {/* Optional header for context */}
       {isEmployeeGroupLife && (
         <div className="mb-4">
-          <h4 className="text-md font-medium text-gray-900">{getHeaderText()}</h4>
-          <p className="text-sm text-gray-500">
+          <h4 className="text-md font-medium text-foreground">{getHeaderText()}</h4>
+          <p className="text-sm text-muted-foreground">
             Please provide your personal details for group life enrollment
           </p>
         </div>
@@ -287,27 +287,27 @@ export function PersonalInfoSection({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 overflow-auto">
         {/* Title (Optional) */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Title (Optional)
           </label>
           <div className="relative">
             <button
               onClick={() => setOpenTitle(!openTitle)}
-              className="w-full p-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors"
+              className="w-full p-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors"
             >
               <span
                 className={
-                  onBoardingData?.title ? "text-gray-900" : "text-gray-400"
+                  onBoardingData?.title ? "text-foreground" : "text-muted-foreground/70"
                 }
               >
                 {onBoardingData?.title || "Select your title"}
               </span>
               <ChevronDown
-                className={cn("w-4 h-4 text-gray-400", openTitle && "rotate-180")}
+                className={cn("w-4 h-4 text-muted-foreground/70", openTitle && "rotate-180")}
               />
             </button>
             {openTitle && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
                 {titles.map((title) => (
                   <button
                     key={title}
@@ -315,7 +315,7 @@ export function PersonalInfoSection({
                       handleChange("title", title);
                       setOpenTitle(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-4 py-2 text-left hover:bg-muted/60 transition-colors"
                   >
                     {title}
                   </button>
@@ -327,81 +327,81 @@ export function PersonalInfoSection({
 
         {/* First Name */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             First Name <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               value={onBoardingData?.first_name || ""}
               onChange={(e) => handleChange("first_name", e.target.value)}
               placeholder="Enter your first name"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Last Name */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Last Name <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               value={onBoardingData?.last_name || ""}
               onChange={(e) => handleChange("last_name", e.target.value)}
               placeholder="Enter your last name"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Middle Name (Optional) */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Middle Name (Optional)
           </label>
           <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               value={onBoardingData?.middle_name || ""}
               onChange={(e) => handleChange("middle_name", e.target.value)}
               placeholder="Enter your middle name"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Gender */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Gender (Optional)
           </label>
           <div className="relative">
             <button
               onClick={() => setOpenGender(!openGender)}
-              className="w-full p-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors"
+              className="w-full p-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors"
             >
               <span
                 className={
-                  onBoardingData?.gender ? "text-gray-900" : "text-gray-400"
+                  onBoardingData?.gender ? "text-foreground" : "text-muted-foreground/70"
                 }
               >
                 {onBoardingData?.gender || "Select your gender"}
               </span>
               <ChevronDown
                 className={cn(
-                  "w-4 h-4 text-gray-400",
+                  "w-4 h-4 text-muted-foreground/70",
                   openGender && "rotate-180",
                 )}
               />
             </button>
             {openGender && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
                 {genders.map((gender) => (
                   <button
                     key={gender}
@@ -409,7 +409,7 @@ export function PersonalInfoSection({
                       handleChange("gender", gender);
                       setOpenGender(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-4 py-2 text-left hover:bg-muted/60 transition-colors"
                   >
                     {gender}
                   </button>
@@ -421,11 +421,11 @@ export function PersonalInfoSection({
 
         {/* Date of Birth */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Date of Birth <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 z-10" />
             <DatePicker
               selected={
                 onBoardingData?.date_of_birth
@@ -435,7 +435,7 @@ export function PersonalInfoSection({
               onChange={(date: any) => handleChange("date_of_birth", date)}
               dateFormat="MMMM d, yyyy"
               placeholderText="Select your date of birth"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               showYearDropdown
               scrollableYearDropdown
               yearDropdownItemNumber={100}
@@ -446,31 +446,31 @@ export function PersonalInfoSection({
 
         {/* Nationality */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Nationality <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <button
               onClick={() => setOpenNationality(!openNationality)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors"
+              className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors"
             >
               <span
                 className={
-                  onBoardingData?.nationality ? "text-gray-900" : "text-gray-400"
+                  onBoardingData?.nationality ? "text-foreground" : "text-muted-foreground/70"
                 }
               >
                 {onBoardingData?.nationality || "Select your nationality"}
               </span>
               <ChevronDown
                 className={cn(
-                  "w-4 h-4 text-gray-400",
+                  "w-4 h-4 text-muted-foreground/70",
                   openNationality && "rotate-180",
                 )}
               />
             </button>
             {openNationality && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden">
                 {nationalities.map((nationality) => (
                   <button
                     key={nationality}
@@ -478,7 +478,7 @@ export function PersonalInfoSection({
                       handleChange("nationality", nationality);
                       setOpenNationality(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-4 py-2 text-left hover:bg-muted/60 transition-colors"
                   >
                     {nationality}
                   </button>
@@ -490,28 +490,28 @@ export function PersonalInfoSection({
 
         {/* Phone Number */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Phone Number <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="tel"
               value={onBoardingData?.phone_number || ""}
               onChange={(e) => handleChange("phone_number", e.target.value)}
               placeholder="+234 801 234 5678"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Confirm Phone Number */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Confirm Phone Number <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="tel"
               value={onBoardingData?.confirm_phone_number || ""}
@@ -526,7 +526,7 @@ export function PersonalInfoSection({
                   onBoardingData?.phone_number !==
                     onBoardingData?.confirm_phone_number
                   ? "border-red-300 bg-red-50"
-                  : "border-gray-200",
+                  : "border-border",
               )}
             />
           </div>
@@ -542,45 +542,45 @@ export function PersonalInfoSection({
 
         {/* Foreign Number (Optional) */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Foreign Number (Optional)
           </label>
           <div className="relative">
-            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="tel"
               value={onBoardingData?.foreign_number || ""}
               onChange={(e) => handleChange("foreign_number", e.target.value)}
               placeholder="International phone number"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Email */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Email Address <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="email"
               value={onBoardingData?.email_address || ""}
               onChange={(e) => handleChange("email_address", e.target.value)}
               placeholder="you@example.com"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
 
         {/* Confirm Email */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Confirm Email Address <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="email"
               value={onBoardingData?.confirm_email_address || ""}
@@ -595,7 +595,7 @@ export function PersonalInfoSection({
                   onBoardingData?.email_address !==
                     onBoardingData?.confirm_email_address
                   ? "border-red-300 bg-red-50"
-                  : "border-gray-200",
+                  : "border-border",
               )}
             />
           </div>
@@ -611,31 +611,31 @@ export function PersonalInfoSection({
 
         {/* Country Dropdown */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Country <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+            <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 z-10" />
             <button
               onClick={() => setOpenCountry(!openCountry)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors"
+              className="w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors"
             >
               <span
                 className={
-                  onBoardingData?.country ? "text-gray-900" : "text-gray-400"
+                  onBoardingData?.country ? "text-foreground" : "text-muted-foreground/70"
                 }
               >
                 {onBoardingData?.country || "Select your country"}
               </span>
               <ChevronDown
                 className={cn(
-                  "w-4 h-4 text-gray-400",
+                  "w-4 h-4 text-muted-foreground/70",
                   openCountry && "rotate-180",
                 )}
               />
             </button>
             {openCountry && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
                 {countries.map((country) => (
                   <button
                     key={country.name}
@@ -645,7 +645,7 @@ export function PersonalInfoSection({
                       handleChange("city", "");
                       setOpenCountry(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-4 py-2 text-left hover:bg-muted/60 transition-colors"
                   >
                     {country.name}
                   </button>
@@ -657,32 +657,32 @@ export function PersonalInfoSection({
 
         {/* State Dropdown */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             State <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 z-10" />
             <button
               onClick={() => setOpenState(!openState)}
               disabled={!onBoardingData?.country}
               className={cn(
-                "w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors",
+                "w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors",
                 !onBoardingData?.country && "opacity-50 cursor-not-allowed",
               )}
             >
               <span
                 className={
-                  onBoardingData?.state ? "text-gray-900" : "text-gray-400"
+                  onBoardingData?.state ? "text-foreground" : "text-muted-foreground/70"
                 }
               >
                 {onBoardingData?.state || "Select your state"}
               </span>
               <ChevronDown
-                className={cn("w-4 h-4 text-gray-400", openState && "rotate-180")}
+                className={cn("w-4 h-4 text-muted-foreground/70", openState && "rotate-180")}
               />
             </button>
             {openState && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
                 {availableStates.map((state) => (
                   <button
                     key={state.name}
@@ -691,7 +691,7 @@ export function PersonalInfoSection({
                       handleChange("city", "");
                       setOpenState(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-4 py-2 text-left hover:bg-muted/60 transition-colors"
                   >
                     {state.name}
                   </button>
@@ -703,32 +703,32 @@ export function PersonalInfoSection({
 
         {/* City Dropdown */}
         <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             City <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 z-10" />
+            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70 z-10" />
             <button
               onClick={() => setOpenCity(!openCity)}
               disabled={!onBoardingData?.state}
               className={cn(
-                "w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl flex items-center justify-between hover:border-gray-300 transition-colors",
+                "w-full pl-10 pr-4 py-3 bg-card border border-border rounded-xl flex items-center justify-between hover:border-muted-foreground/40 transition-colors",
                 !onBoardingData?.state && "opacity-50 cursor-not-allowed",
               )}
             >
               <span
                 className={
-                  onBoardingData?.city ? "text-gray-900" : "text-gray-400"
+                  onBoardingData?.city ? "text-foreground" : "text-muted-foreground/70"
                 }
               >
                 {onBoardingData?.city || "Select your city"}
               </span>
               <ChevronDown
-                className={cn("w-4 h-4 text-gray-400", openCity && "rotate-180")}
+                className={cn("w-4 h-4 text-muted-foreground/70", openCity && "rotate-180")}
               />
             </button>
             {openCity && (
-              <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+              <div className="absolute z-20 w-full mt-1 bg-card border border-border rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto">
                 {availableCities.map((city) => (
                   <button
                     key={city}
@@ -736,7 +736,7 @@ export function PersonalInfoSection({
                       handleChange("city", city);
                       setOpenCity(false);
                     }}
-                    className="w-full px-4 py-2 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full px-4 py-2 text-left hover:bg-muted/60 transition-colors"
                   >
                     {city}
                   </button>
@@ -747,17 +747,17 @@ export function PersonalInfoSection({
         </div>
 
         <div className="space-y-2 mb-4 pr-1 md:col-span-2">
-          <label className="text-sm font-medium text-gray-700">
+          <label className="text-sm font-medium text-foreground/80">
             Residential Address <span className="text-red-500">*</span>
           </label>
           <div className="relative">
-            <House className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <House className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
             <input
               type="text"
               value={onBoardingData?.house_address || ""}
               onChange={(e) => handleChange("house_address", e.target.value)}
               placeholder="Residential Address"
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>

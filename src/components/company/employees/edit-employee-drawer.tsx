@@ -181,7 +181,7 @@ export function EditEmployeeDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl xl:max-w-7xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
         {/* Header */}
-        <div className="sticky top-0 bg-linear-to-r from-emerald-600 to-emerald-800 text-white p-6 z-10">
+        <div className="sticky top-0 bg-emerald-700 text-white p-6 z-10">
           <div className="flex items-center justify-between">
             <div>
               <SheetTitle className="text-white text-xl">
@@ -227,7 +227,7 @@ export function EditEmployeeDrawer({
           </div>
         </div>
         {/* Tabs */}
-        <div className="border-b px-6 sticky top-31 bg-white z-10">
+        <div className="border-b px-6 sticky top-31 bg-card z-10">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
@@ -482,14 +482,14 @@ export function EditEmployeeDrawer({
                       )}
                     />
 
-                    <div className="col-span-2 bg-gray-50 p-4 rounded-lg">
+                    <div className="col-span-2 bg-muted/60 p-4 rounded-lg">
                       <div className="flex items-center gap-3">
                         <Shield className="h-5 w-5 text-gray-400" />
                         <div className="flex-1">
                           <p className="text-sm font-medium">
                             NIN Verification
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-muted-foreground">
                             {employee.ninVerified
                               ? "Verified"
                               : employee.ninSubmitted
@@ -506,7 +506,7 @@ export function EditEmployeeDrawer({
                               !employee.ninVerified &&
                               "bg-yellow-50 text-yellow-700",
                             !employee.ninSubmitted &&
-                              "bg-gray-50 text-gray-700",
+                              "bg-muted/60 text-gray-700",
                           )}
                         >
                           {employee.ninVerified
@@ -662,7 +662,7 @@ export function EditEmployeeDrawer({
               </Tabs>
 
               {/* Form Actions */}
-              <div className="sticky bottom-0 bg-white py-4 border-t flex items-center justify-end gap-3">
+              <div className="sticky bottom-0 bg-card py-4 border-t flex items-center justify-end gap-3">
                 <Button
                   type="button"
                   variant="outline"

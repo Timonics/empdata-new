@@ -96,42 +96,42 @@ export function VerificationModal({
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            <p className="mt-4 text-sm text-gray-600">Verifying your details...</p>
+            <p className="mt-4 text-sm text-muted-foreground">Verifying your details...</p>
           </div>
         ) : (
           <>
             <div className="space-y-4 py-4">
               {/* Verification Details */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h4 className="font-medium text-gray-900 mb-3">
+              <div className="bg-muted/60 rounded-lg p-4">
+                <h4 className="font-medium text-foreground mb-3">
                   {type === "nin" ? "NIN Records" : "CAC Records"}
                 </h4>
                 <div className="space-y-2">
                   {type === "nin" ? (
                     <>
                       <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-muted-foreground">
                           <User className="h-4 w-4" />
                           <span>Full Name:</span>
                         </div>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-foreground">
                           {verificationData?.first_name} {verificationData?.last_name}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-muted-foreground">
                           <Calendar className="h-4 w-4" />
                           <span>Date of Birth:</span>
                         </div>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-foreground">
                           {verificationData?.date_of_birth}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-muted-foreground">
                           <span className="font-medium">Gender:</span>
                         </div>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-foreground">
                           {verificationData?.gender || "Not specified"}
                         </span>
                       </div>
@@ -139,29 +139,29 @@ export function VerificationModal({
                   ) : (
                     <>
                       <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-muted-foreground">
                           <Building2 className="h-4 w-4" />
                           <span>Company Name:</span>
                         </div>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-foreground">
                           {verificationData?.company_name}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-muted-foreground">
                           <Hash className="h-4 w-4" />
                           <span>RC Number:</span>
                         </div>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-foreground">
                           {verificationData?.rc_number}
                         </span>
                       </div>
                       <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 text-gray-600">
+                        <div className="flex items-center gap-2 text-muted-foreground">
                           <MapPin className="h-4 w-4" />
                           <span>Address:</span>
                         </div>
-                        <span className="font-medium text-gray-900">
+                        <span className="font-medium text-foreground">
                           {verificationData?.address}
                         </span>
                       </div>
@@ -174,7 +174,7 @@ export function VerificationModal({
               {type === "nin" && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Name Match:</span>
+                    <span className="text-muted-foreground">Name Match:</span>
                     {matchStatus.nameMatch ? (
                       <Badge className="bg-green-100 text-green-800">
                         <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -188,7 +188,7 @@ export function VerificationModal({
                     )}
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Date of Birth Match:</span>
+                    <span className="text-muted-foreground">Date of Birth Match:</span>
                     {matchStatus.dobMatch ? (
                       <Badge className="bg-green-100 text-green-800">
                         <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -223,7 +223,7 @@ export function VerificationModal({
                 onClick={onConfirm}
                 disabled={type === "nin" && !allMatch}
                 className={cn(
-                  "bg-linear-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700",
+                  "bg-primary text-primary-foreground shadow-sm hover:bg-brand-700",
                   type === "nin" && !allMatch && "opacity-50 cursor-not-allowed"
                 )}
               >

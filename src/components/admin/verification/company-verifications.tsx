@@ -157,7 +157,7 @@ export function CompanyVerifications() {
             variant="outline"
             className={cn(
               "font-medium",
-              statusStyles[item.status as keyof typeof statusStyles] || 'bg-gray-100'
+              statusStyles[item.status as keyof typeof statusStyles] || 'bg-muted'
             )}
           >
             {item.status?.replace('_', ' ')}
@@ -166,7 +166,7 @@ export function CompanyVerifications() {
             variant="outline"
             className={cn(
               "font-medium",
-              verificationStatusStyles[item.verification_status as keyof typeof verificationStatusStyles] || 'bg-gray-100'
+              verificationStatusStyles[item.verification_status as keyof typeof verificationStatusStyles] || 'bg-muted'
             )}
           >
             {item.verification_status === 'verified' ? 'Verified' : 'Not Verified'}
@@ -276,7 +276,7 @@ export function CompanyVerifications() {
         </Button>
       </div>
 
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-card">
         <DataTable
           data={companies}
           columns={columns}

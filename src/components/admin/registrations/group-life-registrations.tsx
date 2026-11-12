@@ -1,5 +1,7 @@
 "use client";
 
+import { useClientPagination } from "@/hooks/useClientPagination";
+
 import { useState, useEffect } from "react";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
@@ -69,7 +71,7 @@ const statusStyles = {
 };
 
 const accountStatusStyles = {
-  pending: "bg-gray-100 text-gray-800 border-gray-200",
+  pending: "bg-muted text-foreground border-border",
   invited: "bg-blue-100 text-blue-800 border-blue-200",
   active: "bg-emerald-100 text-emerald-800 border-emerald-200",
 };
@@ -90,6 +92,7 @@ export function GroupLifeRegistrations() {
   // Drawer state
   const [drawerRegistration, setDrawerRegistration] = useState<any | null>(null);
   const [drawerMode, setDrawerMode] = useState<"view" | "edit">("view");
+  const [initialTab, setInitialTab] = useState("details");
   
   // Filter state
   const [filters, setFilters] = useState<RegistrationFilters>({
@@ -201,6 +204,9 @@ export function GroupLifeRegistrations() {
     }
   };
 
+  const client = useClientPagination(data?.data || []);
+  const tableRows = data?.pagination ? (data?.data || []) : client.rows;
+
   const columns = [
     {
       header: (
@@ -261,7 +267,7 @@ export function GroupLifeRegistrations() {
             className={cn(
               "font-medium",
               statusStyles[item.status as keyof typeof statusStyles] ||
-                "bg-gray-100",
+                "bg-muted",
             )}
           >
             {item.status?.replace("_", " ") || "N/A"}
@@ -272,7 +278,7 @@ export function GroupLifeRegistrations() {
               "font-medium ml-1",
               accountStatusStyles[
                 item.account_status as keyof typeof accountStatusStyles
-              ] || "bg-gray-100",
+              ] || "bg-muted",
             )}
           >
             {item.account_status || "N/A"}
@@ -360,12 +366,19 @@ export function GroupLifeRegistrations() {
                 onClick={() => {
                   setDrawerRegistration(item);
                   setDrawerMode("view");
+                  setInitialTab("details");
                 }}
               >
                 <Eye className="mr-2 h-4 w-4" />
                 View Details
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  setDrawerRegistration(item);
+                  setDrawerMode("view");
+                  setInitialTab("documents");
+                }}
+              >
                 <FileText className="mr-2 h-4 w-4" />
                 View Documents
               </DropdownMenuItem>
@@ -457,9 +470,9 @@ export function GroupLifeRegistrations() {
       </div>
 
       {/* Data Table with Pagination */}
-      <div className="rounded-md border bg-white">
+      <div className="rounded-md border bg-card">
         <DataTable
-          data={data?.data || []}
+          data={tableRows}
           columns={columns}
           isLoading={isLoading}
           pagination={data?.pagination ? {
@@ -467,7 +480,7 @@ export function GroupLifeRegistrations() {
             totalPages: data.pagination.last_page,
             totalItems: data.pagination.total,
             onPageChange: handlePageChange,
-          } : undefined}
+          } : client.pagination}
           emptyMessage="No group life registrations found"
           // onRowClick={(item) => {
           //   setDrawerRegistration(item);
@@ -500,6 +513,7 @@ export function GroupLifeRegistrations() {
           onOpenChange={() => setDrawerRegistration(null)}
           mode={drawerMode}
           onModeChange={(mode) => setDrawerMode(mode)}
+          initialTab={initialTab}
         />
       )}
 
@@ -517,7 +531,7 @@ export function GroupLifeRegistrations() {
                   Are you sure you want to approve{' '}
                   <span className="font-semibold">{selectedRegistration?.company_name}</span>?
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   This will mark the registration as approved. You can then send an invitation to the company to create their account.
                 </p>
               </div>

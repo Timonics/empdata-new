@@ -69,7 +69,14 @@ export function ReviewStep({
     {
       title: "Account Type",
       data: {
-        "Account Type": accountType,
+        "Account Type":
+          accountType === "individual"
+            ? "Individual/Retail"
+            : accountType === "corporate"
+              ? "Corporate"
+              : accountType === "employee-group-life"
+                ? "Employee Group Life"
+                : accountType,
       },
     },
     {
@@ -209,10 +216,10 @@ export function ReviewStep({
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-foreground mb-2">
           Review Your Information
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Please review all information before submitting. You can go back to
           make changes.
         </p>
@@ -232,31 +239,31 @@ export function ReviewStep({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.1 }}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden"
+              className="bg-card border border-border rounded-xl overflow-hidden"
             >
               {/* Section Header */}
               <button
                 onClick={() =>
                   setExpandedSection(isExpanded ? null : section.title)
                 }
-                className="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                className="w-full px-6 py-4 flex items-center justify-between hover:bg-muted/60 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
                     <Icon className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <h4 className="font-medium text-gray-900 text-left">
+                    <h4 className="font-medium text-foreground text-left">
                       {section.title}
                     </h4>
-                    <p className="text-xs text-gray-500 text-left">
+                    <p className="text-xs text-muted-foreground text-left">
                       {Object.keys(section.data).length} items
                     </p>
                   </div>
                 </div>
                 <ChevronRight
                   className={cn(
-                    "w-5 h-5 text-gray-400 transition-transform",
+                    "w-5 h-5 text-muted-foreground/70 transition-transform",
                     isExpanded && "rotate-90",
                   )}
                 />
@@ -268,7 +275,7 @@ export function ReviewStep({
                   initial={{ height: 0 }}
                   animate={{ height: "auto" }}
                   exit={{ height: 0 }}
-                  className="border-t border-gray-200 px-6 py-4"
+                  className="border-t border-border px-6 py-4"
                 >
                   <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {Object.entries(section.data).map(([key, value]) => (
@@ -281,8 +288,8 @@ export function ReviewStep({
                             "text-amber-600",
                         )}
                       >
-                        <dt className="text-xs text-gray-500">{key}</dt>
-                        <dd className="text-sm font-medium text-gray-900">
+                        <dt className="text-xs text-muted-foreground">{key}</dt>
+                        <dd className="text-sm font-medium text-foreground">
                           {renderValue(value)}
                         </dd>
                       </div>
@@ -314,11 +321,11 @@ export function ReviewStep({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+      <div className="flex items-center justify-between pt-6 border-t border-border">
         <button
           onClick={onBack}
           disabled={isSubmitting}
-          className="px-8 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-8 py-3 rounded-xl font-medium text-muted-foreground hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Back
         </button>
@@ -327,7 +334,7 @@ export function ReviewStep({
           disabled={isSubmitting}
           className={cn(
             "px-8 py-3 rounded-xl font-medium transition-all flex items-center gap-2",
-            "bg-linear-to-l  -to-r from-blue-600 to-emerald-600 text-white hover:shadow-lg hover:scale-105",
+            "bg-primary text-primary-foreground shadow-sm hover:bg-brand-700",
             isSubmitting && "opacity-70 cursor-not-allowed hover:scale-100",
           )}
         >

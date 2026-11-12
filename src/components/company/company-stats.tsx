@@ -94,7 +94,7 @@ export function CompanyStats() {
         const colors = colorClasses[stat.color as keyof typeof colorClasses];
 
         return (
-          <Card key={stat.title} className="hover:shadow-lg transition-shadow">
+          <Card key={stat.title} className="transition-shadow hover:shadow-lift">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.title}
@@ -104,7 +104,7 @@ export function CompanyStats() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="font-display text-[28px] font-semibold leading-none tracking-tight">{stat.value}</div>
               <div className="flex items-center gap-2 mt-1">
                 <span
                   className={cn(

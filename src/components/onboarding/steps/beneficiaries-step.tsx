@@ -172,21 +172,21 @@ export function BeneficiariesStep({
   return (
     <div className="space-y-8">
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <h3 className="text-lg font-medium text-foreground mb-2">
           Beneficiaries
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Add the people who will receive the insurance benefits. You can add up
           to 5 beneficiaries.
         </p>
       </div>
 
       {/* Total Percentage Indicator */}
-      <div className="bg-linear-to-r from-blue-50 to-emerald-50 rounded-xl p-6">
+      <div className="bg-muted/60 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <Users className="w-5 h-5 text-blue-600" />
-            <span className="font-semibold text-gray-900">
+            <span className="font-semibold text-foreground">
               Total Allocation:
             </span>
           </div>
@@ -201,7 +201,7 @@ export function BeneficiariesStep({
             >
               {totalPercentage.toFixed(1)}%
             </span>
-            <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
               <motion.div
                 className={cn(
                   "h-full",
@@ -254,24 +254,24 @@ export function BeneficiariesStep({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, x: -100 }}
               transition={{ duration: 0.3 }}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden"
+              className="bg-card border border-border rounded-xl overflow-hidden"
             >
               {/* Header */}
-              <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <div className="bg-muted/60 px-6 py-4 border-b border-border flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
                     <span className="text-sm font-bold text-blue-600">
                       {index + 1}
                     </span>
                   </div>
-                  <h4 className="font-medium text-gray-900">
+                  <h4 className="font-medium text-foreground">
                     Beneficiary {index + 1}
                   </h4>
                 </div>
                 {beneficiaries.length > 1 && (
                   <button
                     onClick={() => handleRemoveBeneficiary(beneficiary.id!)}
-                    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-2 text-muted-foreground/70 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -283,7 +283,7 @@ export function BeneficiariesStep({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* First Name */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-foreground/80">
                       First Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -297,13 +297,13 @@ export function BeneficiariesStep({
                         )
                       }
                       placeholder="Enter first name"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 
                   {/* Last Name */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-foreground/80">
                       Last Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -317,17 +317,17 @@ export function BeneficiariesStep({
                         )
                       }
                       placeholder="Enter last name"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
 
                   {/* Date of Birth */}
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-foreground/80">
                       Date of Birth <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
                       <DatePicker
                         selected={
                           beneficiary.date_of_birth
@@ -343,7 +343,7 @@ export function BeneficiariesStep({
                         }
                         dateFormat="MMMM d, yyyy"
                         placeholderText="Select date of birth"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         showYearDropdown
                         scrollableYearDropdown
                         maxDate={new Date()}
@@ -354,13 +354,13 @@ export function BeneficiariesStep({
                   {/* Percentage Allocation */}
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <label className="text-sm font-medium text-gray-700">
+                      <label className="text-sm font-medium text-foreground/80">
                         Percentage Allocation{" "}
                         <span className="text-red-500">*</span>
                       </label>
                       <Tooltip>
                         <TooltipTrigger>
-                          <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+                          <HelpCircle className="w-4 h-4 text-muted-foreground/70 cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent>
                           Percentage of total benefit this beneficiary will
@@ -369,7 +369,7 @@ export function BeneficiariesStep({
                       </Tooltip>
                     </div>
                     <div className="relative">
-                      <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
                       <input
                         type="number"
                         min="0"
@@ -380,18 +380,18 @@ export function BeneficiariesStep({
                           validatePercentage(beneficiary.id!, e.target.value)
                         }
                         placeholder="Enter percentage"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
                   </div>
 
                   {/* Address */}
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium text-foreground/80">
                       Address <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
                       <input
                         type="text"
                         value={beneficiary.address}
@@ -403,7 +403,7 @@ export function BeneficiariesStep({
                           )
                         }
                         placeholder="Enter residential address"
-                        className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-3 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -420,11 +420,11 @@ export function BeneficiariesStep({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleAddBeneficiary}
-          className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center justify-center gap-2 text-gray-600 hover:text-blue-600"
+          className="w-full py-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all flex items-center justify-center gap-2 text-muted-foreground hover:text-blue-600"
         >
           <Plus className="w-5 h-5" />
           <span className="font-medium">Add Another Beneficiary</span>
-          <span className="text-sm text-gray-400 ml-2">
+          <span className="text-sm text-muted-foreground/70 ml-2">
             ({beneficiaries.length}/5)
           </span>
         </motion.button>
@@ -434,8 +434,8 @@ export function BeneficiariesStep({
       {beneficiaries.some(
         (b) => b.percentage_allocation && b.percentage_allocation > 0,
       ) && (
-        <div className="bg-gray-50 rounded-xl p-6">
-          <h4 className="font-medium text-gray-900 mb-4">
+        <div className="bg-muted/60 rounded-xl p-6">
+          <h4 className="font-medium text-foreground mb-4">
             Distribution Summary
           </h4>
           <div className="space-y-3">
@@ -446,7 +446,7 @@ export function BeneficiariesStep({
               .map((beneficiary) => (
                 <div
                   key={beneficiary.id}
-                  className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0"
+                  className="flex items-center justify-between py-2 border-b border-border last:border-0"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -456,7 +456,7 @@ export function BeneficiariesStep({
                       </span>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium text-foreground">
                         {beneficiary.first_name} {beneficiary.last_name}
                       </p>
                     </div>
@@ -465,7 +465,7 @@ export function BeneficiariesStep({
                     <span className="text-lg font-bold text-blue-600">
                       {beneficiary.percentage_allocation}%
                     </span>
-                    <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="w-20 h-2 bg-muted rounded-full overflow-hidden">
                       <div
                         className="h-full bg-blue-600"
                         style={{
@@ -495,10 +495,10 @@ export function BeneficiariesStep({
       )}
 
       {/* Navigation Buttons */}
-      <div className="flex items-center justify-between pt-6 border-t border-gray-200">
+      <div className="flex items-center justify-between pt-6 border-t border-border">
         <button
           onClick={onBack}
-          className="px-8 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-100 transition-colors"
+          className="px-8 py-3 rounded-xl font-medium text-muted-foreground hover:bg-muted transition-colors"
         >
           Back
         </button>
@@ -508,8 +508,8 @@ export function BeneficiariesStep({
           className={cn(
             "px-8 py-3 rounded-xl font-medium transition-all",
             isFormValid()
-              ? "bg-linear-to-r from-blue-600 to-emerald-600 text-white hover:shadow-lg hover:scale-105"
-              : "bg-gray-100 text-gray-400 cursor-not-allowed",
+              ? "bg-primary text-primary-foreground shadow-sm hover:bg-brand-700"
+              : "bg-muted text-muted-foreground/70 cursor-not-allowed",
           )}
         >
           Continue

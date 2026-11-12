@@ -174,6 +174,26 @@ export function useVerifyEncryptedNIN() {
 }
 
 /**
+ * Verify BVN (public — RSA-encrypted, nothing stored)
+ */
+export function usePublicVerifyBVN() {
+  return useMutation({
+    mutationFn: (encryptedBVN: { encrypted_bvn: string }) =>
+      VerificationService.verifyPublicBVN(encryptedBVN),
+    onSuccess: (response: any) => {
+      if (!response.success) {
+        toast.error(response.message || "BVN verification failed");
+      }
+    },
+    onError: (error: any) => {
+      toast.error(
+        error?.response?.data?.message || "BVN verification failed",
+      );
+    },
+  });
+}
+
+/**
  * Get employee registrations for NIN verification (Admin)
  */
 export function useEmployeeVerifications(filters?: any) {

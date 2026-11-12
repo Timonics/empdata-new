@@ -31,7 +31,7 @@ interface ViewCompanyModalProps {
 
 const statusStyles = {
   active: 'bg-green-100 text-green-800 border-green-200',
-  inactive: 'bg-gray-100 text-gray-800 border-gray-200',
+  inactive: 'bg-muted text-foreground border-border',
   pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   suspended: 'bg-red-100 text-red-800 border-red-200',
 };
@@ -70,7 +70,7 @@ export function ViewCompanyModal({ company, open, onOpenChange }: ViewCompanyMod
           <TabsContent value="overview" className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-muted/60 p-4 rounded-lg">
                   <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Building2 className="h-4 w-4 text-blue-600" />
                     Company Details
@@ -103,7 +103,7 @@ export function ViewCompanyModal({ company, open, onOpenChange }: ViewCompanyMod
                   </div>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-muted/60 p-4 rounded-lg">
                   <h3 className="font-medium mb-3 flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-blue-600" />
                     Address
@@ -113,7 +113,7 @@ export function ViewCompanyModal({ company, open, onOpenChange }: ViewCompanyMod
               </div>
 
               <div className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-muted/60 p-4 rounded-lg">
                   <h3 className="font-medium mb-3 flex items-center gap-2">
                     <User className="h-4 w-4 text-blue-600" />
                     Contact Information
@@ -132,7 +132,7 @@ export function ViewCompanyModal({ company, open, onOpenChange }: ViewCompanyMod
                   </div>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-muted/60 p-4 rounded-lg">
                   <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Briefcase className="h-4 w-4 text-blue-600" />
                     Admin Account
@@ -151,7 +151,7 @@ export function ViewCompanyModal({ company, open, onOpenChange }: ViewCompanyMod
                   </div>
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-lg">
+                <div className="bg-muted/60 p-4 rounded-lg">
                   <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-blue-600" />
                     Activity
@@ -172,7 +172,7 @@ export function ViewCompanyModal({ company, open, onOpenChange }: ViewCompanyMod
           </TabsContent>
 
           <TabsContent value="employees" className="mt-4">
-            <div className="bg-gray-50 p-8 rounded-lg text-center">
+            <div className="bg-muted/60 p-8 rounded-lg text-center">
               <Users className="h-12 w-12 mx-auto text-gray-300 mb-3" />
               <h3 className="font-medium mb-1">Employee List</h3>
               <p className="text-sm text-muted-foreground">
@@ -182,7 +182,7 @@ export function ViewCompanyModal({ company, open, onOpenChange }: ViewCompanyMod
           </TabsContent>
 
           <TabsContent value="policies" className="mt-4">
-            <div className="bg-gray-50 p-8 rounded-lg text-center">
+            <div className="bg-muted/60 p-8 rounded-lg text-center">
               <Shield className="h-12 w-12 mx-auto text-gray-300 mb-3" />
               <h3 className="font-medium mb-1">Insurance Policies</h3>
               <p className="text-sm text-muted-foreground">

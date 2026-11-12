@@ -11,94 +11,154 @@ import {
   LayoutDashboard,
   Users,
   Mail,
-  Building2,
-  Settings,
+  FileText,
   ChevronLeft,
   ChevronRight,
   Menu,
-  FileText,
   LogOut,
   X,
-  UserPlus,
-  BarChart3,
 } from "lucide-react";
 import Logo from "@/components/logo";
 import { useSidebar } from "@/contexts/sidebar-context";
+import { useAuth } from "@/hooks/useAuth";
+import { LogoutDialog } from "../admin/logout-dialog";
 
 const navigation = [
-  {
-    name: "Dashboard",
-    link: "/portal/company",
-    icon: LayoutDashboard,
-  },
-  {
-    name: "Employees",
-    link: "/portal/company/employees",
-    icon: Users,
-  },
-  {
-    name: "Invitations",
-    link: "/portal/company/invitations",
-    icon: Mail,
-    badge: "3",
-  },
-  {
-    name: "Documents",
-    link: "/portal/company/documents",
-    icon: FileText,
-  }
+  { name: "Dashboard", link: "/portal/company", icon: LayoutDashboard },
+  { name: "Employees", link: "/portal/company/employees", icon: Users },
+  { name: "Invitations", link: "/portal/company/invitations", icon: Mail, badge: "3" },
+  { name: "Documents", link: "/portal/company/documents", icon: FileText },
 ];
 
-interface NavItemProps {
+function NavItem({
+  item,
+  pathname,
+  expanded,
+  onNavClick,
+}: {
   item: (typeof navigation)[0];
   pathname: string;
-  collapsed: boolean;
+  expanded: boolean;
   onNavClick?: () => void;
-}
-
-function NavItem({ item, pathname, collapsed, onNavClick }: NavItemProps) {
-  const isActive = pathname === item.link;
+}) {
+  const isActive =
+    item.link === "/portal/company"
+      ? pathname === item.link
+      : pathname.startsWith(item.link);
 
   return (
     <Link
       href={item.link}
       onClick={onNavClick}
+      title={expanded ? undefined : item.name}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-300 hover:scale-95",
+        "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
         isActive
-          ? "bg-white/25 text-white shadow-lg backdrop-blur-sm font-bold"
-          : "text-white/80 hover:bg-white/10 hover:text-white font-medium",
-        !collapsed && "justify-start",
-        collapsed && "justify-center px-2",
+          ? "bg-white/10 font-semibold text-white shadow-sm"
+          : "font-medium text-sidebar-foreground/70 hover:bg-white/5 hover:text-white",
+        isActive &&
+          "relative before:absolute before:inset-y-1.5 before:left-0 before:w-[3px] before:rounded-full before:bg-brand-400",
+        !expanded && "justify-center px-0",
       )}
     >
-      <item.icon size={collapsed ? 22 : 20} className="shrink-0" />
-      {!collapsed && (
+      <span
+        className={cn(
+          "flex size-8 shrink-0 items-center justify-center rounded-md transition-colors",
+          isActive
+            ? "bg-brand-500/20 text-brand-300"
+            : "text-sidebar-foreground/60 group-hover:bg-white/5 group-hover:text-white",
+        )}
+      >
+        <item.icon className="size-4" />
+      </span>
+      {expanded && (
         <>
           <span className="flex-1">{item.name}</span>
           {item.badge && (
-            <span className="bg-red-500 text-white text-xs rounded-full h-5 min-w-5 flex items-center justify-center px-1">
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-600 px-1.5 text-xs font-semibold text-white">
               {item.badge}
             </span>
           )}
         </>
       )}
-      {collapsed && item.badge && (
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-          {item.badge}
-        </span>
-      )}
     </Link>
+  );
+}
+
+function SidebarBody({
+  pathname,
+  expanded,
+  onNavClick,
+  onLogout,
+}: {
+  pathname: string;
+  expanded: boolean;
+  onNavClick?: () => void;
+  onLogout: () => void;
+}) {
+  return (
+    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
+      {/* Brand */}
+      <div
+        className={cn(
+          "flex h-16 shrink-0 items-center border-b border-sidebar-border px-4",
+          !expanded && "justify-center px-0",
+        )}
+      >
+        <Logo width={36} height={36} className="shadow-none" />
+        {expanded && (
+          <div className="ml-3 leading-tight">
+            <p className="font-display text-sm font-semibold text-white">
+              EMPDATA
+            </p>
+            <p className="text-[11px] text-sidebar-foreground/50">
+              Company Portal
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* Navigation */}
+      <ScrollArea className="flex-1 px-3 py-4">
+        <nav className="space-y-0.5">
+          {navigation.map((item) => (
+            <NavItem
+              key={item.link}
+              item={item}
+              pathname={pathname}
+              expanded={expanded}
+              onNavClick={onNavClick}
+            />
+          ))}
+        </nav>
+      </ScrollArea>
+
+      {/* Logout */}
+      <div className="shrink-0 border-t border-sidebar-border p-3">
+        <button
+          onClick={onLogout}
+          title={expanded ? undefined : "Logout"}
+          className={cn(
+            "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-red-500/10 hover:text-red-300",
+            !expanded && "justify-center px-0",
+          )}
+        >
+          <LogOut className="size-4 shrink-0" />
+          {expanded && <span>Logout</span>}
+        </button>
+      </div>
+    </div>
   );
 }
 
 export function CompanySidebar() {
   const { isCollapsed, toggleSidebar } = useSidebar();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const pathname = usePathname();
+  const { logout, isLoggingOut } = useAuth();
 
-  // For compatibility
-  const navIsOpen = !isCollapsed;
+  const expanded = !isCollapsed;
 
   return (
     <>
@@ -109,112 +169,67 @@ export function CompanySidebar() {
         className="fixed left-4 top-4 z-40 md:hidden"
         onClick={() => setMobileOpen(true)}
       >
-        <Menu className="h-5 w-5" />
+        <Menu className="size-5" />
       </Button>
 
       {/* Mobile Sheet */}
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent side="left" className="w-64 p-0">
-          <div className="flex h-full flex-col bg-linear-to-b from-blue-600 via-blue-500 to-blue-400 text-white">
-            <div className="flex justify-between items-center p-4 border-b border-white/10">
-              <Logo />
-              <X
-                className="text-white/75 cursor-pointer hover:text-white transition duration-300"
-                onClick={() => setMobileOpen(false)}
-              />
-            </div>
-            <ScrollArea className="flex-1 px-3 py-4">
-              <nav className="space-y-1">
-                {navigation.map((item) => (
-                  <NavItem
-                    key={item.link}
-                    item={item}
-                    pathname={pathname}
-                    collapsed={false}
-                    onNavClick={() => setMobileOpen(false)}
-                  />
-                ))}
-              </nav>
-            </ScrollArea>
-
-            {/* Logout button at bottom */}
-            <div className="p-4 border-t border-white/10">
-              <button className="w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition duration-300">
-                <LogOut size={20} />
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-3 top-4 z-10 text-sidebar-foreground/70 hover:text-white"
+            onClick={() => setMobileOpen(false)}
+          >
+            <X className="size-4" />
+          </Button>
+          <SidebarBody
+            pathname={pathname}
+            expanded={true}
+            onNavClick={() => setMobileOpen(false)}
+            onLogout={() => {
+              setMobileOpen(false);
+              setShowLogoutDialog(true);
+            }}
+          />
         </SheetContent>
       </Sheet>
 
       {/* Desktop Sidebar */}
-      <div
+      <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 hidden md:flex md:flex-col h-full border-r-2 bg-linear-to-b from-blue-600 via-blue-500 to-blue-400 border-gray-400 px-2",
-          "transition-all duration-300 ease-in-out overflow-auto scrollbar",
-          navIsOpen ? "w-55" : "w-24",
+          "fixed inset-y-0 left-0 z-50 hidden flex-col border-r border-sidebar-border transition-[width] duration-300 ease-in-out md:flex",
+          expanded ? "w-64" : "w-16",
         )}
       >
-        <div className="flex flex-col text-white h-full gap-6 py-4">
-          <div className="mx-auto">
-            <Logo />
-          </div>
+        <SidebarBody
+          pathname={pathname}
+          expanded={expanded}
+          onLogout={() => setShowLogoutDialog(true)}
+        />
 
-          <ScrollArea className="flex-1 px-1">
-            <div
-              className={cn(
-                "flex flex-col h-full gap-2",
-                !navIsOpen && "items-center",
-              )}
-            >
-              {/* Navigation Items */}
-              {navigation.map((item) => (
-                <NavItem
-                  key={item.link}
-                  item={item}
-                  pathname={pathname}
-                  collapsed={!navIsOpen}
-                />
-              ))}
-            </div>
-          </ScrollArea>
-
-          {/* Logout Button */}
-          <div className={cn("mt-auto", navIsOpen ? "px-1" : "px-0")}>
-            <button
-              className={cn(
-                "w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 hover:text-white transition duration-300",
-                !navIsOpen && "justify-center",
-              )}
-            >
-              <LogOut size={navIsOpen ? 20 : 22} />
-              {navIsOpen && <span>Logout</span>}
-            </button>
-          </div>
-        </div>
-
-        {/* Collapse Toggle Button */}
-        <div
-          className={cn(
-            "py-4 border-t border-white/10 flex items-center",
-            navIsOpen ? "justify-end" : "justify-center",
-          )}
-        >
-          <Button
-            variant="ghost"
-            size="icon"
+        {/* Collapse Toggle */}
+        <div className="absolute -right-3 top-[72px] hidden md:block">
+          <button
             onClick={toggleSidebar}
-            className="text-white hover:bg-white/10"
+            className="flex size-6 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-card transition-colors hover:text-foreground"
           >
-            {navIsOpen ? (
-              <ChevronLeft className="h-5 w-5" />
+            {expanded ? (
+              <ChevronLeft className="size-3.5" />
             ) : (
-              <ChevronRight className="h-5 w-5" />
+              <ChevronRight className="size-3.5" />
             )}
-          </Button>
+          </button>
         </div>
-      </div>
+      </aside>
+
+      {/* Logout Confirmation Dialog */}
+      <LogoutDialog
+        open={showLogoutDialog}
+        onOpenChange={setShowLogoutDialog}
+        onConfirm={logout}
+        isLoggingOut={isLoggingOut}
+      />
     </>
   );
 }

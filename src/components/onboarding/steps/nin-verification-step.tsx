@@ -145,7 +145,7 @@ export function NinVerificationStep({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium text-gray-700">
+        <label className="text-sm font-medium text-foreground/80">
           {label} <span className="text-red-500">*</span>
         </label>
         {getVerificationBadge()}
@@ -153,7 +153,7 @@ export function NinVerificationStep({
 
       <div className="flex gap-3">
         <div className="relative flex-1">
-          <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/70" />
           <input
             type="text"
             maxLength={11}
@@ -213,7 +213,7 @@ export function NinVerificationStep({
         </Alert>
       )}
 
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-muted-foreground">
         Your NIN will be encrypted and verified against official records. If
         verification fails, an admin will review your details.
       </p>

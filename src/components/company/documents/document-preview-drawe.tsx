@@ -67,10 +67,10 @@ export function DocumentPreviewDrawer({
     value: string;
     icon?: any;
   }) => (
-    <div className="flex items-start gap-3 py-3 border-b border-gray-100 last:border-0">
+    <div className="flex items-start gap-3 py-3 border-b border-border/70 last:border-0">
       {Icon && <Icon className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />}
       <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-500">{label}</p>
+        <p className="text-xs text-muted-foreground">{label}</p>
         <p className="text-sm font-medium mt-0.5 wrap-break-word">
           {value || "—"}
         </p>
@@ -85,7 +85,7 @@ export function DocumentPreviewDrawer({
     title: string;
     children: React.ReactNode;
   }) => (
-    <div className="bg-gray-50 rounded-lg p-5">
+    <div className="bg-muted/60 rounded-lg p-5">
       <h3 className="text-sm font-medium text-gray-700 mb-4">{title}</h3>
       <div className="space-y-1">{children}</div>
     </div>
@@ -95,7 +95,7 @@ export function DocumentPreviewDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-5xl lg:max-w-6xl max-w-[95vw]! p-0 overflow-y-auto [&>div]:max-w-none data-[side=right]:max-w-none">
         {/* Header */}
-        <div className="bg-linear-to-r from-emerald-600 to-emerald-800 text-white p-6 sticky top-0 z-10">
+        <div className="bg-emerald-700 text-white p-6 sticky top-0 z-10">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <div className="h-14 w-14 rounded-lg bg-white/20 flex items-center justify-center">
@@ -163,7 +163,7 @@ export function DocumentPreviewDrawer({
           </div>
         </div>
         {/* Tabs */}
-        <div className="border-b px-6 sticky top-35 bg-white z-10">
+        <div className="border-b px-6 sticky top-35 bg-card z-10">
           <Tabs
             value={activeTab}
             onValueChange={setActiveTab}
@@ -196,10 +196,10 @@ export function DocumentPreviewDrawer({
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             {/* Preview Tab */}
             <TabsContent value="preview" className="mt-0">
-              <div className="bg-gray-100 rounded-lg p-8 min-h-100 flex items-center justify-center">
+              <div className="bg-muted rounded-lg p-8 min-h-100 flex items-center justify-center">
                 <div className="text-center">
                   <FileIcon className="h-20 w-20 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-500 font-medium">{document.name}</p>
+                  <p className="text-muted-foreground font-medium">{document.name}</p>
                   <p className="text-sm text-gray-400 mt-2">
                     Preview not available. Click download to view file.
                   </p>
@@ -283,7 +283,7 @@ export function DocumentPreviewDrawer({
                 <SectionCard title="Tags">
                   <div className="flex flex-wrap gap-2">
                     {document.tags.map((tag: string) => (
-                      <Badge key={tag} variant="secondary" className="bg-white">
+                      <Badge key={tag} variant="secondary" className="bg-card">
                         {tag}
                       </Badge>
                     ))}
@@ -305,7 +305,7 @@ export function DocumentPreviewDrawer({
                     </div>
                     <div className="flex-1 pb-4">
                       <p className="font-medium">Version 3 uploaded</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         By Grace Ogunleye • 2 days ago
                       </p>
                       <p className="text-xs text-gray-400 mt-1">Size: 856 KB</p>
@@ -314,14 +314,14 @@ export function DocumentPreviewDrawer({
 
                   <div className="flex gap-3">
                     <div className="relative">
-                      <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        <FileText className="h-4 w-4 text-gray-600" />
+                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                        <FileText className="h-4 w-4 text-muted-foreground" />
                       </div>
                       <div className="absolute top-8 left-4 h-12 w-px bg-gray-200" />
                     </div>
                     <div className="flex-1 pb-4">
                       <p className="font-medium">Version 2 uploaded</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         By John Adeleke • 1 week ago
                       </p>
                       <p className="text-xs text-gray-400 mt-1">Size: 1.2 MB</p>
@@ -329,12 +329,12 @@ export function DocumentPreviewDrawer({
                   </div>
 
                   <div className="flex gap-3">
-                    <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                      <FileText className="h-4 w-4 text-gray-600" />
+                    <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
+                      <FileText className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium">Version 1 uploaded</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         By Sarah Okafor • 2 weeks ago
                       </p>
                       <p className="text-xs text-gray-400 mt-1">Size: 1.5 MB</p>

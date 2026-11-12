@@ -15,9 +15,9 @@ import {
 import { formatDistanceToNow, isValid } from "date-fns";
 
 const statusStyles = {
-  verified: "bg-green-100 text-green-800 border-green-200",
-  pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  inactive: "bg-gray-100 text-gray-800 border-gray-200",
+  verified: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  pending: "bg-amber-50 text-amber-700 border-amber-200",
+  inactive: "bg-muted text-foreground border-border",
 };
 
 // Helper function to safely format date
@@ -94,7 +94,7 @@ export function RecentEmployees() {
           {employeeList.map((employee) => (
             <div
               key={employee.id}
-              className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/60 transition-colors"
             >
               <div className="flex items-center gap-3">
                 <Avatar className="h-10 w-10 border">
@@ -121,7 +121,7 @@ export function RecentEmployees() {
                     "font-medium",
                     statusStyles[
                       employee.status as keyof typeof statusStyles
-                    ] || "bg-gray-100",
+                    ] || "bg-muted",
                   )}
                 >
                   {employee.status || "unknown"}

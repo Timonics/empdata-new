@@ -97,7 +97,7 @@ export function CreateFolderDialog({ open, onOpenChange }: CreateFolderDialogPro
                   "flex items-center gap-2 p-3 rounded-lg border-2 transition-all",
                   access === 'private'
                     ? "border-emerald-500 bg-emerald-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    : "border-border hover:border-gray-300"
                 )}
               >
                 <Lock className={cn(
@@ -106,7 +106,7 @@ export function CreateFolderDialog({ open, onOpenChange }: CreateFolderDialogPro
                 )} />
                 <span className={cn(
                   "text-sm font-medium",
-                  access === 'private' ? "text-emerald-600" : "text-gray-600"
+                  access === 'private' ? "text-emerald-600" : "text-muted-foreground"
                 )}>
                   Private
                 </span>
@@ -119,7 +119,7 @@ export function CreateFolderDialog({ open, onOpenChange }: CreateFolderDialogPro
                   "flex items-center gap-2 p-3 rounded-lg border-2 transition-all",
                   access === 'shared'
                     ? "border-emerald-500 bg-emerald-50"
-                    : "border-gray-200 hover:border-gray-300"
+                    : "border-border hover:border-gray-300"
                 )}
               >
                 <Users className={cn(
@@ -128,7 +128,7 @@ export function CreateFolderDialog({ open, onOpenChange }: CreateFolderDialogPro
                 )} />
                 <span className={cn(
                   "text-sm font-medium",
-                  access === 'shared' ? "text-emerald-600" : "text-gray-600"
+                  access === 'shared' ? "text-emerald-600" : "text-muted-foreground"
                 )}>
                   Shared
                 </span>

@@ -10,13 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { AuthCard } from "./auth-card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import { AuthService } from "@/services/auth.service";
@@ -82,7 +82,10 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
 
     try {
       // Pass the role to the service
-      const response = await AuthService.forgotPassword(data.email);
+      const response = await AuthService.forgotPassword(
+        data.email,
+        role === "admin" ? "admin" : "portal"
+      );
 
       if (response.success) {
         setSuccess(true);
@@ -108,10 +111,7 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
 
   if (success) {
     return (
-      <Card className={cn(
-        "w-full shadow-lg border-0",
-        isAdmin ? "border-blue-100" : "border-blue-100"
-      )}>
+      <AuthCard>
         <CardHeader>
           <div className="flex items-center gap-2">
             <CheckCircle className={cn(
@@ -129,16 +129,9 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Alert className={cn(
-            isAdmin ? "bg-blue-50 border-blue-200" : "bg-blue-50 border-blue-200"
-          )}>
-            <Mail className={cn(
-              "h-4 w-4",
-              isAdmin ? "text-blue-600" : "text-blue-600"
-            )} />
-            <AlertDescription className={cn(
-              isAdmin ? "text-blue-800" : "text-blue-800"
-            )}>
+          <Alert className="bg-brand-50 dark:bg-brand-950 border-brand-200 dark:border-brand-800">
+            <Mail className="h-4 w-4 text-brand-600 dark:text-brand-300" />
+            <AlertDescription className="text-brand-800 dark:text-brand-200">
               Click the link in the email to reset your password. The link will
               expire in 1 hour.
             </AlertDescription>
@@ -158,10 +151,7 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
           <Button 
             variant="outline" 
             onClick={() => setSuccess(false)}
-            className={cn(
-              isAdmin && "hover:bg-blue-50 hover:text-blue-600",
-              !isAdmin && "hover:bg-blue-50 hover:text-blue-600"
-            )}
+            className="hover:bg-brand-50 dark:hover:bg-brand-950 hover:text-brand-600 dark:hover:text-brand-300"
           >
             Try again
           </Button>
@@ -175,25 +165,15 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
             Back to login
           </Link>
         </CardFooter>
-      </Card>
+      </AuthCard>
     );
   }
 
   return (
-    <Card className={cn(
-      "w-full shadow-lg border-0",
-      isAdmin ? "border-blue-100" : "border-blue-100"
-    )}>
+    <AuthCard>
       <CardHeader>
         <CardTitle>
-          <h1
-            className={cn(
-              "text-2xl font-semibold tracking-tight bg-linear-to-r bg-clip-text text-transparent",
-              isAdmin
-                ? "from-blue-600 to-blue-800"
-                : "from-blue-600 to-blue-800",
-            )}
-          >
+          <h1 className="font-display text-2xl font-semibold tracking-tight text-foreground">
             {getTitle()}
           </h1>
         </CardTitle>
@@ -263,6 +243,6 @@ export function ForgotPasswordForm({ role }: ForgotPasswordFormProps) {
           Back to login
         </Link>
       </CardFooter>
-    </Card>
+    </AuthCard>
   );
 }

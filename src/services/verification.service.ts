@@ -161,6 +161,24 @@ export class VerificationService {
   }
 
   /**
+   * Get full registration detail (contains encrypted NIN which list
+   * endpoints may omit)
+   */
+  static async getRegistrationDetail(
+    type: "company" | "employee" | "individual",
+    id: number,
+  ) {
+    const base =
+      type === "company"
+        ? this.COMPANY_BASE
+        : type === "employee"
+          ? this.EMPLOYEE_BASE
+          : this.INDIVIDUAL_BASE;
+    const response = await api.get(`${base}/${id}`);
+    return response.data;
+  }
+
+  /**
    * Get documents for a specific registration
    */
   static async getRegistrationDocuments(
@@ -177,6 +195,27 @@ export class VerificationService {
    */
   static async verifyPublicNIN(encryptedNIN: EncryptedNIN) {
     const response = await api.post(`${this.PUBLIC_VERIFY_NIN}`, encryptedNIN);
+    return response.data;
+  }
+
+  /**
+   * Verify BVN (Public — no auth, nothing stored)
+   * POST /api/public/bvn/verify
+   */
+  static async verifyPublicBVN(encryptedBVN: { encrypted_bvn: string }) {
+    const response = await api.post("/api/public/bvn/verify", encryptedBVN);
+    return response.data;
+  }
+
+  /**
+   * Verify company against CAC registry (public — nothing stored)
+   * GET /api/public/cac/verify?rc_number=...&company_type=...
+   */
+  static async verifyPublicCAC(params: {
+    rc_number: string;
+    company_type: string;
+  }) {
+    const response = await api.get("/api/public/cac/verify", { params });
     return response.data;
   }
 

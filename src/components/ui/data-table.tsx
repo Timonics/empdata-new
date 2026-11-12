@@ -93,7 +93,7 @@ export function DataTable<T>({
             <Skeleton className="h-10 w-full max-w-sm" />
           </div>
         )}
-        <div className="rounded-lg border bg-white">
+        <div className="rounded-lg border bg-card">
           <div className="p-4 space-y-4">
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
@@ -108,15 +108,15 @@ export function DataTable<T>({
 
   if (!data.length) {
     return (
-      <div className="rounded-lg border bg-white">
+      <div className="rounded-lg border bg-card">
         <div className="flex flex-col items-center justify-center py-16 px-4">
-          <div className="rounded-full bg-gray-100 p-4 mb-4">
+          <div className="rounded-full bg-muted p-4 mb-4">
             <Search className="h-8 w-8 text-gray-400" />
           </div>
-          <p className="text-lg font-medium text-gray-900 mb-1">
+          <p className="text-lg font-medium text-foreground mb-1">
             No results found
           </p>
-          <p className="text-sm text-gray-500 text-center max-w-sm">
+          <p className="text-sm text-muted-foreground text-center max-w-sm">
             {emptyMessage}
           </p>
         </div>
@@ -152,15 +152,15 @@ export function DataTable<T>({
       )}
 
       {/* Table */}
-      <div className="rounded-lg border bg-white overflow-hidden">
+      <div className="rounded-lg border bg-card overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-50/80 hover:bg-gray-50/80">
+            <TableRow className="bg-muted/60/80 hover:bg-muted/60/80">
               {columns.map((column, index) => (
                 <TableHead
                   key={index}
                   className={cn(
-                    "h-12 px-4 text-xs font-medium text-gray-600 uppercase tracking-wider",
+                    "h-12 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider",
                     column.sortable && "cursor-pointer select-none",
                     column.className
                   )}
@@ -185,7 +185,7 @@ export function DataTable<T>({
               <TableRow
                 key={rowIndex}
                 className={cn(
-                  "hover:bg-gray-50/50 transition-colors",
+                  "hover:bg-muted/60/50 transition-colors",
                   onRowClick && "cursor-pointer"
                 )}
                 onClick={() => onRowClick?.(item)}
@@ -210,8 +210,8 @@ export function DataTable<T>({
 
       {/* Pagination */}
       {pagination && (
-        <div className="flex items-center justify-between px-2 py-4 bg-white rounded-lg border">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between px-2 py-4 bg-card rounded-lg border">
+          <div className="text-sm text-muted-foreground">
             {pagination.totalItems ? (
               <>
                 Showing{" "}
@@ -274,7 +274,7 @@ export function DataTable<T>({
                       "h-8 w-8 p-0",
                       pagination.currentPage === pageNum
                         ? "bg-blue-600 hover:bg-blue-700"
-                        : "text-gray-600 hover:bg-gray-100"
+                        : "text-muted-foreground hover:bg-muted"
                     )}
                   >
                     {pageNum}
