@@ -215,6 +215,10 @@ export default function PoliciesPage() {
               }
             : client.pagination
         }
+        onRowClick={(item) => {
+          setSelectedPolicy(item);
+          setShowDetailSheet(true);
+        }}
         emptyMessage="No policies found"
       />
 

@@ -64,7 +64,7 @@ export default function HomePage() {
 
           {/* Main Heading */}
           <h1 className="pops text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-            <span className="bg-linear-to-r from-blue-800 via-indigo-690 to-blue-600 bg-clip-text text-transparent bg-300% animate-gradient">
+            <span className="font-serif italic bg-linear-to-r from-blue-800 via-indigo-690 to-blue-600 bg-clip-text text-transparent bg-300% animate-gradient">
               Seamless Secure
             </span>
             <br />
@@ -236,72 +236,124 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="relative z-10 container mx-auto px-6 py-16">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
-          <span className="bg-linear-to-r from-blue-300 to-indigo-600 bg-clip-text text-transparent">
-            How It Works
-          </span>
-        </h2>
+      <section id="process" className="relative z-10 container mx-auto px-6 py-16">
+        <div className="relative overflow-hidden rounded-3xl border border-blue-100 bg-linear-to-b from-blue-50/80 via-white to-white px-6 py-14 md:px-12">
+          {/* soft decorative glow */}
+          <div className="pointer-events-none absolute -top-24 right-10 h-64 w-64 rounded-full bg-blue-100/60 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 left-10 h-64 w-64 rounded-full bg-indigo-100/50 blur-3xl" />
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-          {[
-            {
-              icon: FileCheck,
-              title: "1. Submit Information",
-              description:
-                "Fill in your details and upload required documents securely.",
-              color: "blue",
-            },
-            {
-              icon: ShieldCheck,
-              title: "2. Verification",
-              description:
-                "Your identity is verified through secure NIN/BVN checks.",
-              color: "indigo",
-            },
-            {
-              icon: HeartHandshake,
-              title: "3. Confirmation",
-              description:
-                "Receive instant confirmation and access your dashboard.",
-              color: "blue",
-            },
-          ].map((step, index) => (
-            <div key={index} className="text-center">
-              <div className="relative mb-6">
-                <div className="h-20 w-20 rounded-2xl bg-linear-to-br from-blue-100 to-indigo-100 flex items-center justify-center mx-auto">
-                  <step.icon className="h-8 w-8 text-blue-600" />
-                </div>
+          <div className="relative mb-12 text-center">
+            <p className="font-serif mb-3 text-xl text-blue-500 italic">
+              Simple by design.
+            </p>
+            <h2 className="pops text-3xl font-bold md:text-4xl">
+              <span className="bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                How It Works
+              </span>
+            </h2>
+          </div>
+
+          <div className="relative grid gap-10 md:grid-cols-3 md:gap-8">
+            {[
+              {
+                icon: FileCheck,
+                step: "01",
+                title: "Submit Information",
+                description:
+                  "Fill in your details and upload required documents securely.",
+                tile: "from-blue-500 to-blue-600",
+                chip: "bg-blue-50 text-blue-600",
+              },
+              {
+                icon: ShieldCheck,
+                step: "02",
+                title: "Verification",
+                description:
+                  "Your identity is verified through secure NIN/BVN checks.",
+                tile: "from-indigo-500 to-indigo-600",
+                chip: "bg-indigo-50 text-indigo-600",
+              },
+              {
+                icon: HeartHandshake,
+                step: "03",
+                title: "Confirmation",
+                description:
+                  "Receive instant confirmation and access your dashboard.",
+                tile: "from-sky-500 to-blue-600",
+                chip: "bg-sky-50 text-sky-600",
+              },
+            ].map((step, index) => (
+              <div key={index} className="relative text-center">
+                {/* connector line between steps */}
                 {index < 2 && (
-                  <div className="hidden md:block absolute top-10 left-[60%] w-full h-0.5 bg-linear-to-r from-blue-300 to-indigo-300"></div>
+                  <div className="absolute top-10 left-[calc(50%+3.5rem)] hidden h-px w-[calc(100%-7rem)] bg-linear-to-r from-blue-200 to-indigo-200 md:block" />
                 )}
+
+                <div className="relative mx-auto mb-5 flex h-20 w-20 items-center justify-center">
+                  <div
+                    className={`flex h-full w-full items-center justify-center rounded-2xl bg-linear-to-br ${step.tile} shadow-lg shadow-blue-600/20`}
+                  >
+                    <step.icon className="h-8 w-8 text-white" />
+                  </div>
+                  <span
+                    className={`absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-bold ${step.chip} ring-4 ring-white`}
+                  >
+                    {step.step}
+                  </span>
+                </div>
+
+                <h3 className="pops mb-2 text-lg font-semibold text-gray-900">
+                  {step.title}
+                </h3>
+                <p className="mx-auto max-w-55 text-sm leading-relaxed text-gray-600">
+                  {step.description}
+                </p>
               </div>
-              <h3 className="text-xl font-bold mb-2">{step.title}</h3>
-              <p className="text-gray-600">{step.description}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* CTA Section */}
       <section className="relative z-10 container mx-auto px-6 py-16">
-        <div className="text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Ready to Get Started?
-          </h2>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join thousands of users who trust EMPDATA for their insurance
-            onboarding needs.
-          </p>
-          <Link href="/onboarding">
-            <Button
-              size="lg"
-              className="bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-6 text-lg shadow-lg"
-            >
-              Start Your Onboarding Journey
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </Link>
+        <div className="relative overflow-hidden rounded-3xl bg-linear-to-r from-blue-700 via-blue-600 to-indigo-600 px-6 py-16 text-center text-white shadow-xl shadow-blue-600/20 md:py-20">
+          {/* decorative circles */}
+          <div className="pointer-events-none absolute -top-20 -left-20 h-64 w-64 rounded-full bg-white/10" />
+          <div className="pointer-events-none absolute -right-16 -bottom-24 h-72 w-72 rounded-full bg-white/10" />
+          <div className="pointer-events-none absolute top-1/2 left-1/4 h-40 w-40 -translate-y-1/2 rounded-full bg-indigo-400/20 blur-2xl" />
+
+          <div className="relative">
+            <p className="font-serif mb-4 text-2xl text-blue-100 italic">
+              Ready when you are.
+            </p>
+            <h2 className="pops mx-auto max-w-2xl text-3xl font-bold md:text-5xl">
+              Ready to Get Started?
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-lg text-blue-100">
+              Join thousands of users who trust EMPDATA for their insurance
+              onboarding needs.
+            </p>
+            <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link href="/onboarding">
+                <Button
+                  size="lg"
+                  className="bg-white px-8 py-6 text-lg font-semibold text-blue-700 shadow-lg hover:bg-blue-50"
+                >
+                  Start Your Onboarding Journey
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="/portal/auth">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white/40 px-8 py-6 text-lg text-white hover:bg-white/10 hover:text-white"
+                >
+                  Portal Login
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 

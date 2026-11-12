@@ -410,7 +410,7 @@ export function CompaniesTable({
             : client.pagination
         }
         emptyMessage="No companies found"
-        // onRowClick={(item) => handleView(item)}
+        onRowClick={(item) => handleView(item)}
       />
 
       {/* Company Drawer for View/Edit */}

@@ -520,6 +520,11 @@ export function EmployeeGroupLifeRegistrations() {
                 }
               : client.pagination
           }
+          onRowClick={(item: any) => {
+            setDrawerRegistration(item);
+            setDrawerMode("view");
+            setInitialTab("details");
+          }}
           emptyMessage="No employee group life registrations found"
         />
       </div>

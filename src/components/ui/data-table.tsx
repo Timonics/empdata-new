@@ -188,7 +188,18 @@ export function DataTable<T>({
                   "hover:bg-muted/60/50 transition-colors",
                   onRowClick && "cursor-pointer"
                 )}
-                onClick={() => onRowClick?.(item)}
+                onClick={(e) => {
+                  // Ignore clicks on interactive elements inside the row
+                  // (action buttons, checkboxes, links) so they keep working
+                  if (
+                    (e.target as HTMLElement).closest(
+                      "button, a, input, select, [role='button'], [role='checkbox'], [role='menuitem'], [data-no-row-click]"
+                    )
+                  ) {
+                    return;
+                  }
+                  onRowClick?.(item);
+                }}
               >
                 {columns.map((column, colIndex) => (
                   <TableCell

@@ -529,6 +529,7 @@ export function NINVerifications() {
             totalItems: verifications.length,
             onPageChange: setPage,
           }}
+          onRowClick={(item: any) => setDrawerVerification(item)}
           emptyMessage={
             filter === "pending_admin"
               ? "No pending admin verifications. All NINs have been processed."

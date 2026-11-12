@@ -494,6 +494,11 @@ export function CorporateRegistrations() {
                 }
               : client.pagination
           }
+          onRowClick={(item: any) => {
+            setDrawerRegistration(item);
+            setDrawerMode("view");
+            setInitialTab("details");
+          }}
           emptyMessage="No corporate registrations found"
         />
       </div>

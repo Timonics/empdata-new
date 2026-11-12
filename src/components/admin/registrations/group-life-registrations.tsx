@@ -481,6 +481,11 @@ export function GroupLifeRegistrations() {
             totalItems: data.pagination.total,
             onPageChange: handlePageChange,
           } : client.pagination}
+          onRowClick={(item: any) => {
+            setDrawerRegistration(item);
+            setDrawerMode("view");
+            setInitialTab("details");
+          }}
           emptyMessage="No group life registrations found"
           // onRowClick={(item) => {
           //   setDrawerRegistration(item);

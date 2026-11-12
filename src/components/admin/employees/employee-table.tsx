@@ -342,6 +342,10 @@ export function EmployeesTable({
               }
             : client.pagination
         }
+        onRowClick={(item: any) => {
+          setDrawerEmployee(item);
+          setDrawerMode("view");
+        }}
         emptyMessage="No employees found"
       />
 

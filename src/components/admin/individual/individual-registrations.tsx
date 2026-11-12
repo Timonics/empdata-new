@@ -637,6 +637,11 @@ export function IndividualRegistrations() {
                 }
               : client.pagination
           }
+          onRowClick={(item: any) => {
+            setDrawerRegistration(item);
+            setDrawerMode("view");
+            setInitialTab("details");
+          }}
           emptyMessage="No individual registrations found"
         />
       </div>
